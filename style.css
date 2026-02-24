@@ -1,1 +1,7 @@
-
+#navigationBar{
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-top: 10px;
+  color: lightblue;
+}
