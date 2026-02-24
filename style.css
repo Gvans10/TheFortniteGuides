@@ -4,4 +4,15 @@
   gap: 10px;
   margin-top: 10px;
   color: lightblue;
+  background-color: grey;
+  border-radius: 0 0 5px 5px;
+  font-family: helvetica;
+  
+  
+}
+
+#navigationBar button{
+  background-color: yellow;
+  color: black;
+  font-size: 25px;
 }
