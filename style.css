@@ -13,9 +13,13 @@
 
 #navigationBar button{
   background-color: yellow;
-  color: black;
+  color: white;
   font-size: 25px;
 }
 body{
   background-color: black;
+}
+
+h1{
+  color: white;
 }
