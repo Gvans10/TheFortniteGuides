@@ -1,26 +1,134 @@
-#navigationBar {
-  display: flex;
-  flex-direction: row;
-  justify-content: center; /* Centers everything horizontally */
-  align-items: center;     /* Aligns buttons and H1 vertically */
-  gap: 15px;
-  margin-top: 0;           /* Cleaned up top margin */
-  background-color: grey;
-  border-radius: 0 0 5px 5px;
-  font-family: helvetica;
-  padding: 10px;           /* Added padding so it's not cramped */
-}
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,900;1,900&family=Rajdhani:wght@500;700&display=swap');
 
-#navigationBar button {
-  background-color: yellow;
-  color: black;            /* Changed to black; white on yellow is hard to read! */
-  font-size: 20px;
-  cursor: pointer;
-  border: none;
-  border-radius: 4px;
+:root {
+    --primary: #00f2ff;
+    --bg-dark: #05070a;
+    --card-bg: rgba(15, 20, 30, 0.6);
 }
 
 body {
-  background-color: black;
-  margin: 0;               /* Removes the default white gap around the edge */
+    background-color: var(--bg-dark);
+    margin: 0;
+    color: white;
+    font-family: 'Rajdhani', sans-serif;
 }
+
+/* Background HUD Grid */
+.grid-overlay {
+    position: fixed;
+    inset: 0;
+    background-image: 
+        linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    z-index: -1;
+    mask-image: radial-gradient(circle, black 40%, transparent 90%);
+}
+
+/* Sticky Header Logic */
+.sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+#navigationBar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 25px;
+    background: rgba(5, 7, 10, 0.95); /* Semi-transparent for glass effect */
+    backdrop-filter: blur(10px);
+}
+
+.nav-group { display: flex; gap: 12px; }
+
+#navigationBar h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-style: italic;
+    font-size: 2.4rem;
+    margin: 0 45px;
+    text-transform: uppercase;
+    color: #fff;
+    letter-spacing: -2px;
+    text-shadow: 0 1px 0 #ccc, 0 4px 10px rgba(0, 242, 255, 0.3);
+}
+
+.nav-btn {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    border: 1px solid rgba(0, 242, 255, 0.3);
+    padding: 12px 28px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    clip-path: polygon(15% 0%, 100% 0%, 85% 100%, 0% 100%);
+}
+
+.nav-btn:hover {
+    background: var(--primary);
+    color: #000;
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 0 20px var(--primary);
+}
+
+/* The Energy Rail - Now follows the scroll */
+.nav-line {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        var(--primary) 50%, 
+        transparent 100%
+    );
+    box-shadow: 0px 0px 15px var(--primary);
+    animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; box-shadow: 0px 0px 10px var(--primary); }
+    50% { opacity: 1; box-shadow: 0px 0px 20px var(--primary); }
+    100% { opacity: 0.6; box-shadow: 0px 0px 10px var(--primary); }
+}
+
+/* Content Modules */
+#contentContainer {
+    max-width: 950px;
+    margin: 60px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 0 20px;
+}
+
+.data-module {
+    display: flex;
+    align-items: center;
+    background: var(--card-bg);
+    border-left: 4px solid #222;
+    padding: 25px 40px;
+    backdrop-filter: blur(10px);
+    transition: 0.4s;
+}
+
+.data-module:hover {
+    border-left-color: var(--primary);
+    background: rgba(0, 242, 255, 0.08);
+    transform: translateX(15px);
+}
+
+.module-header { display: flex; align-items: center; min-width: 280px; }
+.module-number { font-size: 0.7rem; color: var(--primary); margin-right: 15px; opacity: 0.5; }
+.module-header h1 { font-size: 1.1rem; text-transform: uppercase; margin: 0; }
+
+.module-content p {
+    margin: 0;
+    color: #aaa;
+    border-left: 1px solid rgba(255,255,255,0.1);
+    padding-left: 25px;
+}
+
+.feature { border-left-color: var(--primary); background: linear-gradient(90deg, rgba(0, 242, 255, 0.1), transparent); }
