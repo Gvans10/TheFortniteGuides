@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Fortnite Guides | Pro Elite</title>
+    <title>The Fortnite Guides</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,15 +12,16 @@
     <header class="sticky-header">
         <nav id="navigationBar">
             <div class="nav-group">
-                <button class="nav-btn">Building</button>
-                <button class="nav-btn">Editing</button>
+                <a class="nav-btn" id="homeBtn" href="index.html">Home</a>
+                <a class="nav-btn" href="Subpages/building.html">Building</a>
+                <a class="nav-btn" href="Subpages/editing.html">Editing</a>
             </div>
             <div class="title-container">
                 <h1>Fortnite Guides</h1>
             </div>
             <div class="nav-group">
-                <button class="nav-btn">Keybinds</button>
-                <button class="nav-btn">Videos</button>
+                <a class="nav-btn" href="Subpages/keybinds.html">Keybinds</a>
+                <a class="nav-btn" href="Subpages/videos.html">Videos</a>
             </div>
         </nav>
         <div class="nav-line"></div>
@@ -31,7 +32,7 @@
             <div class="module-header">
                 <span class="module-number">01</span>
                 <h1>Skill Improvement</h1>
-                <button id="compactBtn">Get started</button>
+                <a id="compactBtn" class="startBtn" href="Subpages/gallery.html">Get started</a>
             </div>
             <div class="module-content">
                 <p>Unlock <strong>mechanical secrets</strong> from <em>Tier 1 Pros</em>. Master elite techniques used by <strong>Peterbot</strong>, <strong>Bugha</strong>, and <strong>Clix</strong>.</p>
@@ -42,7 +43,7 @@
             <div class="module-header">
                 <span class="module-number">02</span>
                 <h1>Building Evolution</h1>
-                <button id="compactBtn">practice</button>
+                <a id="compactBtn" class="buildBtn" href="Subpages/building.html">practice</a>
             </div>
             <div class="module-content">
                 <p><strong>Advanced crosshair placement</strong> and <strong>piece-control maps</strong> to <em>consistently</em> improve building for <strong>competitive scenarios</strong>.</p>
@@ -53,7 +54,7 @@
             <div class="module-header">
                 <span class="module-number">03</span>
                 <h1>Editing Mechanics</h1>
-                <button id="compactBtn">boost speed</button>
+                <a id="compactBtn" class="editBtn" href="Subpages/editing.html">boost speed</a>
             </div>
             <div class="module-content">
                 <p>Master editing speed through <strong>optimal sensitivity</strong> and specialized maps designed to reach <strong>Peterbot-level</strong> speeds.</p>
@@ -64,7 +65,7 @@
             <div class="module-header">
                 <span class="module-number">04</span>
                 <h1>Keybinds</h1>
-                <button id="compactBtn">view pro setups</button>
+                <a id="compactBtn" class="keybindBtn" href="Subpages/keybinds.html">View pro setups</a>
             </div>
             <div class="module-content">
                 <p>Access over 20 <strong>Tier 1 Pro setups</strong>. Optimize your layout to eliminate <strong>input delay</strong> and movement conflicts.</p>
@@ -75,7 +76,7 @@
             <div class="module-header">
                 <span class="module-number">05</span>
                 <h1>Pro Videos</h1>
-                <button id="compactBtn">View breakdowns</button>
+                <a id="compactBtn" class="videoBtn" href="Subpages/videos.html">View breakdowns</a>
             </div>
             <div class="module-content">
                 <p><strong>Custom-made</strong> video breakdowns of <strong>Peterbot</strong>, <strong>Pollo</strong>, and <strong>Clix</strong> showcasing secret fighting techniques.</p>
@@ -83,6 +84,37 @@
         </section>
         
         <div style="height: 10vh;"></div>
+        
+        <footer id="tactical-footer">
+            <div id="footer-titles">
+                <h1 id="firstFoot">About Us</h1>
+                <h1 id="secondFoot">Contact Us</h1>
+            </div>
+            <div id="first-linkset">
+                <a href="">Our Story</a>
+                <a href="">Partnerships</a>
+                <a href="">The Goal</a>
+            </div>
+            <div id="second-linkset">
+                <a href="">Discord</a>
+                <a href="">Email</a>
+                <a href="">Instagram</a>
+                <a href="">TikTok</a>
+                <a href="">YouTube</a>
+                
+            </div>
+            <div id="bottom-footer">
+                <h1>Fortnite Guides</h1>
+                <a href="">Privacy Policies</a>
+                <a href="">Terms & Conditions</a>
+
+            </div>
+            
+            
+            
+        </footer>
     </main>
+    
+    <script src="index.js"></script>
 </body>
 </html>
