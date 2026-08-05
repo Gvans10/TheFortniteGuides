@@ -12,6 +12,7 @@
 <title>
 Grayson's Snack Shop Admin
 </title>
+
 <link rel="icon" type="image/png" href="graysonslogos.png">
 
 <link rel="stylesheet" href="style.css">
@@ -50,8 +51,6 @@ Back To Shop
 
 
 
-
-
 <section class="admin-section">
 
 
@@ -70,32 +69,20 @@ Owner Access Only
 
 
 
-
-
 <input
-
 id="username"
-
 type="text"
-
 placeholder="Username"
-
 >
-
 
 
 
 
 <input
-
 id="password"
-
 type="password"
-
 placeholder="Password"
-
 >
-
 
 
 
@@ -109,14 +96,11 @@ Login
 
 
 
-
 <p id="loginMessage"></p>
 
 
 
 </div>
-
-
 
 
 
@@ -142,67 +126,44 @@ Add New Product
 
 
 
-
 <input
-
 id="newName"
-
 placeholder="Product Name"
-
 >
 
 
 
 
-
 <input
-
 id="newPrice"
-
 type="number"
-
 placeholder="Price"
-
 >
 
 
 
 
-
 <input
-
 id="newStock"
-
 type="number"
-
 placeholder="Stock Amount"
-
 >
 
 
 
 
-
 <input
-
 id="newRestock"
-
 placeholder="Restock Date"
-
 >
-
 
 
 
 
 <input
-
 id="newImage"
-
-placeholder="Image Filename (example: chips.png)"
-
+placeholder="Image Filename"
 >
-
 
 
 
@@ -218,8 +179,6 @@ Add Product
 
 
 
-
-
 <h2>
 Current Products
 </h2>
@@ -228,7 +187,6 @@ Current Products
 
 
 <div id="adminProducts"></div>
-
 
 
 
@@ -255,13 +213,7 @@ Logout
 
 
 
-
-
-<script src="inventory.js"></script>
-
-<script src="admin.js"></script>
-
-
+<script type="module" src="admin.js"></script>
 
 
 </body>
