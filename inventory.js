@@ -6,7 +6,6 @@ Shared Product Storage
 ==========================================================
 */
 
-
 const defaultInventory = [
 
     {
@@ -18,16 +17,14 @@ const defaultInventory = [
         image: "redtakifiesta.png"
     },
 
-
     {
         id: 2,
         name: "Taki Blue Fiesta",
         price: 8.00,
         stock: 8,
         restock: "8/9/2026",
-        icon: "🔵"
+        image: "bluetakifiesta.png"
     },
-
 
     {
         id: 3,
@@ -35,9 +32,8 @@ const defaultInventory = [
         price: 1.00,
         stock: 50,
         restock: "8/9/2026",
-        icon: "🌶️"
+        image: "redtakismall.png"
     },
-
 
     {
         id: 4,
@@ -45,9 +41,8 @@ const defaultInventory = [
         price: 1.00,
         stock: 50,
         restock: "8/9/2026",
-        icon: "🔵"
+        image: "bluetakismall.png"
     },
-
 
     {
         id: 5,
@@ -55,9 +50,8 @@ const defaultInventory = [
         price: 5.00,
         stock: 5,
         restock: "8/9/2026",
-        icon: "🍬"
+        image: "bluenerdcluster.png"
     },
-
 
     {
         id: 6,
@@ -65,9 +59,8 @@ const defaultInventory = [
         price: 3.00,
         stock: 4,
         restock: "8/9/2026",
-        icon: "🍭"
+        image: "mikenike.png"
     },
-
 
     {
         id: 7,
@@ -75,9 +68,8 @@ const defaultInventory = [
         price: 6.00,
         stock: 4,
         restock: "8/9/2026",
-        icon: "🥤"
+        image: "redbullwhite.png"
     },
-
 
     {
         id: 8,
@@ -85,9 +77,8 @@ const defaultInventory = [
         price: 6.00,
         stock: 4,
         restock: "8/9/2026",
-        icon: "🔴"
+        image: "redbullred.png"
     },
-
 
     {
         id: 9,
@@ -95,9 +86,8 @@ const defaultInventory = [
         price: 2.00,
         stock: 4,
         restock: "8/9/2026",
-        icon: "🥭"
+        image: "arizonamango.png"
     },
-
 
     {
         id: 10,
@@ -105,64 +95,34 @@ const defaultInventory = [
         price: 2.00,
         stock: 4,
         restock: "8/9/2026",
-        icon: "🍒"
+        image: "arizonafruitpunch.png"
     }
 
 ];
 
+function loadInventory() {
 
+    const saved = localStorage.getItem("snackInventory");
 
-
-
-// Load inventory from browser storage
-
-function loadInventory(){
-
-    let saved = localStorage.getItem("snackInventory");
-
-
-    if(saved){
-
+    if (saved) {
         return JSON.parse(saved);
-
     }
 
-
     localStorage.setItem(
-
         "snackInventory",
-
         JSON.stringify(defaultInventory)
-
     );
-
 
     return defaultInventory;
-
 }
 
-
-
-
-
-// Save inventory changes
-
-function saveInventory(products){
+function saveInventory(products) {
 
     localStorage.setItem(
-
         "snackInventory",
-
         JSON.stringify(products)
-
     );
 
 }
-
-
-
-
-
-// This is what script.js and admin.js use
 
 let inventory = loadInventory();
