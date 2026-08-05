@@ -2,9 +2,18 @@
 ==========================================================
 Grayson's Snack Shop
 inventory.js
-Shared Product Storage
+Firebase Product Storage
 ==========================================================
 */
+
+import { db } from "./firebase.js";
+import { 
+    collection,
+    getDocs,
+    setDoc,
+    doc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
 
 const defaultInventory = [
 
@@ -42,87 +51,50 @@ const defaultInventory = [
         stock: 50,
         restock: "8/9/2026",
         image: "bluetakismall.png"
-    },
-
-    {
-        id: 5,
-        name: "Blue Nerd Clusters 8oz Bag",
-        price: 5.00,
-        stock: 5,
-        restock: "8/9/2026",
-        image: "bluenerdcluster.png"
-    },
-
-    {
-        id: 6,
-        name: "Mike N Ike 5oz Box",
-        price: 3.00,
-        stock: 4,
-        restock: "8/9/2026",
-        image: "mikenike.png"
-    },
-
-    {
-        id: 7,
-        name: "Red Bull White",
-        price: 6.00,
-        stock: 4,
-        restock: "8/9/2026",
-        image: "redbullwhite.png"
-    },
-
-    {
-        id: 8,
-        name: "Red Bull Red",
-        price: 6.00,
-        stock: 4,
-        restock: "8/9/2026",
-        image: "redbullred.png"
-    },
-
-    {
-        id: 9,
-        name: "Arizona Mango Can",
-        price: 2.00,
-        stock: 4,
-        restock: "8/9/2026",
-        image: "arizonamango.png"
-    },
-
-    {
-        id: 10,
-        name: "Arizona Fruit Punch Can",
-        price: 2.00,
-        stock: 4,
-        restock: "8/9/2026",
-        image: "arizonafruitpunch.png"
     }
 
+    // Keep the rest of your products here
 ];
 
-function loadInventory() {
 
-    const saved = localStorage.getItem("snackInventory");
+const inventoryRef = collection(db, "inventory");
 
-    if (saved) {
-        return JSON.parse(saved);
+
+// Upload products to Firebase
+async function uploadInventory() {
+
+    for (const product of defaultInventory) {
+
+        await setDoc(
+            doc(inventoryRef, product.id.toString()),
+            product
+        );
+
     }
 
-    localStorage.setItem(
-        "snackInventory",
-        JSON.stringify(defaultInventory)
-    );
-
-    return defaultInventory;
+    console.log("Inventory uploaded to Firebase");
 }
 
-function saveInventory(products) {
 
-    localStorage.setItem(
-        "snackInventory",
-        JSON.stringify(products)
-    );
+// Load products from Firebase
+async function loadInventory() {
 
+    const snapshot = await getDocs(inventoryRef);
+
+    let products = [];
+
+    snapshot.forEach((doc) => {
+        products.push({
+            id: doc.id,
+            ...doc.data()
+        });
+    });
+
+
+    console.log("Firebase Inventory:", products);
+
+    return products;
 }
 
-let inventory = loadInventory();
+
+loadInventory();
