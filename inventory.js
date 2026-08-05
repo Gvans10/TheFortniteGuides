@@ -6,95 +6,143 @@ Firebase Product Storage
 ==========================================================
 */
 
+
 import { db } from "./firebase.js";
-import { 
+
+import {
     collection,
     getDocs,
+    doc,
     setDoc,
-    doc
+    updateDoc,
+    deleteDoc
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 
-const defaultInventory = [
 
-    {
-        id: 1,
-        name: "Taki Red Fiesta",
-        price: 8.00,
-        stock: 8,
-        restock: "8/9/2026",
-        image: "redtakifiesta.png"
-    },
 
-    {
-        id: 2,
-        name: "Taki Blue Fiesta",
-        price: 8.00,
-        stock: 8,
-        restock: "8/9/2026",
-        image: "bluetakifiesta.png"
-    },
-
-    {
-        id: 3,
-        name: "Taki Red 1oz Bag",
-        price: 1.00,
-        stock: 50,
-        restock: "8/9/2026",
-        image: "redtakismall.png"
-    },
-
-    {
-        id: 4,
-        name: "Taki Blue 1oz Bag",
-        price: 1.00,
-        stock: 50,
-        restock: "8/9/2026",
-        image: "bluetakismall.png"
-    }
-
-    // Keep the rest of your products here
-];
-
+// Firestore inventory collection
 
 const inventoryRef = collection(db, "inventory");
 
 
-// Upload products to Firebase
-async function uploadInventory() {
 
-    for (const product of defaultInventory) {
+// Current inventory
 
-        await setDoc(
-            doc(inventoryRef, product.id.toString()),
-            product
-        );
-
-    }
-
-    console.log("Inventory uploaded to Firebase");
-}
+let inventory = [];
 
 
-// Load products from Firebase
+
+
+// Load inventory from Firebase
+
 async function loadInventory() {
+
+
+    inventory = [];
+
 
     const snapshot = await getDocs(inventoryRef);
 
-    let products = [];
 
-    snapshot.forEach((doc) => {
-        products.push({
-            id: doc.id,
-            ...doc.data()
+
+    snapshot.forEach((item) => {
+
+
+        inventory.push({
+
+            id: Number(item.id),
+
+            ...item.data()
+
         });
+
+
     });
 
 
-    console.log("Firebase Inventory:", products);
 
-    return products;
+    console.log("Firebase Inventory Loaded:", inventory);
+
+
+
+    return inventory;
+
+
 }
 
 
-loadInventory();
+
+
+
+// Save product changes
+
+async function saveProduct(product) {
+
+
+    await updateDoc(
+
+        doc(db, "inventory", product.id.toString()),
+
+        product
+
+    );
+
+
+}
+
+
+
+
+
+// Add new product
+
+async function addProduct(product) {
+
+
+    await setDoc(
+
+        doc(db, "inventory", product.id.toString()),
+
+        product
+
+    );
+
+
+}
+
+
+
+
+
+// Delete product
+
+async function deleteProduct(id) {
+
+
+    await deleteDoc(
+
+        doc(db, "inventory", id.toString())
+
+    );
+
+
+}
+
+
+
+
+
+export {
+
+    inventory,
+
+    loadInventory,
+
+    saveProduct,
+
+    addProduct,
+
+    deleteProduct
+
+};
