@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>
+Grayson's Snack Shop Admin
+</title>
+
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+
+
+<body>
+
+
+<header>
+
+<nav class="navbar">
+
+
+<div class="logo">
+
+🍬 Admin Panel
+
+</div>
+
+
+<a href="index.html">
+
+Back To Shop
+
+</a>
+
+
+</nav>
+
+</header>
+
+
+
+
+
+<section class="admin-section">
+
+
+
+<div id="loginBox" class="admin-box">
+
+
+<h1>
+Admin Login
+</h1>
+
+
+<p>
+Owner Access Only
+</p>
+
+
+
+<input
+
+id="username"
+
+type="text"
+
+placeholder="Username"
+
+>
+
+
+
+<input
+
+id="password"
+
+type="password"
+
+placeholder="Password"
+
+>
+
+
+
+<button id="loginButton">
+
+Login
+
+</button>
+
+
+
+<p id="loginMessage"></p>
+
+
+</div>
+
+
+
+
+
+
+
+<div id="dashboard" class="admin-box hidden">
+
+
+
+<h1>
+Inventory Dashboard
+</h1>
+
+
+
+<h2>
+Add New Product
+</h2>
+
+
+
+
+<input
+
+id="newName"
+
+placeholder="Product Name"
+
+>
+
+
+
+<input
+
+id="newPrice"
+
+type="number"
+
+placeholder="Price"
+
+>
+
+
+
+<input
+
+id="newStock"
+
+type="number"
+
+placeholder="Stock Amount"
+
+>
+
+
+
+<input
+
+id="newRestock"
+
+placeholder="Restock Date"
+
+>
+
+
+
+<input
+
+id="newIcon"
+
+placeholder="Emoji Icon"
+
+>
+
+
+
+<button id="addProduct">
+
+Add Product
+
+</button>
+
+
+
+
+
+
+<h2>
+Current Products
+</h2>
+
+
+
+<div id="adminProducts"></div>
+
+
+
+<button id="logout">
+
+Logout
+
+</button>
+
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+<script src="inventory.js"></script>
+
+<script src="admin.js"></script>
+
+
+
+</body>
+
+</html>
