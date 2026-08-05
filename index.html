@@ -1,120 +1,567 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Fortnite Guides</title>
-    <link rel="stylesheet" href="style.css">
+
+
+<meta charset="UTF-8">
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>
+Grayson's Snack Shop | Uplift Elevate Preparatory
+</title>
+
+
+
+<link rel="stylesheet" href="style.css">
+
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+
+
 </head>
+
+
+
+
+
 <body>
-    <div class="grid-overlay"></div>
 
-    <header class="sticky-header">
-        <nav id="navigationBar">
-            <div class="nav-group">
-                <a class="nav-btn" id="homeBtn" href="index.html">Home</a>
-                <a class="nav-btn" href="Subpages/building.html">Building</a>
-                <a class="nav-btn" href="Subpages/editing.html">Editing</a>
-            </div>
-            <div class="title-container">
-                <h1>Fortnite Guides</h1>
-            </div>
-            <div class="nav-group">
-                <a class="nav-btn" href="Subpages/keybinds.html">Keybinds</a>
-                <a class="nav-btn" href="Subpages/videos.html">Videos</a>
-            </div>
-        </nav>
-        <div class="nav-line"></div>
-    </header>
-    
-    <main id="contentContainer">
-        <section class="data-module feature">
-            <div class="module-header">
-                <span class="module-number">01</span>
-                <h1>Skill Improvement</h1>
-                <a id="compactBtn" class="startBtn" href="Subpages/gallery.html">Get started</a>
-            </div>
-            <div class="module-content">
-                <p>Unlock <strong>mechanical secrets</strong> from <em>Tier 1 Pros</em>. Master elite techniques used by <strong>Peterbot</strong>, <strong>Bugha</strong>, and <strong>Clix</strong>.</p>
-            </div>
-        </section>
 
-        <section class="data-module">
-            <div class="module-header">
-                <span class="module-number">02</span>
-                <h1>Building Evolution</h1>
-                <a id="compactBtn" class="buildBtn" href="Subpages/building.html">practice</a>
-            </div>
-            <div class="module-content">
-                <p><strong>Advanced crosshair placement</strong> and <strong>piece-control maps</strong> to <em>consistently</em> improve building for <strong>competitive scenarios</strong>.</p>
-            </div>
-        </section>
 
-        <section class="data-module">
-            <div class="module-header">
-                <span class="module-number">03</span>
-                <h1>Editing Mechanics</h1>
-                <a id="compactBtn" class="editBtn" href="Subpages/editing.html">boost speed</a>
-            </div>
-            <div class="module-content">
-                <p>Master editing speed through <strong>optimal sensitivity</strong> and specialized maps designed to reach <strong>Peterbot-level</strong> speeds.</p>
-            </div>
-        </section>
 
-        <section class="data-module">
-            <div class="module-header">
-                <span class="module-number">04</span>
-                <h1>Keybinds</h1>
-                <a id="compactBtn" class="keybindBtn" href="Subpages/keybinds.html">View pro setups</a>
-            </div>
-            <div class="module-content">
-                <p>Access over 20 <strong>Tier 1 Pro setups</strong>. Optimize your layout to eliminate <strong>input delay</strong> and movement conflicts.</p>
-            </div>
-        </section>
 
-        <section class="data-module">
-            <div class="module-header">
-                <span class="module-number">05</span>
-                <h1>Pro Videos</h1>
-                <a id="compactBtn" class="videoBtn" href="Subpages/videos.html">View breakdowns</a>
-            </div>
-            <div class="module-content">
-                <p><strong>Custom-made</strong> video breakdowns of <strong>Peterbot</strong>, <strong>Pollo</strong>, and <strong>Clix</strong> showcasing secret fighting techniques.</p>
-            </div>
-        </section>
-        
-        <div style="height: 10vh;"></div>
-        
-        <footer id="tactical-footer">
-            <div id="footer-titles">
-                <h1 id="firstFoot">About Us</h1>
-                <h1 id="secondFoot">Contact Us</h1>
-            </div>
-            <div id="first-linkset">
-                <a href="">Our Story</a>
-                <a href="">Partnerships</a>
-                <a href="">The Goal</a>
-            </div>
-            <div id="second-linkset">
-                <a href="">Discord</a>
-                <a href="">Email</a>
-                <a href="">Instagram</a>
-                <a href="">TikTok</a>
-                <a href="">YouTube</a>
-                
-            </div>
-            <div id="bottom-footer">
-                <h1>Fortnite Guides</h1>
-                <a href="">Privacy Policies</a>
-                <a href="">Terms & Conditions</a>
+<header>
 
-            </div>
-            
-            
-            
-        </footer>
-    </main>
-    
-    <script src="index.js"></script>
+
+<nav class="navbar">
+
+
+
+<div class="logo">
+
+🍬 Grayson's Snack Shop
+
+</div>
+
+
+
+
+
+<ul class="nav-links">
+
+
+<li>
+<a href="#home">
+Home
+</a>
+</li>
+
+
+
+<li>
+<a href="#products">
+Products
+</a>
+</li>
+
+
+
+<li>
+<a href="#inventory">
+Stock
+</a>
+</li>
+
+
+
+<li>
+<a href="#contact">
+Contact
+</a>
+</li>
+
+
+
+<li>
+
+<a href="admin.html">
+
+🔐 Admin
+
+</a>
+
+</li>
+
+
+
+</ul>
+
+
+
+
+
+<button id="darkModeButton">
+
+🌙
+
+</button>
+
+
+
+
+</nav>
+
+
+</header>
+
+
+
+
+
+
+
+
+<section id="home" class="hero">
+
+
+
+<div class="hero-text">
+
+
+
+<h1>
+
+Grayson's Snack Shop
+
+</h1>
+
+
+
+
+<h2>
+
+Uplift Elevate Preparatory
+
+</h2>
+
+
+
+
+<p>
+
+Affordable snacks and drinks for students.
+
+Check what is available and when new items are arriving.
+
+</p>
+
+
+
+
+
+<a href="#products" class="heroButton">
+
+View Snacks
+
+</a>
+
+
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section class="stats">
+
+
+
+<div class="stat">
+
+
+<h2 id="totalProducts">
+
+0
+
+</h2>
+
+
+<p>
+
+Available Products
+
+</p>
+
+
+</div>
+
+
+
+
+
+<div class="stat">
+
+
+<h2 id="itemsInStock">
+
+0
+
+</h2>
+
+
+<p>
+
+Items Available
+
+</p>
+
+
+</div>
+
+
+
+
+
+<div class="stat">
+
+
+<h2>
+
+📦
+
+</h2>
+
+
+<p>
+
+Regular Restocks
+
+</p>
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section id="products">
+
+
+
+<h2 class="section-title">
+
+Snacks & Drinks
+
+</h2>
+
+
+
+
+
+<div class="searchBar">
+
+
+<input
+
+type="text"
+
+id="searchInput"
+
+placeholder="Search snacks..."
+
+>
+
+
+</div>
+
+
+
+
+
+
+<div id="productContainer" class="product-grid">
+
+
+</div>
+
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section id="inventory">
+
+
+
+<h2 class="section-title">
+
+Current Stock
+
+</h2>
+
+
+
+
+
+<div class="table-container">
+
+
+
+<table>
+
+
+
+<thead>
+
+
+<tr>
+
+
+<th>
+Item
+</th>
+
+
+<th>
+Price
+</th>
+
+
+<th>
+Available
+</th>
+
+
+<th>
+Status
+</th>
+
+
+<th>
+Restock Date
+</th>
+
+
+</tr>
+
+
+</thead>
+
+
+
+
+
+<tbody id="inventoryTable">
+
+
+</tbody>
+
+
+
+
+</table>
+
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section id="contact">
+
+
+
+<h2 class="section-title">
+
+Contact
+
+</h2>
+
+
+
+
+
+
+<div class="contact-box">
+
+
+<h3>
+
+Owner
+
+</h3>
+
+
+<p>
+
+Grayson VanTassel
+
+</p>
+
+
+
+
+
+<h3>
+
+School
+
+</h3>
+
+
+<p>
+
+Uplift Elevate Preparatory
+
+</p>
+
+
+
+
+
+<h3>
+
+Email
+
+</h3>
+
+
+<p>
+
+
+<a href="mailto:vantasselgrayson@gmail.com">
+
+vantasselgrayson@gmail.com
+
+</a>
+
+
+</p>
+
+
+
+
+
+
+<h3>
+
+Suggestions?
+
+</h3>
+
+
+<p>
+
+I read every message sent and consider new snack requests!
+
+</p>
+
+
+
+</div>
+
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<footer>
+
+
+
+<p>
+
+© 2026 Grayson's Snack Shop
+
+</p>
+
+
+
+<p>
+
+Serving students at Uplift Elevate Preparatory
+
+</p>
+
+
+
+</footer>
+
+
+
+
+
+
+
+
+<script src="inventory.js"></script>
+
+<script src="script.js"></script>
+
+
+
+
 </body>
+
+
 </html>
