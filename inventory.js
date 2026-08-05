@@ -15,7 +15,7 @@ const defaultInventory = [
         price: 8.00,
         stock: 8,
         restock: "8/9/2026",
-        icon: "🌶️"
+        image: "redtakifiesta.png"
     },
 
 
