@@ -3,25 +3,24 @@
 ==========================================================
 Grayson's Snack Shop
 script.js
-Main Website JavaScript
+Main Website
+Firebase Inventory Version
 ==========================================================
 */
+
+import {
+    inventory,
+    loadInventory
+} from "./inventory.js";
 
 import {
     db
 } from "./firebase.js";
 
 import {
-    collection,
-    getDocs,
     doc,
     getDoc
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-
-import {
-    inventory,
-    loadInventory
-} from "./inventory.js";
 
 
 // ==========================================================
@@ -46,9 +45,6 @@ const itemsInStock =
 const darkButton =
     document.getElementById("darkModeButton");
 
-const promotionContainer =
-    document.getElementById("promotionContainer");
-
 
 // ==========================================================
 // MONEY FORMAT
@@ -56,8 +52,13 @@ const promotionContainer =
 
 function money(amount) {
 
-    return "$" + Number(amount).toFixed(2);
+    const number = Number(amount);
 
+    if (Number.isNaN(number)) {
+        return "$0.00";
+    }
+
+    return "$" + number.toFixed(2);
 }
 
 
@@ -67,7 +68,9 @@ function money(amount) {
 
 function getStatus(product) {
 
-    if (Number(product.stock) <= 0) {
+    const stock = Number(product.stock);
+
+    if (stock <= 0) {
 
         return {
             text: "Out of Stock",
@@ -76,8 +79,7 @@ function getStatus(product) {
 
     }
 
-
-    if (Number(product.stock) <= 5) {
+    if (stock <= 5) {
 
         return {
             text: "Low Stock",
@@ -85,7 +87,6 @@ function getStatus(product) {
         };
 
     }
-
 
     return {
         text: "In Stock",
@@ -104,10 +105,8 @@ function createProduct(product) {
     const status =
         getStatus(product);
 
-
     const card =
         document.createElement("div");
-
 
     card.className =
         "product-card";
@@ -143,7 +142,7 @@ function createProduct(product) {
             <div class="product-stock">
 
                 Available:
-                ${Number(product.stock)}
+                ${Number(product.stock) || 0}
 
             </div>
 
@@ -184,7 +183,6 @@ function createTableRow(product) {
     const status =
         getStatus(product);
 
-
     const row =
         document.createElement("tr");
 
@@ -202,7 +200,7 @@ function createTableRow(product) {
 
 
         <td>
-            ${Number(product.stock)}
+            ${Number(product.stock) || 0}
         </td>
 
 
@@ -230,7 +228,7 @@ function createTableRow(product) {
 
 
 // ==========================================================
-// UPDATE STATS
+// UPDATE STATISTICS
 // ==========================================================
 
 function updateStats(products) {
@@ -241,18 +239,33 @@ function updateStats(products) {
 
     products.forEach((product) => {
 
-        total +=
-            Number(product.stock) || 0;
+        const stock =
+            Number(product.stock);
+
+
+        if (!Number.isNaN(stock)) {
+
+            total += stock;
+
+        }
 
     });
 
 
-    totalProducts.textContent =
-        products.length;
+    if (totalProducts) {
+
+        totalProducts.textContent =
+            products.length;
+
+    }
 
 
-    itemsInStock.textContent =
-        total;
+    if (itemsInStock) {
+
+        itemsInStock.textContent =
+            total;
+
+    }
 
 }
 
@@ -263,11 +276,62 @@ function updateStats(products) {
 
 function displayProducts(products) {
 
+    if (!productContainer ||
+        !inventoryTable) {
+
+        console.error(
+            "Product containers were not found in index.html."
+        );
+
+        return;
+
+    }
+
+
     productContainer.innerHTML =
         "";
 
     inventoryTable.innerHTML =
         "";
+
+
+    if (products.length === 0) {
+
+        productContainer.innerHTML = `
+
+            <p style="
+                text-align:center;
+                width:100%;
+                grid-column:1/-1;
+            ">
+
+                No products found.
+
+            </p>
+
+        `;
+
+
+        inventoryTable.innerHTML = `
+
+            <tr>
+
+                <td colspan="5">
+
+                    No products found.
+
+                </td>
+
+            </tr>
+
+        `;
+
+
+        updateStats([]);
+
+        return;
+
+    }
 
 
     products.forEach((product) => {
@@ -301,15 +365,19 @@ if (searchInput) {
 
 
             const filtered =
-                inventory.filter((product) => {
+                inventory.filter(
+                    (product) => {
 
-                    return String(
-                        product.name || ""
-                    )
-                        .toLowerCase()
-                        .includes(text);
+                        const name =
+                            String(
+                                product.name || ""
+                            ).toLowerCase();
 
-                });
+
+                        return name.includes(text);
+
+                    }
+                );
 
 
             displayProducts(filtered);
@@ -324,20 +392,30 @@ if (searchInput) {
 // DARK MODE
 // ==========================================================
 
-if (
-    localStorage.getItem("darkMode") ===
-    "enabled"
-) {
+function loadDarkMode() {
 
-    document.body.classList.add(
-        "dark"
-    );
+    const savedMode =
+        localStorage.getItem(
+            "darkMode"
+        );
 
 
-    if (darkButton) {
+    if (
+        savedMode === "enabled" &&
+        document.body
+    ) {
 
-        darkButton.textContent =
-            "☀️";
+        document.body.classList.add(
+            "dark"
+        );
+
+
+        if (darkButton) {
+
+            darkButton.textContent =
+                "☀️";
+
+        }
 
     }
 
@@ -355,11 +433,13 @@ if (darkButton) {
             );
 
 
-            if (
+            const enabled =
                 document.body.classList.contains(
                     "dark"
-                )
-            ) {
+                );
+
+
+            if (enabled) {
 
                 localStorage.setItem(
                     "darkMode",
@@ -391,18 +471,14 @@ if (darkButton) {
 }
 
 
+loadDarkMode();
+
+
 // ==========================================================
-// LOAD PROMOTION
+// PROMOTION
 // ==========================================================
 
 async function loadPromotion() {
-
-    if (!promotionContainer) {
-
-        return;
-
-    }
-
 
     try {
 
@@ -422,17 +498,9 @@ async function loadPromotion() {
 
         if (!snapshot.exists()) {
 
-            promotionContainer.innerHTML = `
-
-                <h3>
-                    No Current Promotion
-                </h3>
-
-                <p>
-                    Check back soon for special offers!
-                </p>
-
-            `;
+            console.log(
+                "No promotion currently saved."
+            );
 
             return;
 
@@ -443,151 +511,15 @@ async function loadPromotion() {
             snapshot.data();
 
 
-        if (
-            promotion.active !== true
-        ) {
-
-            promotionContainer.innerHTML = `
-
-                <h3>
-                    No Current Promotion
-                </h3>
-
-                <p>
-                    Check back soon for special offers!
-                </p>
-
-            `;
-
-            return;
-
-        }
+        console.log(
+            "Promotion loaded:",
+            promotion
+        );
 
 
-        const now =
-            new Date();
-
-
-        if (promotion.start) {
-
-            const start =
-                new Date(
-                    promotion.start
-                );
-
-
-            if (
-                !Number.isNaN(start.getTime()) &&
-                now < start
-            ) {
-
-                promotionContainer.innerHTML = `
-
-                    <h3>
-                        🎉 ${promotion.name || "Special Promotion"}
-                    </h3>
-
-                    <p>
-                        This promotion starts soon!
-                    </p>
-
-                    <p>
-                        Qualifying Product:
-                        <strong>
-                            ${promotion.qualifyingProductName || "Product"}
-                        </strong>
-                    </p>
-
-                `;
-
-                return;
-
-            }
-
-        }
-
-
-        if (promotion.end) {
-
-            const end =
-                new Date(
-                    promotion.end
-                );
-
-
-            if (
-                !Number.isNaN(end.getTime()) &&
-                now > end
-            ) {
-
-                promotionContainer.innerHTML = `
-
-                    <h3>
-                        Promotion Ended
-                    </h3>
-
-                    <p>
-                        Check back soon for our next promotion!
-                    </p>
-
-                `;
-
-                return;
-
-            }
-
-        }
-
-
-        promotionContainer.innerHTML = `
-
-            <h2>
-                🎉 ${promotion.name || "Special Promotion"}
-            </h2>
-
-
-            <p style="margin:15px 0;">
-
-                Bring a friend who has never purchased
-                from Grayson's Snack Shop before!
-
-            </p>
-
-
-            <p>
-
-                When they purchase:
-
-                <strong>
-                    ${promotion.qualifyingProductName || "the qualifying product"}
-                </strong>
-
-            </p>
-
-
-            <p>
-
-                You receive:
-
-                <strong>
-                    ${promotion.rewardQuantity || 1}
-                    ×
-                    ${promotion.rewardProductName || "your reward"}
-                </strong>
-
-            </p>
-
-
-            <p style="margin-top:15px;">
-
-                <strong>
-                    Referral rewards are given after
-                    the purchase is approved.
-                </strong>
-
-            </p>
-
-        `;
+        displayPromotion(
+            promotion
+        );
 
     }
 
@@ -598,26 +530,128 @@ async function loadPromotion() {
             error
         );
 
-
-        promotionContainer.innerHTML = `
-
-            <h3>
-                Promotion Currently Unavailable
-            </h3>
-
-            <p>
-                Please check back later.
-            </p>
-
-        `;
-
     }
 
 }
 
 
 // ==========================================================
-// START WEBSITE
+// DISPLAY PROMOTION
+// ==========================================================
+
+function displayPromotion(promotion) {
+
+    if (!promotion) {
+        return;
+    }
+
+
+    if (promotion.active !== true) {
+
+        return;
+
+    }
+
+
+    let promotionBox =
+        document.getElementById(
+            "promotionBanner"
+        );
+
+
+    /*
+    If there isn't a promotion banner
+    in index.html yet, create one.
+    */
+
+    if (!promotionBox) {
+
+        promotionBox =
+            document.createElement(
+                "section"
+            );
+
+
+        promotionBox.id =
+            "promotionBanner";
+
+
+        promotionBox.style.cssText = `
+
+            margin: 30px auto;
+            max-width: 1000px;
+            padding: 30px;
+            border-radius: 20px;
+            background: #fff3e6;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+
+        `;
+
+
+        const productsSection =
+            document.getElementById(
+                "products"
+            );
+
+
+        if (productsSection) {
+
+            productsSection.parentNode.insertBefore(
+                promotionBox,
+                productsSection
+            );
+
+        }
+
+    }
+
+
+    promotionBox.innerHTML = `
+
+        <h2 style="
+            margin-bottom:10px;
+        ">
+
+            🎉 ${promotion.name || "Special Promotion"}
+
+        </h2>
+
+
+        <p style="
+            margin-bottom:10px;
+        ">
+
+            Bring a new customer to
+            Grayson's Snack Shop!
+
+        </p>
+
+
+        <p>
+
+            Buy:
+
+            <strong>
+                ${promotion.qualifyingProductName || "a qualifying product"}
+            </strong>
+
+            and the referrer can receive:
+
+            <strong>
+                ${promotion.rewardQuantity || 1} ×
+                ${promotion.rewardProductName || "reward"}
+            </strong>
+
+        </p>
+
+    `;
+
+}
+
+
+// ==========================================================
+// START SHOP
 // ==========================================================
 
 async function startShop() {
@@ -625,7 +659,7 @@ async function startShop() {
     try {
 
         console.log(
-            "Starting Grayson's Snack Shop..."
+            "Loading Grayson's Snack Shop..."
         );
 
 
@@ -641,7 +675,7 @@ async function startShop() {
 
 
         console.log(
-            "Grayson's Snack Shop Loaded Successfully"
+            "Grayson's Snack Shop Loaded From Firebase"
         );
 
     }
@@ -660,7 +694,8 @@ async function startShop() {
 
                 <p style="
                     text-align:center;
-                    padding:30px;
+                    width:100%;
+                    grid-column:1/-1;
                 ">
 
                     Unable to load the shop right now.
