@@ -1,47 +1,40 @@
+```javascript
 /*
 ==========================================================
 Grayson's Snack Shop
 admin.js
-Advanced Admin Dashboard
+Firebase Admin Dashboard + Promotions
 ==========================================================
 */
 
 import {
-
-    auth,
-    db
-
+    auth
 } from "./firebase.js";
 
-
 import {
-
     signInWithEmailAndPassword,
     signOut,
     onAuthStateChanged
-
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
-
 import {
-
-    collection,
-    doc,
-    getDoc,
-    setDoc
-
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-
-
-import {
-
     loadInventory,
-    saveProduct,
+    saveProduct as saveInventoryProduct,
     addProduct,
-    deleteProduct
-
+    deleteProduct as deleteInventoryProduct
 } from "./inventory.js";
 
+import {
+    collection,
+    getDocs,
+    doc,
+    setDoc,
+    getDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+import {
+    db
+} from "./firebase.js";
 
 
 // ==========================================================
@@ -49,83 +42,45 @@ import {
 // ==========================================================
 
 const loginBox =
-    document.getElementById(
-        "loginBox"
-    );
-
+    document.getElementById("loginBox");
 
 const dashboard =
-    document.getElementById(
-        "dashboard"
-    );
-
+    document.getElementById("dashboard");
 
 const loginButton =
-    document.getElementById(
-        "loginButton"
-    );
-
+    document.getElementById("loginButton");
 
 const loginMessage =
-    document.getElementById(
-        "loginMessage"
-    );
-
+    document.getElementById("loginMessage");
 
 const adminProducts =
-    document.getElementById(
-        "adminProducts"
-    );
-
+    document.getElementById("adminProducts");
 
 const logoutButton =
-    document.getElementById(
-        "logout"
-    );
-
+    document.getElementById("logout");
 
 const addButton =
-    document.getElementById(
-        "addProduct"
-    );
-
-
+    document.getElementById("addProduct");
 
 const qualifyingProduct =
-    document.getElementById(
-        "qualifyingProduct"
-    );
-
+    document.getElementById("qualifyingProduct");
 
 const rewardProduct =
-    document.getElementById(
-        "rewardProduct"
-    );
-
+    document.getElementById("rewardProduct");
 
 const savePromotionButton =
-    document.getElementById(
-        "savePromotion"
-    );
-
-
-const promotionStatus =
-    document.getElementById(
-        "promotionStatus"
-    );
-
+    document.getElementById("savePromotion");
 
 
 // ==========================================================
-// CURRENT PRODUCTS
+// PRODUCTS
 // ==========================================================
 
 let products = [];
 
 
-
 // ==========================================================
-// PROMOTION FIRESTORE DOCUMENT
+// FIRESTORE PROMOTION
 // ==========================================================
 
 const promotionRef =
@@ -136,35 +91,23 @@ const promotionRef =
     );
 
 
-
 // ==========================================================
 // AUTHENTICATION
 // ==========================================================
 
 onAuthStateChanged(
-
     auth,
-
     async (user) => {
 
         if (user) {
 
-            loginBox.classList.add(
-                "hidden"
-            );
+            loginBox.classList.add("hidden");
 
+            dashboard.classList.remove("hidden");
 
-            dashboard.classList.remove(
-                "hidden"
-            );
-
-
-            loginMessage.textContent =
-                "";
-
+            loginMessage.textContent = "";
 
             await loadAdminProducts();
-
 
             await loadPromotion();
 
@@ -172,21 +115,14 @@ onAuthStateChanged(
 
         else {
 
-            dashboard.classList.add(
-                "hidden"
-            );
+            dashboard.classList.add("hidden");
 
-
-            loginBox.classList.remove(
-                "hidden"
-            );
+            loginBox.classList.remove("hidden");
 
         }
 
     }
-
 );
-
 
 
 // ==========================================================
@@ -194,27 +130,22 @@ onAuthStateChanged(
 // ==========================================================
 
 loginButton.addEventListener(
-
     "click",
-
     async () => {
 
         const email =
-            document.getElementById(
-                "username"
-            ).value.trim();
-
+            document
+                .getElementById("username")
+                .value
+                .trim();
 
         const password =
-            document.getElementById(
-                "password"
-            ).value;
+            document
+                .getElementById("password")
+                .value;
 
 
-        if (
-            !email ||
-            !password
-        ) {
+        if (!email || !password) {
 
             loginMessage.textContent =
                 "Please enter your email and password.";
@@ -224,26 +155,20 @@ loginButton.addEventListener(
         }
 
 
-        loginButton.disabled =
-            true;
-
+        loginButton.disabled = true;
 
         loginButton.textContent =
             "Logging In...";
 
-
-        loginMessage.textContent =
-            "";
+        loginMessage.textContent = "";
 
 
         try {
 
             await signInWithEmailAndPassword(
-
                 auth,
                 email,
                 password
-
             );
 
         }
@@ -255,7 +180,6 @@ loginButton.addEventListener(
                 error
             );
 
-
             loginMessage.textContent =
                 "Incorrect email or password.";
 
@@ -263,9 +187,7 @@ loginButton.addEventListener(
 
         finally {
 
-            loginButton.disabled =
-                false;
-
+            loginButton.disabled = false;
 
             loginButton.textContent =
                 "Login";
@@ -273,23 +195,17 @@ loginButton.addEventListener(
         }
 
     }
-
 );
 
 
-
 // ==========================================================
-// LOAD PRODUCTS
+// LOAD ADMIN PRODUCTS
 // ==========================================================
 
 async function loadAdminProducts() {
 
     adminProducts.innerHTML = `
-
-        <p>
-            Loading products...
-        </p>
-
+        <p>Loading products...</p>
     `;
 
 
@@ -299,28 +215,13 @@ async function loadAdminProducts() {
             await loadInventory();
 
 
-        adminProducts.innerHTML =
-            "";
+        adminProducts.innerHTML = "";
 
 
-        if (
-            products.length === 0
-        ) {
+        if (products.length === 0) {
 
             adminProducts.innerHTML = `
-
-                <div class="empty-products">
-
-                    <h3>
-                        No products found
-                    </h3>
-
-                    <p>
-                        Add your first snack below.
-                    </p>
-
-                </div>
-
+                <p>No products found.</p>
             `;
 
             populatePromotionDropdowns();
@@ -331,7 +232,6 @@ async function loadAdminProducts() {
 
 
         products.forEach(
-
             product => {
 
                 createAdminProduct(
@@ -339,16 +239,8 @@ async function loadAdminProducts() {
                 );
 
             }
-
         );
 
-
-        /*
-        IMPORTANT:
-
-        Populate the promotion dropdowns
-        AFTER Firebase inventory has loaded.
-        */
 
         populatePromotionDropdowns();
 
@@ -363,19 +255,9 @@ async function loadAdminProducts() {
 
 
         adminProducts.innerHTML = `
-
-            <div class="empty-products">
-
-                <h3>
-                    Unable to load products
-                </h3>
-
-                <p>
-                    Check the browser console for details.
-                </p>
-
-            </div>
-
+            <p>
+                Unable to load products.
+            </p>
         `;
 
     }
@@ -383,149 +265,14 @@ async function loadAdminProducts() {
 }
 
 
-
-// ==========================================================
-// POPULATE PROMOTION DROPDOWNS
-// ==========================================================
-
-function populatePromotionDropdowns() {
-
-    /*
-    Clear both dropdowns.
-    */
-
-    qualifyingProduct.innerHTML =
-        "";
-
-
-    rewardProduct.innerHTML =
-        "";
-
-
-
-    /*
-    Add default options.
-    */
-
-    const qualifyingDefault =
-        document.createElement(
-            "option"
-        );
-
-
-    qualifyingDefault.value =
-        "";
-
-
-    qualifyingDefault.textContent =
-        "Select qualifying product";
-
-
-    qualifyingProduct.appendChild(
-        qualifyingDefault
-    );
-
-
-
-    const rewardDefault =
-        document.createElement(
-            "option"
-        );
-
-
-    rewardDefault.value =
-        "";
-
-
-    rewardDefault.textContent =
-        "Select reward product";
-
-
-    rewardProduct.appendChild(
-        rewardDefault
-    );
-
-
-
-    /*
-    Add every Firebase product
-    to both dropdowns.
-    */
-
-    products.forEach(
-
-        product => {
-
-            const productValue =
-                product.firebaseId ||
-                product.id.toString();
-
-
-            const qualifyingOption =
-                document.createElement(
-                    "option"
-                );
-
-
-            qualifyingOption.value =
-                productValue;
-
-
-            qualifyingOption.textContent =
-                `${product.name} — $${Number(product.price).toFixed(2)}`;
-
-
-            qualifyingProduct.appendChild(
-                qualifyingOption
-            );
-
-
-
-            const rewardOption =
-                document.createElement(
-                    "option"
-                );
-
-
-            rewardOption.value =
-                productValue;
-
-
-            rewardOption.textContent =
-                `${product.name} — $${Number(product.price).toFixed(2)}`;
-
-
-            rewardProduct.appendChild(
-                rewardOption
-            );
-
-        }
-
-    );
-
-
-    console.log(
-        "Promotion dropdowns populated:",
-        products.length,
-        "products"
-    );
-
-}
-
-
-
 // ==========================================================
 // CREATE ADMIN PRODUCT
 // ==========================================================
 
-function createAdminProduct(
-    product
-) {
+function createAdminProduct(product) {
 
     const box =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
 
     box.className =
@@ -533,7 +280,10 @@ function createAdminProduct(
 
 
     const productId =
-        product.id.toString();
+        String(
+            product.firebaseId ||
+            product.id
+        );
 
 
     box.innerHTML = `
@@ -542,7 +292,7 @@ function createAdminProduct(
 
             <img
                 src="${product.image || ""}"
-                alt="${product.name}"
+                alt="${product.name || "Product"}"
                 onerror="this.src='https://placehold.co/100x100?text=No+Image'"
             >
 
@@ -550,7 +300,7 @@ function createAdminProduct(
 
 
         <h3>
-            ${product.name}
+            ${product.name || "Unnamed Product"}
         </h3>
 
 
@@ -570,7 +320,7 @@ function createAdminProduct(
 
         <input
             id="price-${productId}"
-            value="${product.price}"
+            value="${product.price ?? 0}"
             type="number"
             step="0.01"
             min="0"
@@ -583,7 +333,7 @@ function createAdminProduct(
 
         <input
             id="stock-${productId}"
-            value="${product.stock}"
+            value="${product.stock ?? 0}"
             type="number"
             min="0"
         >
@@ -599,7 +349,12 @@ function createAdminProduct(
         >
 
 
-        <div class="product-actions">
+        <div style="
+            display:flex;
+            gap:10px;
+            margin-top:15px;
+            flex-wrap:wrap;
+        ">
 
             <button
                 onclick="saveProduct('${productId}')"
@@ -609,7 +364,6 @@ function createAdminProduct(
 
 
             <button
-                class="delete-button"
                 onclick="deleteProduct('${productId}')"
             >
                 Delete
@@ -620,12 +374,9 @@ function createAdminProduct(
     `;
 
 
-    adminProducts.appendChild(
-        box
-    );
+    adminProducts.appendChild(box);
 
 }
-
 
 
 // ==========================================================
@@ -639,11 +390,11 @@ window.saveProduct =
 
             const product =
                 products.find(
-
                     item =>
-                        item.id.toString() ===
-                        id.toString()
-
+                        String(
+                            item.firebaseId ||
+                            item.id
+                        ) === String(id)
                 );
 
 
@@ -660,14 +411,7 @@ window.saveProduct =
 
             const updatedProduct = {
 
-                id:
-                    product.id,
-
-                firebaseId:
-                    product.firebaseId,
-
-                name:
-                    product.name,
+                ...product,
 
                 image:
                     document.getElementById(
@@ -696,39 +440,7 @@ window.saveProduct =
             };
 
 
-            if (
-                Number.isNaN(
-                    updatedProduct.price
-                ) ||
-                updatedProduct.price < 0
-            ) {
-
-                alert(
-                    "Please enter a valid price."
-                );
-
-                return;
-
-            }
-
-
-            if (
-                Number.isNaN(
-                    updatedProduct.stock
-                ) ||
-                updatedProduct.stock < 0
-            ) {
-
-                alert(
-                    "Please enter a valid stock amount."
-                );
-
-                return;
-
-            }
-
-
-            await saveProduct(
+            await saveInventoryProduct(
                 updatedProduct
             );
 
@@ -739,6 +451,7 @@ window.saveProduct =
 
 
             await loadAdminProducts();
+
 
         }
 
@@ -759,7 +472,6 @@ window.saveProduct =
     };
 
 
-
 // ==========================================================
 // DELETE PRODUCT
 // ==========================================================
@@ -769,11 +481,11 @@ window.deleteProduct =
 
         const product =
             products.find(
-
                 item =>
-                    item.id.toString() ===
-                    id.toString()
-
+                    String(
+                        item.firebaseId ||
+                        item.id
+                    ) === String(id)
             );
 
 
@@ -790,9 +502,7 @@ window.deleteProduct =
 
         const confirmed =
             confirm(
-
                 `Are you sure you want to delete "${product.name}"?`
-
             );
 
 
@@ -805,7 +515,7 @@ window.deleteProduct =
 
         try {
 
-            await deleteProduct(
+            await deleteInventoryProduct(
                 product
             );
 
@@ -836,50 +546,49 @@ window.deleteProduct =
     };
 
 
-
 // ==========================================================
 // ADD PRODUCT
 // ==========================================================
 
 addButton.addEventListener(
-
     "click",
-
     async () => {
 
         const name =
-            document.getElementById(
-                "newName"
-            ).value.trim();
+            document
+                .getElementById("newName")
+                .value
+                .trim();
 
 
         const price =
             Number(
-                document.getElementById(
-                    "newPrice"
-                ).value
+                document
+                    .getElementById("newPrice")
+                    .value
             );
 
 
         const stock =
             Number(
-                document.getElementById(
-                    "newStock"
-                ).value
+                document
+                    .getElementById("newStock")
+                    .value
             );
 
 
         const restock =
-            document.getElementById(
-                "newRestock"
-            ).value.trim();
+            document
+                .getElementById("newRestock")
+                .value
+                .trim();
 
 
         const image =
-            document.getElementById(
-                "newImage"
-            ).value.trim();
-
+            document
+                .getElementById("newImage")
+                .value
+                .trim();
 
 
         if (!name) {
@@ -921,36 +630,26 @@ addButton.addEventListener(
         }
 
 
-
         const newProduct = {
 
-            id:
-                Date.now(),
+            id: Date.now(),
 
-            name:
-                name,
+            name: name,
 
-            price:
-                price,
+            price: price,
 
-            stock:
-                stock,
+            stock: stock,
 
-            restock:
-                restock,
+            restock: restock,
 
-            image:
-                image
+            image: image
 
         };
 
 
-
         try {
 
-            addButton.disabled =
-                true;
-
+            addButton.disabled = true;
 
             addButton.textContent =
                 "Adding Product...";
@@ -1011,23 +710,324 @@ addButton.addEventListener(
 
         finally {
 
-            addButton.disabled =
-                false;
-
+            addButton.disabled = false;
 
             addButton.textContent =
-                "➕ Add Product";
+                "Add Product";
 
         }
 
     }
-
 );
 
 
+// ==========================================================
+// POPULATE PROMOTION DROPDOWNS
+// ==========================================================
+
+function populatePromotionDropdowns() {
+
+    if (!qualifyingProduct || !rewardProduct) {
+
+        console.warn(
+            "Promotion dropdowns were not found."
+        );
+
+        return;
+
+    }
+
+
+    qualifyingProduct.innerHTML = `
+        <option value="">
+            Select qualifying product
+        </option>
+    `;
+
+
+    rewardProduct.innerHTML = `
+        <option value="">
+            Select reward product
+        </option>
+    `;
+
+
+    products.forEach(
+        product => {
+
+            const productId =
+                String(
+                    product.firebaseId ||
+                    product.id
+                );
+
+
+            const productName =
+                product.name ||
+                "Unnamed Product";
+
+
+            const option1 =
+                document.createElement(
+                    "option"
+                );
+
+            option1.value =
+                productId;
+
+            option1.textContent =
+                `${productName} — $${Number(product.price || 0).toFixed(2)}`;
+
+
+            qualifyingProduct.appendChild(
+                option1
+            );
+
+
+            const option2 =
+                document.createElement(
+                    "option"
+                );
+
+            option2.value =
+                productId;
+
+            option2.textContent =
+                `${productName} — $${Number(product.price || 0).toFixed(2)}`;
+
+
+            rewardProduct.appendChild(
+                option2
+            );
+
+        }
+    );
+
+
+    console.log(
+        "Promotion dropdowns populated:",
+        products.length,
+        "products"
+    );
+
+}
+
 
 // ==========================================================
-// LOAD EXISTING PROMOTION
+// SAVE PROMOTION
+// ==========================================================
+
+if (savePromotionButton) {
+
+    savePromotionButton.addEventListener(
+        "click",
+        async () => {
+
+            const name =
+                document
+                    .getElementById(
+                        "promotionName"
+                    )
+                    .value
+                    .trim();
+
+
+            const active =
+                document
+                    .getElementById(
+                        "promotionActive"
+                    )
+                    .checked;
+
+
+            const start =
+                document
+                    .getElementById(
+                        "promotionStart"
+                    )
+                    .value;
+
+
+            const end =
+                document
+                    .getElementById(
+                        "promotionEnd"
+                    )
+                    .value;
+
+
+            const qualifyingId =
+                qualifyingProduct.value;
+
+
+            const rewardId =
+                rewardProduct.value;
+
+
+            const rewardQuantity =
+                Number(
+                    document
+                        .getElementById(
+                            "rewardQuantity"
+                        )
+                        .value
+                );
+
+
+            if (!name) {
+
+                alert(
+                    "Please enter a promotion name."
+                );
+
+                return;
+
+            }
+
+
+            if (!qualifyingId) {
+
+                alert(
+                    "Please select the qualifying product."
+                );
+
+                return;
+
+            }
+
+
+            if (!rewardId) {
+
+                alert(
+                    "Please select the reward product."
+                );
+
+                return;
+
+            }
+
+
+            if (
+                !rewardQuantity ||
+                rewardQuantity < 1
+            ) {
+
+                alert(
+                    "Please enter a valid reward quantity."
+                );
+
+                return;
+
+            }
+
+
+            try {
+
+                savePromotionButton.disabled =
+                    true;
+
+                savePromotionButton.textContent =
+                    "Saving Promotion...";
+
+
+                const qualifying =
+                    products.find(
+                        product =>
+                            String(
+                                product.firebaseId ||
+                                product.id
+                            ) ===
+                            String(qualifyingId)
+                    );
+
+
+                const reward =
+                    products.find(
+                        product =>
+                            String(
+                                product.firebaseId ||
+                                product.id
+                            ) ===
+                            String(rewardId)
+                    );
+
+
+                await setDoc(
+                    promotionRef,
+                    {
+
+                        name: name,
+
+                        active: active,
+
+                        start: start,
+
+                        end: end,
+
+                        qualifyingProductId:
+                            qualifyingId,
+
+                        qualifyingProductName:
+                            qualifying
+                                ? qualifying.name
+                                : "",
+
+                        rewardProductId:
+                            rewardId,
+
+                        rewardProductName:
+                            reward
+                                ? reward.name
+                                : "",
+
+                        rewardQuantity:
+                            rewardQuantity,
+
+                        updatedAt:
+                            new Date().toISOString()
+
+                    }
+                );
+
+
+                alert(
+                    "Promotion saved successfully!"
+                );
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Error saving promotion:",
+                    error
+                );
+
+
+                alert(
+                    "Could not save the promotion."
+                );
+
+            }
+
+            finally {
+
+                savePromotionButton.disabled =
+                    false;
+
+                savePromotionButton.textContent =
+                    "Save Promotion";
+
+            }
+
+        }
+    );
+
+}
+
+
+// ==========================================================
+// LOAD PROMOTION
 // ==========================================================
 
 async function loadPromotion() {
@@ -1040,12 +1040,10 @@ async function loadPromotion() {
             );
 
 
-        if (
-            !snapshot.exists()
-        ) {
+        if (!snapshot.exists()) {
 
             console.log(
-                "No saved promotion found."
+                "No promotion has been saved yet."
             );
 
             return;
@@ -1061,12 +1059,6 @@ async function loadPromotion() {
             "promotionName"
         ).value =
             promotion.name || "";
-
-
-        document.getElementById(
-            "promotionDescription"
-        ).value =
-            promotion.description || "";
 
 
         document.getElementById(
@@ -1093,28 +1085,18 @@ async function loadPromotion() {
             promotion.rewardQuantity || 1;
 
 
-
-        /*
-        The dropdowns must be populated before
-        selecting the saved products.
-        */
-
-        if (
-            promotion.qualifyingProduct
-        ) {
+        if (qualifyingProduct) {
 
             qualifyingProduct.value =
-                promotion.qualifyingProduct;
+                promotion.qualifyingProductId || "";
 
         }
 
 
-        if (
-            promotion.rewardProduct
-        ) {
+        if (rewardProduct) {
 
             rewardProduct.value =
-                promotion.rewardProduct;
+                promotion.rewardProductId || "";
 
         }
 
@@ -1138,268 +1120,12 @@ async function loadPromotion() {
 }
 
 
-
-// ==========================================================
-// SAVE PROMOTION
-// ==========================================================
-
-savePromotionButton.addEventListener(
-
-    "click",
-
-    async () => {
-
-        const name =
-            document.getElementById(
-                "promotionName"
-            ).value.trim();
-
-
-        const description =
-            document.getElementById(
-                "promotionDescription"
-            ).value.trim();
-
-
-        const active =
-            document.getElementById(
-                "promotionActive"
-            ).checked;
-
-
-        const start =
-            document.getElementById(
-                "promotionStart"
-            ).value;
-
-
-        const end =
-            document.getElementById(
-                "promotionEnd"
-            ).value;
-
-
-        const qualifying =
-            qualifyingProduct.value;
-
-
-        const reward =
-            rewardProduct.value;
-
-
-        const rewardQuantity =
-            Number(
-                document.getElementById(
-                    "rewardQuantity"
-                ).value
-            );
-
-
-
-        if (!name) {
-
-            showPromotionStatus(
-                "Please enter a promotion name.",
-                "error"
-            );
-
-            return;
-
-        }
-
-
-        if (!qualifying) {
-
-            showPromotionStatus(
-                "Please select the qualifying product.",
-                "error"
-            );
-
-            return;
-
-        }
-
-
-        if (!reward) {
-
-            showPromotionStatus(
-                "Please select the reward product.",
-                "error"
-            );
-
-            return;
-
-        }
-
-
-        if (
-            !rewardQuantity ||
-            rewardQuantity < 1
-        ) {
-
-            showPromotionStatus(
-                "Reward quantity must be at least 1.",
-                "error"
-            );
-
-            return;
-
-        }
-
-
-        if (
-            start &&
-            end &&
-            start >= end
-        ) {
-
-            showPromotionStatus(
-                "The promotion end time must be after the start time.",
-                "error"
-            );
-
-            return;
-
-        }
-
-
-
-        const promotion = {
-
-            name:
-                name,
-
-            description:
-                description,
-
-            active:
-                active,
-
-            start:
-                start,
-
-            end:
-                end,
-
-            qualifyingProduct:
-                qualifying,
-
-            rewardProduct:
-                reward,
-
-            rewardQuantity:
-                rewardQuantity,
-
-            updatedAt:
-                new Date().toISOString()
-
-        };
-
-
-
-        try {
-
-            savePromotionButton.disabled =
-                true;
-
-
-            savePromotionButton.textContent =
-                "Saving Promotion...";
-
-
-            await setDoc(
-                promotionRef,
-                promotion
-            );
-
-
-            showPromotionStatus(
-                "Promotion saved successfully!",
-                "success"
-            );
-
-
-            console.log(
-                "Promotion saved:",
-                promotion
-            );
-
-        }
-
-        catch (error) {
-
-            console.error(
-                "Error saving promotion:",
-                error
-            );
-
-
-            showPromotionStatus(
-                "Could not save the promotion. Check the console.",
-                "error"
-            );
-
-        }
-
-        finally {
-
-            savePromotionButton.disabled =
-                false;
-
-
-            savePromotionButton.textContent =
-                "💾 Save Promotion";
-
-        }
-
-    }
-
-);
-
-
-
-// ==========================================================
-// PROMOTION STATUS MESSAGE
-// ==========================================================
-
-function showPromotionStatus(
-    message,
-    type
-) {
-
-    promotionStatus.textContent =
-        message;
-
-
-    promotionStatus.className =
-        `promotion-status ${type}`;
-
-
-    setTimeout(
-
-        () => {
-
-            promotionStatus.className =
-                "promotion-status";
-
-        },
-
-        5000
-
-    );
-
-}
-
-
-
 // ==========================================================
 // LOGOUT
 // ==========================================================
 
 logoutButton.addEventListener(
-
     "click",
-
     async () => {
 
         try {
@@ -1420,5 +1146,5 @@ logoutButton.addEventListener(
         }
 
     }
-
 );
+```
