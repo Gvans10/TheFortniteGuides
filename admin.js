@@ -1,846 +1,1149 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>
+Grayson's Snack Shop Admin
+</title>
+
+<link
+    rel="icon"
+    type="image/png"
+    href="graysonslogos.png"
+>
+
+<link
+    rel="stylesheet"
+    href="style.css"
+>
+
+
+<style>
+
 /*
 ==========================================================
-Grayson's Snack Shop
-admin.js
-Firebase Admin Dashboard
+ADMIN DASHBOARD EXTRA STYLES
 ==========================================================
 */
 
-import { db } from "./firebase.js";
+#dashboard.admin-box {
 
-import {
-    collection,
-    doc,
-    setDoc,
-    updateDoc,
-    deleteDoc,
-    onSnapshot
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+    max-width: 1200px;
+    width: 100%;
+
+}
 
 
-// ==========================================================
-// ADMIN LOGIN
-// ==========================================================
+.admin-dashboard-header {
 
-const ADMIN_USERNAME = "60340276";
-const ADMIN_PASSWORD = "5527GSS02";
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
 
-
-// ==========================================================
-// FIRESTORE
-// ==========================================================
-
-const inventoryRef = collection(db, "inventory");
-
-let inventory = [];
-
-let unsubscribeInventory = null;
+}
 
 
-// ==========================================================
-// ELEMENTS
-// ==========================================================
+.admin-dashboard-header h1 {
 
-const loginBox =
-    document.getElementById("loginBox");
+    margin: 0;
 
-const dashboard =
-    document.getElementById("dashboard");
-
-const loginButton =
-    document.getElementById("loginButton");
-
-const loginMessage =
-    document.getElementById("loginMessage");
-
-const adminProducts =
-    document.getElementById("adminProducts");
-
-const logoutButton =
-    document.getElementById("logout");
-
-const addButton =
-    document.getElementById("addProduct");
-
-const usernameInput =
-    document.getElementById("username");
-
-const passwordInput =
-    document.getElementById("password");
+}
 
 
-// ==========================================================
-// LOGIN
-// ==========================================================
+.admin-tabs {
 
-function login() {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
 
-    const username =
-        usernameInput.value.trim();
-
-    const password =
-        passwordInput.value.trim();
+}
 
 
-    if (
-        username === ADMIN_USERNAME &&
-        password === ADMIN_PASSWORD
-    ) {
+.admin-tab-button {
 
-        loginMessage.textContent = "";
+    background: #eee;
+    color: #222;
 
-        loginBox.classList.add("hidden");
+}
 
-        dashboard.classList.remove("hidden");
 
-        startInventoryListener();
+.admin-tab-button.active {
+
+    background: #ff7b00;
+    color: white;
+
+}
+
+
+.admin-tab-panel {
+
+    width: 100%;
+
+}
+
+
+.admin-section-card {
+
+    background: #fff8f0;
+    padding: 25px;
+    border-radius: 18px;
+    margin-bottom: 25px;
+
+}
+
+
+.admin-section-card h2 {
+
+    margin-bottom: 15px;
+
+}
+
+
+.admin-section-card h3 {
+
+    margin-bottom: 12px;
+
+}
+
+
+.admin-form-grid {
+
+    display: grid;
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(220px, 1fr)
+        );
+
+    gap: 15px;
+
+}
+
+
+.admin-field {
+
+    display: flex;
+    flex-direction: column;
+
+}
+
+
+.admin-field label {
+
+    font-weight: 600;
+    margin-bottom: 5px;
+
+}
+
+
+.admin-field input,
+.admin-field textarea,
+.admin-field select {
+
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-family: inherit;
+
+}
+
+
+.admin-field textarea {
+
+    min-height: 100px;
+    resize: vertical;
+
+}
+
+
+.admin-checkbox-row {
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+
+}
+
+
+.admin-checkbox-row input {
+
+    width: auto;
+
+}
+
+
+.promotion-save-row {
+
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+
+}
+
+
+#promotionMessage {
+
+    font-weight: 600;
+
+}
+
+
+.referral-stats {
+
+    display: grid;
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(180px, 1fr)
+        );
+
+    gap: 15px;
+    margin-bottom: 25px;
+
+}
+
+
+.referral-stat {
+
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 3px 10px #ddd;
+
+}
+
+
+.referral-stat h3 {
+
+    font-size: 30px;
+    color: #ff7b00;
+
+}
+
+
+.referral-request {
+
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 3px 10px #ddd;
+
+}
+
+
+.referral-request-top {
+
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+
+}
+
+
+.referral-request p {
+
+    margin: 6px 0;
+
+}
+
+
+.referral-code-card {
+
+    background: white;
+    padding: 18px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 3px 10px #ddd;
+
+}
+
+
+.referral-code-header {
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+
+}
+
+
+.referral-code {
+
+    font-size: 20px;
+    font-weight: 700;
+    color: #ff7b00;
+
+}
+
+
+.admin-status {
+
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 13px;
+
+}
+
+
+.status-pending {
+
+    background: #fff3cd;
+    color: #7a5b00;
+
+}
+
+
+.status-approved {
+
+    background: #d7f5df;
+    color: #126b2b;
+
+}
+
+
+.status-rejected {
+
+    background: #ffd9d9;
+    color: #8a1616;
+
+}
+
+
+.status-rewarded {
+
+    background: #dceaff;
+    color: #174d8c;
+
+}
+
+
+.admin-button-row {
+
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+
+}
+
+
+.approve-button {
+
+    background: #168a39;
+
+}
+
+
+.reject-button {
+
+    background: #c93636;
+
+}
+
+
+.reward-button {
+
+    background: #246fd1;
+
+}
+
+
+.secondary-button {
+
+    background: #666;
+
+}
+
+
+.danger-button {
+
+    background: #c93636;
+
+}
+
+
+.admin-loading {
+
+    text-align: center;
+    padding: 25px;
+    opacity: .7;
+
+}
+
+
+/*
+==========================================================
+DARK MODE ADMIN
+==========================================================
+*/
+
+.dark .admin-section-card {
+
+    background: #2c2c2c;
+
+}
+
+
+.dark .referral-stat,
+.dark .referral-request,
+.dark .referral-code-card {
+
+    background: #222;
+    color: white;
+    box-shadow: none;
+
+}
+
+
+.dark .admin-field input,
+.dark .admin-field textarea,
+.dark .admin-field select {
+
+    background: #333;
+    color: white;
+    border-color: #555;
+
+}
+
+
+.dark .admin-tab-button {
+
+    background: #444;
+    color: white;
+
+}
+
+
+.dark .admin-tab-button.active {
+
+    background: #ff7b00;
+
+}
+
+
+/*
+==========================================================
+MOBILE ADMIN
+==========================================================
+*/
+
+@media(max-width:700px) {
+
+    #dashboard.admin-box {
+
+        padding: 20px;
 
     }
 
-    else {
 
-        loginMessage.textContent =
-            "Incorrect username or password";
+    .admin-section-card {
+
+        padding: 18px;
+
+    }
+
+
+    .admin-tabs {
+
+        flex-direction: column;
+
+    }
+
+
+    .admin-tab-button {
+
+        width: 100%;
 
     }
 
 }
 
+</style>
 
-loginButton.addEventListener(
-    "click",
-    login
-);
 
+</head>
 
-usernameInput.addEventListener(
-    "keydown",
-    (event) => {
 
-        if (event.key === "Enter") {
 
-            login();
+<body>
 
-        }
 
-    }
-);
+<header>
 
+<nav class="navbar">
 
-passwordInput.addEventListener(
-    "keydown",
-    (event) => {
 
-        if (event.key === "Enter") {
+<div class="logo">
 
-            login();
+🍬 Admin Panel
 
-        }
+</div>
 
-    }
-);
 
+<a href="index.html">
 
-// ==========================================================
-// FIRESTORE LIVE INVENTORY
-// ==========================================================
+Back To Shop
 
-function startInventoryListener() {
+</a>
 
-    if (unsubscribeInventory) {
 
-        unsubscribeInventory();
+</nav>
 
-    }
+</header>
 
 
-    unsubscribeInventory = onSnapshot(
 
-        inventoryRef,
 
-        (snapshot) => {
 
-            inventory = [];
+<section class="admin-section">
 
 
-            snapshot.forEach((item) => {
 
-                inventory.push({
+<!-- =====================================================
+LOGIN
+===================================================== -->
 
-                    firestoreId: item.id,
+<div
+    id="loginBox"
+    class="admin-box"
+>
 
-                    ...item.data()
 
-                });
+<h1>
+Admin Login
+</h1>
 
-            });
 
+<p>
+Owner Access Only
+</p>
 
-            inventory.sort(
-                (a, b) => {
 
-                    return String(
-                        a.name || ""
-                    ).localeCompare(
-                        String(
-                            b.name || ""
-                        )
-                    );
 
-                }
-            );
+<input
+    id="username"
+    type="text"
+    placeholder="Username"
+>
 
 
-            console.log(
-                "Admin Firebase Inventory:",
-                inventory
-            );
+<input
+    id="password"
+    type="password"
+    placeholder="Password"
+>
 
 
-            loadAdminProducts();
+<button
+    id="loginButton"
+    type="button"
+>
 
-        },
+Login
 
-        (error) => {
+</button>
 
-            console.error(
-                "Firestore inventory error:",
-                error
-            );
 
-            alert(
-                "Could not load inventory from Firebase. Check the console."
-            );
+<p id="loginMessage"></p>
 
-        }
 
-    );
+</div>
 
-}
 
 
-// ==========================================================
-// DISPLAY ADMIN PRODUCTS
-// ==========================================================
 
-function loadAdminProducts() {
 
-    adminProducts.innerHTML = "";
+<!-- =====================================================
+DASHBOARD
+===================================================== -->
 
+<div
+    id="dashboard"
+    class="admin-box hidden"
+>
 
-    if (inventory.length === 0) {
 
-        const emptyMessage =
-            document.createElement("p");
+<div class="admin-dashboard-header">
 
-        emptyMessage.textContent =
-            "No products are currently in Firestore.";
 
-        adminProducts.appendChild(
-            emptyMessage
-        );
+<div>
 
-        return;
+<h1>
+Grayson's Snack Shop
+</h1>
 
-    }
+<p>
+Admin Dashboard
+</p>
 
+</div>
 
-    inventory.forEach(
-        (product) => {
 
-            createAdminProduct(
-                product
-            );
+<button
+    id="logout"
+    type="button"
+>
 
-        }
-    );
+Logout
 
-}
+</button>
 
 
-// ==========================================================
-// CREATE ADMIN PRODUCT BOX
-// ==========================================================
+</div>
 
-function createAdminProduct(product) {
 
-    const box =
-        document.createElement("div");
 
-    box.className =
-        "admin-product";
 
 
-    box.innerHTML = `
+<!-- =====================================================
+TABS
+===================================================== -->
 
-        <div class="product-image">
+<div class="admin-tabs">
 
-            <img
-                src="${product.image || ""}"
-                alt="${product.name || "Product"}"
-                onerror="this.src='https://placehold.co/100x100?text=No+Image'"
-            >
 
-        </div>
+<button
+    id="inventoryTabButton"
+    class="admin-tab-button active"
+    type="button"
+>
 
+📦 Inventory
 
-        <h3>
-            ${product.name || "Unnamed Product"}
-        </h3>
+</button>
 
 
-        <label>
-            Product Name
-        </label>
+<button
+    id="promotionsTabButton"
+    class="admin-tab-button"
+    type="button"
+>
 
-        <input
-            class="admin-name-input"
-            value="${product.name || ""}"
-        >
+🎁 Promotions & Referrals
 
+</button>
 
-        <label>
-            Image Filename
-        </label>
 
-        <input
-            class="admin-image-input"
-            value="${product.image || ""}"
-            placeholder="example.png"
-        >
+</div>
 
 
-        <label>
-            Price
-        </label>
 
-        <input
-            class="admin-price-input"
-            value="${Number(product.price || 0)}"
-            type="number"
-            min="0"
-            step="0.01"
-        >
 
 
-        <label>
-            Stock
-        </label>
+<!-- =====================================================
+INVENTORY TAB
+===================================================== -->
 
-        <input
-            class="admin-stock-input"
-            value="${Number(product.stock || 0)}"
-            type="number"
-            min="0"
-            step="1"
-        >
+<div
+    id="inventoryTab"
+    class="admin-tab-panel"
+>
 
 
-        <label>
-            Restock Date
-        </label>
+<div class="admin-section-card">
 
-        <input
-            class="admin-restock-input"
-            value="${product.restock || ""}"
-            placeholder="8/9/2026"
-        >
 
-    `;
+<h2>
+Add New Product
+</h2>
 
 
-    const saveButton =
-        document.createElement("button");
+<div class="admin-form-grid">
 
-    saveButton.textContent =
-        "Save";
 
-    saveButton.addEventListener(
-        "click",
-        () => {
+<div class="admin-field">
 
-            saveProduct(
-                product,
-                box
-            );
+<label for="newName">
+Product Name
+</label>
 
-        }
-    );
+<input
+    id="newName"
+    placeholder="Product Name"
+>
 
+</div>
 
-    const deleteButton =
-        document.createElement("button");
 
-    deleteButton.textContent =
-        "Delete";
+<div class="admin-field">
 
-    deleteButton.style.marginLeft =
-        "10px";
+<label for="newPrice">
+Price
+</label>
 
-    deleteButton.addEventListener(
-        "click",
-        () => {
+<input
+    id="newPrice"
+    type="number"
+    min="0"
+    step="0.01"
+    placeholder="Price"
+>
 
-            deleteProduct(
-                product
-            );
+</div>
 
-        }
-    );
 
+<div class="admin-field">
 
-    box.appendChild(
-        saveButton
-    );
+<label for="newStock">
+Stock Amount
+</label>
 
-    box.appendChild(
-        deleteButton
-    );
+<input
+    id="newStock"
+    type="number"
+    min="0"
+    step="1"
+    placeholder="Stock Amount"
+>
 
+</div>
 
-    adminProducts.appendChild(
-        box
-    );
 
-}
+<div class="admin-field">
 
+<label for="newRestock">
+Restock Date
+</label>
 
-// ==========================================================
-// SAVE PRODUCT
-// ==========================================================
+<input
+    id="newRestock"
+    placeholder="8/9/2026"
+>
 
-async function saveProduct(
-    product,
-    box
-) {
+</div>
 
-    const name =
-        box
-            .querySelector(
-                ".admin-name-input"
-            )
-            .value
-            .trim();
 
+<div class="admin-field">
 
-    const image =
-        box
-            .querySelector(
-                ".admin-image-input"
-            )
-            .value
-            .trim();
+<label for="newImage">
+Image Filename
+</label>
 
+<input
+    id="newImage"
+    placeholder="example.png"
+>
 
-    const price =
-        Number(
-            box
-                .querySelector(
-                    ".admin-price-input"
-                )
-                .value
-        );
+</div>
 
 
-    const stock =
-        Number(
-            box
-                .querySelector(
-                    ".admin-stock-input"
-                )
-                .value
-        );
+</div>
 
 
-    const restock =
-        box
-            .querySelector(
-                ".admin-restock-input"
-            )
-            .value
-            .trim();
+<br>
 
 
-    if (!name) {
+<button
+    id="addProduct"
+    type="button"
+>
 
-        alert(
-            "Product name cannot be empty."
-        );
+Add Product
 
-        return;
+</button>
 
-    }
 
+</div>
 
-    if (
-        Number.isNaN(price) ||
-        price < 0
-    ) {
 
-        alert(
-            "Enter a valid price."
-        );
 
-        return;
 
-    }
 
+<div class="admin-section-card">
 
-    if (
-        Number.isNaN(stock) ||
-        stock < 0
-    ) {
 
-        alert(
-            "Enter a valid stock amount."
-        );
+<h2>
+Current Products
+</h2>
 
-        return;
 
-    }
+<div id="adminProducts">
 
+<p class="admin-loading">
+Loading inventory...
+</p>
 
-    try {
+</div>
 
-        await updateDoc(
 
-            doc(
-                db,
-                "inventory",
-                product.firestoreId
-            ),
+</div>
 
-            {
-                name: name,
-                image: image,
-                price: price,
-                stock: stock,
-                restock: restock
-            }
 
-        );
+</div>
 
 
-        alert(
-            "Product Updated!"
-        );
 
-    }
 
-    catch (error) {
 
-        console.error(
-            "Error updating product:",
-            error
-        );
+<!-- =====================================================
+PROMOTIONS TAB
+===================================================== -->
 
-        alert(
-            "There was an error updating the product."
-        );
+<div
+    id="promotionsTab"
+    class="admin-tab-panel hidden"
+>
 
-    }
 
-}
+<!-- PROMOTION SETTINGS -->
 
+<div class="admin-section-card">
 
-// ==========================================================
-// DELETE PRODUCT
-// ==========================================================
 
-async function deleteProduct(
-    product
-) {
+<h2>
+🎁 Bring a Friend Promotion
+</h2>
 
-    const confirmed =
-        confirm(
-            `Delete "${product.name}"?`
-        );
 
+<p>
+Control your referral promotion from here.
+</p>
 
-    if (!confirmed) {
 
-        return;
 
-    }
+<div class="admin-checkbox-row">
 
+<input
+    id="promotionActive"
+    type="checkbox"
+>
 
-    try {
+<label for="promotionActive">
 
-        await deleteDoc(
+Promotion Active
 
-            doc(
-                db,
-                "inventory",
-                product.firestoreId
-            )
+</label>
 
-        );
+</div>
 
 
-        alert(
-            "Product Deleted!"
-        );
 
-    }
+<div class="admin-form-grid">
 
-    catch (error) {
 
-        console.error(
-            "Error deleting product:",
-            error
-        );
+<div class="admin-field">
 
-        alert(
-            "There was an error deleting the product."
-        );
+<label for="promotionName">
+Promotion Name
+</label>
 
-    }
+<input
+    id="promotionName"
+    placeholder="Bring a Friend"
+>
 
-}
+</div>
 
 
-// ==========================================================
-// ADD PRODUCT
-// ==========================================================
 
-addButton.addEventListener(
-    "click",
-    addNewProduct
-);
+<div class="admin-field">
 
+<label for="promotionStart">
+Start Date
+</label>
 
-async function addNewProduct() {
+<input
+    id="promotionStart"
+    type="date"
+>
 
-    const name =
-        document
-            .getElementById(
-                "newName"
-            )
-            .value
-            .trim();
+</div>
 
 
-    const price =
-        Number(
-            document
-                .getElementById(
-                    "newPrice"
-                )
-                .value
-        );
 
+<div class="admin-field">
 
-    const stock =
-        Number(
-            document
-                .getElementById(
-                    "newStock"
-                )
-                .value
-        );
+<label for="promotionEnd">
+End Date
+</label>
 
+<input
+    id="promotionEnd"
+    type="date"
+>
 
-    const restock =
-        document
-            .getElementById(
-                "newRestock"
-            )
-            .value
-            .trim();
+</div>
 
 
-    const image =
-        document
-            .getElementById(
-                "newImage"
-            )
-            .value
-            .trim();
 
+<div class="admin-field">
 
-    if (!name) {
+<label for="promotionQualifyingProduct">
+Qualifying Product
+</label>
 
-        alert(
-            "Enter a product name."
-        );
+<input
+    id="promotionQualifyingProduct"
+    list="inventoryProductNames"
+    placeholder="Product customer must purchase"
+>
 
-        return;
+</div>
 
-    }
 
 
-    if (
-        Number.isNaN(price) ||
-        price < 0
-    ) {
+<div class="admin-field">
 
-        alert(
-            "Enter a valid price."
-        );
+<label for="promotionRewardProduct">
+Reward Product
+</label>
 
-        return;
+<input
+    id="promotionRewardProduct"
+    list="inventoryProductNames"
+    placeholder="Reward product"
+>
 
-    }
+</div>
 
 
-    if (
-        Number.isNaN(stock) ||
-        stock < 0
-    ) {
 
-        alert(
-            "Enter a valid stock amount."
-        );
+<div class="admin-field">
 
-        return;
+<label for="promotionRewardQuantity">
+Reward Quantity
+</label>
 
-    }
+<input
+    id="promotionRewardQuantity"
+    type="number"
+    min="1"
+    step="1"
+    value="1"
+>
 
+</div>
 
-    const productId =
-        Date.now().toString();
 
+</div>
 
-    const newProduct = {
 
-        id: Number(productId),
 
-        name: name,
+<div class="admin-field">
 
-        price: price,
+<label for="promotionDescription">
+Promotion Description
+</label>
 
-        stock: stock,
+<textarea
+    id="promotionDescription"
+    placeholder="Explain how the promotion works..."
+></textarea>
 
-        restock: restock,
+</div>
 
-        image: image
 
-    };
 
+<datalist id="inventoryProductNames">
+</datalist>
 
-    try {
 
-        await setDoc(
 
-            doc(
-                db,
-                "inventory",
-                productId
-            ),
+<div class="promotion-save-row">
 
-            newProduct
+<button
+    id="savePromotion"
+    type="button"
+>
 
-        );
+Save Promotion
 
+</button>
 
-        clearAddProductForm();
 
+<span id="promotionMessage"></span>
 
-        alert(
-            "Product Added!"
-        );
+</div>
 
-    }
 
-    catch (error) {
+</div>
 
-        console.error(
-            "Error adding product:",
-            error
-        );
 
-        alert(
-            "There was an error adding the product."
-        );
 
-    }
 
-}
 
+<!-- REFERRAL STATS -->
 
-// ==========================================================
-// CLEAR ADD PRODUCT FORM
-// ==========================================================
+<div class="admin-section-card">
 
-function clearAddProductForm() {
 
-    document.getElementById(
-        "newName"
-    ).value = "";
+<h2>
+Referral Overview
+</h2>
 
 
-    document.getElementById(
-        "newPrice"
-    ).value = "";
+<div class="referral-stats">
 
 
-    document.getElementById(
-        "newStock"
-    ).value = "";
+<div class="referral-stat">
 
+<h3 id="pendingReferralCount">
+0
+</h3>
 
-    document.getElementById(
-        "newRestock"
-    ).value = "";
+<p>
+Pending
+</p>
 
+</div>
 
-    document.getElementById(
-        "newImage"
-    ).value = "";
 
-}
 
+<div class="referral-stat">
 
-// ==========================================================
-// LOGOUT
-// ==========================================================
+<h3 id="approvedReferralCount">
+0
+</h3>
 
-logoutButton.addEventListener(
-    "click",
-    () => {
+<p>
+Approved
+</p>
 
-        if (
-            unsubscribeInventory
-        ) {
+</div>
 
-            unsubscribeInventory();
 
-            unsubscribeInventory =
-                null;
 
-        }
+<div class="referral-stat">
 
+<h3 id="outstandingRewardCount">
+0
+</h3>
 
-        inventory = [];
+<p>
+Rewards To Give
+</p>
 
-        adminProducts.innerHTML =
-            "";
+</div>
 
 
-        dashboard.classList.add(
-            "hidden"
-        );
 
-        loginBox.classList.remove(
-            "hidden"
-        );
+<div class="referral-stat">
 
+<h3 id="totalReferralCodes">
+0
+</h3>
 
-        usernameInput.value = "";
+<p>
+Referral Codes
+</p>
 
-        passwordInput.value = "";
+</div>
 
-        loginMessage.textContent =
-            "";
 
-    }
-);
+</div>
 
 
-// ==========================================================
-// READY
-// ==========================================================
+</div>
 
-console.log(
-    "Grayson's Snack Shop Admin Firebase Loaded"
-);
+
+
+
+
+<!-- REFERRAL REQUESTS -->
+
+<div class="admin-section-card">
+
+
+<h2>
+Referral Purchase Reviews
+</h2>
+
+
+<p>
+Approve a referral after you verify the referred customer completed the qualifying purchase.
+</p>
+
+
+<br>
+
+
+<div id="referralRequests">
+
+<p class="admin-loading">
+Loading referral requests...
+</p>
+
+</div>
+
+
+</div>
+
+
+
+
+
+<!-- REFERRAL CODES -->
+
+<div class="admin-section-card">
+
+
+<h2>
+Customer Referral Codes
+</h2>
+
+
+<p>
+View referral performance and enable or disable individual codes.
+</p>
+
+
+<br>
+
+
+<div id="referralCodes">
+
+<p class="admin-loading">
+Loading referral codes...
+</p>
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+<script
+    type="module"
+    src="admin.js"
+></script>
+
+
+</body>
+
+</html>
