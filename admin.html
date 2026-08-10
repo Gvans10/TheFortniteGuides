@@ -1,357 +1,400 @@
-/*
-==========================================================
-Grayson's Snack Shop
-inventory.js
-Firebase Inventory System
-==========================================================
-*/
+<!DOCTYPE html>
+<html lang="en">
 
-import {
-    db
-} from "./firebase.js";
+<head>
 
-import {
-    collection,
-    getDocs,
-    doc,
-    setDoc,
-    updateDoc,
-    deleteDoc
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+    <meta charset="UTF-8">
 
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
+    <title>
+        Grayson's Snack Shop Admin
+    </title>
 
-// ==========================================================
-// FIRESTORE COLLECTION
-// ==========================================================
+    <link
+        rel="icon"
+        type="image/png"
+        href="graysonslogos.png"
+    >
 
-const inventoryRef =
-    collection(
-        db,
-        "inventory"
-    );
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
 
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
 
-// ==========================================================
-// CURRENT INVENTORY
-// ==========================================================
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
 
-let inventory = [];
+</head>
 
 
+<body>
 
-// ==========================================================
-// LOAD INVENTORY
-// ==========================================================
 
-async function loadInventory() {
+<!-- ======================================================
+     NAVBAR
+====================================================== -->
 
-    try {
+<header>
 
-        inventory = [];
+    <nav class="navbar">
 
+        <div class="logo">
 
-        const snapshot =
-            await getDocs(
-                inventoryRef
-            );
+            🍬 Grayson's Snack Shop Admin
 
+        </div>
 
-        snapshot.forEach(
-            (item) => {
 
-                const data =
-                    item.data();
+        <a href="index.html">
 
+            Back To Shop
 
-                let productId =
-                    data.id;
+        </a>
 
+    </nav>
 
-                /*
-                If the product doesn't have a usable
-                numeric ID, use the Firebase document ID.
-                */
+</header>
 
-                if (
-                    productId === undefined ||
-                    productId === null ||
-                    productId === "" ||
-                    Number.isNaN(
-                        Number(productId)
-                    )
-                ) {
 
-                    productId =
-                        item.id;
 
-                }
+<!-- ======================================================
+     ADMIN SECTION
+====================================================== -->
 
+<section class="admin-section">
 
-                inventory.push({
 
-                    ...data,
+    <!-- ==================================================
+         LOGIN
+    =================================================== -->
 
-                    id: productId,
+    <div
+        id="loginBox"
+        class="admin-box"
+    >
 
-                    firebaseId:
-                        item.id
+        <h1>
+            Admin Login
+        </h1>
 
-                });
 
-            }
-        );
+        <p>
+            Owner Access Only
+        </p>
 
 
-        console.log(
-            "Firebase Inventory Loaded:",
-            inventory
-        );
+        <input
+            id="username"
+            type="email"
+            placeholder="Admin Email"
+            autocomplete="email"
+        >
 
 
-        return inventory;
+        <input
+            id="password"
+            type="password"
+            placeholder="Password"
+            autocomplete="current-password"
+        >
 
-    }
 
-    catch (error) {
+        <button id="loginButton">
 
-        console.error(
-            "Error loading inventory:",
-            error
-        );
+            Login
 
-        inventory = [];
+        </button>
 
-        throw error;
 
-    }
+        <p id="loginMessage"></p>
 
-}
+    </div>
 
 
 
-// ==========================================================
-// SAVE PRODUCT
-// ==========================================================
+    <!-- ==================================================
+         DASHBOARD
+    =================================================== -->
 
-async function saveProduct(product) {
+    <div
+        id="dashboard"
+        class="admin-box hidden"
+    >
 
-    try {
 
-        const documentId =
-            product.firebaseId ||
-            product.id.toString();
+        <h1>
+            Inventory Dashboard
+        </h1>
 
 
-        await updateDoc(
+        <p>
+            Manage your snacks, inventory, and promotions.
+        </p>
 
-            doc(
-                db,
-                "inventory",
-                documentId
-            ),
 
-            {
 
-                name:
-                    product.name,
+        <!-- ==============================================
+             PROMOTION
+        =============================================== -->
 
-                price:
-                    Number(product.price),
+        <h2>
+            Promotion Event
+        </h2>
 
-                stock:
-                    Number(product.stock),
 
-                restock:
-                    product.restock || "",
+        <p>
+            Create and manage your current promotion.
+        </p>
 
-                image:
-                    product.image || ""
 
-            }
+        <label>
+            Promotion Name
+        </label>
 
-        );
+        <input
+            id="promotionName"
+            type="text"
+            placeholder="Example: Bring a Friend"
+        >
 
 
-        console.log(
-            "Product saved:",
-            product.name
-        );
 
+        <label>
 
-        return true;
+            Promotion Active
 
-    }
+        </label>
 
-    catch (error) {
+        <input
+            id="promotionActive"
+            type="checkbox"
+        >
 
-        console.error(
-            "Error saving product:",
-            error
-        );
 
-        throw error;
 
-    }
+        <label>
+            Start Date & Time
+        </label>
 
-}
+        <input
+            id="promotionStart"
+            type="datetime-local"
+        >
 
 
 
-// ==========================================================
-// ADD PRODUCT
-// ==========================================================
+        <label>
+            End Date & Time
+        </label>
 
-async function addProduct(product) {
+        <input
+            id="promotionEnd"
+            type="datetime-local"
+        >
 
-    try {
 
-        const productId =
-            product.id ||
-            Date.now();
 
+        <label>
+            Qualifying Product
+        </label>
 
-        const newProduct = {
+        <select
+            id="qualifyingProduct"
+        >
 
-            id:
-                productId,
+            <option value="">
+                Loading products...
+            </option>
 
-            name:
-                product.name,
+        </select>
 
-            price:
-                Number(product.price),
 
-            stock:
-                Number(product.stock),
 
-            restock:
-                product.restock || "",
+        <label>
+            Reward Product
+        </label>
 
-            image:
-                product.image || ""
+        <select
+            id="rewardProduct"
+        >
 
-        };
+            <option value="">
+                Loading products...
+            </option>
 
+        </select>
 
-        await setDoc(
 
-            doc(
-                db,
-                "inventory",
-                productId.toString()
-            ),
 
-            newProduct
+        <label>
+            Reward Quantity
+        </label>
 
-        );
+        <input
+            id="rewardQuantity"
+            type="number"
+            min="1"
+            value="1"
+        >
 
 
-        console.log(
-            "Product added:",
-            newProduct
-        );
 
+        <button
+            id="savePromotion"
+            type="button"
+        >
 
-        return true;
+            Save Promotion
 
-    }
+        </button>
 
-    catch (error) {
 
-        console.error(
-            "Error adding product:",
-            error
-        );
 
-        throw error;
+        <!-- ==============================================
+             ADD PRODUCT
+        =============================================== -->
 
-    }
+        <h2>
+            Add New Product
+        </h2>
 
-}
 
+        <label>
+            Product Name
+        </label>
 
+        <input
+            id="newName"
+            type="text"
+            placeholder="Product Name"
+        >
 
-// ==========================================================
-// DELETE PRODUCT
-// ==========================================================
 
-async function deleteProduct(product) {
+        <label>
+            Price
+        </label>
 
-    try {
+        <input
+            id="newPrice"
+            type="number"
+            step="0.01"
+            min="0"
+            placeholder="Price"
+        >
 
-        let documentId;
 
+        <label>
+            Stock Amount
+        </label>
 
-        if (
-            typeof product === "object"
-        ) {
+        <input
+            id="newStock"
+            type="number"
+            min="0"
+            placeholder="Stock Amount"
+        >
 
-            documentId =
-                product.firebaseId ||
-                product.id.toString();
 
-        }
+        <label>
+            Restock Date
+        </label>
 
-        else {
+        <input
+            id="newRestock"
+            type="text"
+            placeholder="Example: 8/15/2026"
+        >
 
-            documentId =
-                product.toString();
 
-        }
+        <label>
+            Image Filename
+        </label>
 
+        <input
+            id="newImage"
+            type="text"
+            placeholder="Example: chips.png"
+        >
 
-        await deleteDoc(
 
-            doc(
-                db,
-                "inventory",
-                documentId
-            )
+        <button
+            id="addProduct"
+            type="button"
+        >
 
-        );
+            Add Product
 
+        </button>
 
-        console.log(
-            "Product deleted:",
-            documentId
-        );
 
 
-        return true;
+        <!-- ==============================================
+             CURRENT PRODUCTS
+        =============================================== -->
 
-    }
+        <h2>
+            Current Products
+        </h2>
 
-    catch (error) {
 
-        console.error(
-            "Error deleting product:",
-            error
-        );
+        <div id="adminProducts">
 
-        throw error;
+            <p>
+                Loading products...
+            </p>
 
-    }
+        </div>
 
-}
 
 
+        <!-- ==============================================
+             LOGOUT
+        =============================================== -->
 
-// ==========================================================
-// EXPORT
-// ==========================================================
+        <button
+            id="logout"
+            type="button"
+        >
 
-export {
+            Logout
 
-    inventory,
+        </button>
 
-    loadInventory,
 
-    saveProduct,
+    </div>
 
-    addProduct,
 
-    deleteProduct
+</section>
 
-};
+
+
+<!-- ======================================================
+     JAVASCRIPT
+====================================================== -->
+
+<script
+    type="module"
+    src="admin.js"
+></script>
+
+
+</body>
+
+</html>
