@@ -6,7 +6,6 @@ Firebase Admin Dashboard
 ==========================================================
 */
 
-
 import { db } from "./firebase.js";
 
 import {
@@ -19,14 +18,12 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 
-
 // ==========================================================
 // ADMIN LOGIN
 // ==========================================================
 
 const ADMIN_USERNAME = "60340276";
 const ADMIN_PASSWORD = "5527GSS02";
-
 
 
 // ==========================================================
@@ -40,57 +37,49 @@ let inventory = [];
 let unsubscribeInventory = null;
 
 
-
 // ==========================================================
 // ELEMENTS
 // ==========================================================
 
-const loginBox = document.getElementById("loginBox");
+const loginBox =
+    document.getElementById("loginBox");
 
-const dashboard = document.getElementById("dashboard");
+const dashboard =
+    document.getElementById("dashboard");
 
-const loginButton = document.getElementById("loginButton");
+const loginButton =
+    document.getElementById("loginButton");
 
-const loginMessage = document.getElementById("loginMessage");
+const loginMessage =
+    document.getElementById("loginMessage");
 
-const adminProducts = document.getElementById("adminProducts");
+const adminProducts =
+    document.getElementById("adminProducts");
 
-const logoutButton = document.getElementById("logout");
+const logoutButton =
+    document.getElementById("logout");
 
-const addButton = document.getElementById("addProduct");
+const addButton =
+    document.getElementById("addProduct");
 
+const usernameInput =
+    document.getElementById("username");
+
+const passwordInput =
+    document.getElementById("password");
 
 
 // ==========================================================
 // LOGIN
 // ==========================================================
 
-loginButton.addEventListener("click", login);
-
-
-
-document
-    .getElementById("password")
-    .addEventListener("keydown", (event) => {
-
-        if (event.key === "Enter") {
-
-            login();
-
-        }
-
-    });
-
-
-
 function login() {
 
     const username =
-        document.getElementById("username").value.trim();
+        usernameInput.value.trim();
 
     const password =
-        document.getElementById("password").value;
-
+        passwordInput.value.trim();
 
 
     if (
@@ -110,12 +99,46 @@ function login() {
 
     else {
 
-        loginMessage.textContent = "Incorrect login";
+        loginMessage.textContent =
+            "Incorrect username or password";
 
     }
 
 }
 
+
+loginButton.addEventListener(
+    "click",
+    login
+);
+
+
+usernameInput.addEventListener(
+    "keydown",
+    (event) => {
+
+        if (event.key === "Enter") {
+
+            login();
+
+        }
+
+    }
+);
+
+
+passwordInput.addEventListener(
+    "keydown",
+    (event) => {
+
+        if (event.key === "Enter") {
+
+            login();
+
+        }
+
+    }
+);
 
 
 // ==========================================================
@@ -131,7 +154,6 @@ function startInventoryListener() {
     }
 
 
-
     unsubscribeInventory = onSnapshot(
 
         inventoryRef,
@@ -139,7 +161,6 @@ function startInventoryListener() {
         (snapshot) => {
 
             inventory = [];
-
 
 
             snapshot.forEach((item) => {
@@ -155,22 +176,25 @@ function startInventoryListener() {
             });
 
 
+            inventory.sort(
+                (a, b) => {
 
-            inventory.sort((a, b) => {
+                    return String(
+                        a.name || ""
+                    ).localeCompare(
+                        String(
+                            b.name || ""
+                        )
+                    );
 
-                return String(a.name || "").localeCompare(
-                    String(b.name || "")
-                );
-
-            });
-
+                }
+            );
 
 
             console.log(
                 "Admin Firebase Inventory:",
                 inventory
             );
-
 
 
             loadAdminProducts();
@@ -195,7 +219,6 @@ function startInventoryListener() {
 }
 
 
-
 // ==========================================================
 // DISPLAY ADMIN PRODUCTS
 // ==========================================================
@@ -203,7 +226,6 @@ function startInventoryListener() {
 function loadAdminProducts() {
 
     adminProducts.innerHTML = "";
-
 
 
     if (inventory.length === 0) {
@@ -214,22 +236,26 @@ function loadAdminProducts() {
         emptyMessage.textContent =
             "No products are currently in Firestore.";
 
-        adminProducts.appendChild(emptyMessage);
+        adminProducts.appendChild(
+            emptyMessage
+        );
 
         return;
 
     }
 
 
+    inventory.forEach(
+        (product) => {
 
-    inventory.forEach((product) => {
+            createAdminProduct(
+                product
+            );
 
-        createAdminProduct(product);
-
-    });
+        }
+    );
 
 }
-
 
 
 // ==========================================================
@@ -238,10 +264,11 @@ function loadAdminProducts() {
 
 function createAdminProduct(product) {
 
-    const box = document.createElement("div");
+    const box =
+        document.createElement("div");
 
-    box.className = "admin-product";
-
+    box.className =
+        "admin-product";
 
 
     box.innerHTML = `
@@ -322,105 +349,127 @@ function createAdminProduct(product) {
     `;
 
 
-
-    // SAVE BUTTON
-
     const saveButton =
         document.createElement("button");
 
-    saveButton.textContent = "Save";
+    saveButton.textContent =
+        "Save";
 
     saveButton.addEventListener(
         "click",
-        () => saveProduct(product, box)
+        () => {
+
+            saveProduct(
+                product,
+                box
+            );
+
+        }
     );
 
-
-
-    // DELETE BUTTON
 
     const deleteButton =
         document.createElement("button");
 
-    deleteButton.textContent = "Delete";
+    deleteButton.textContent =
+        "Delete";
 
-    deleteButton.style.marginLeft = "10px";
+    deleteButton.style.marginLeft =
+        "10px";
 
     deleteButton.addEventListener(
         "click",
-        () => deleteProduct(product)
+        () => {
+
+            deleteProduct(
+                product
+            );
+
+        }
     );
 
 
+    box.appendChild(
+        saveButton
+    );
 
-    box.appendChild(saveButton);
+    box.appendChild(
+        deleteButton
+    );
 
-    box.appendChild(deleteButton);
 
-
-
-    adminProducts.appendChild(box);
+    adminProducts.appendChild(
+        box
+    );
 
 }
-
 
 
 // ==========================================================
 // SAVE PRODUCT
 // ==========================================================
 
-async function saveProduct(product, box) {
+async function saveProduct(
+    product,
+    box
+) {
 
     const name =
         box
-            .querySelector(".admin-name-input")
+            .querySelector(
+                ".admin-name-input"
+            )
             .value
             .trim();
-
 
 
     const image =
         box
-            .querySelector(".admin-image-input")
+            .querySelector(
+                ".admin-image-input"
+            )
             .value
             .trim();
-
 
 
     const price =
         Number(
             box
-                .querySelector(".admin-price-input")
+                .querySelector(
+                    ".admin-price-input"
+                )
                 .value
         );
-
 
 
     const stock =
         Number(
             box
-                .querySelector(".admin-stock-input")
+                .querySelector(
+                    ".admin-stock-input"
+                )
                 .value
         );
 
 
-
     const restock =
         box
-            .querySelector(".admin-restock-input")
+            .querySelector(
+                ".admin-restock-input"
+            )
             .value
             .trim();
 
 
-
     if (!name) {
 
-        alert("Product name cannot be empty.");
+        alert(
+            "Product name cannot be empty."
+        );
 
         return;
 
     }
-
 
 
     if (
@@ -428,12 +477,13 @@ async function saveProduct(product, box) {
         price < 0
     ) {
 
-        alert("Enter a valid price.");
+        alert(
+            "Enter a valid price."
+        );
 
         return;
 
     }
-
 
 
     if (
@@ -441,12 +491,13 @@ async function saveProduct(product, box) {
         stock < 0
     ) {
 
-        alert("Enter a valid stock amount.");
+        alert(
+            "Enter a valid stock amount."
+        );
 
         return;
 
     }
-
 
 
     try {
@@ -460,24 +511,19 @@ async function saveProduct(product, box) {
             ),
 
             {
-
                 name: name,
-
                 image: image,
-
                 price: price,
-
                 stock: stock,
-
                 restock: restock
-
             }
 
         );
 
 
-
-        alert("Product Updated!");
+        alert(
+            "Product Updated!"
+        );
 
     }
 
@@ -497,19 +543,18 @@ async function saveProduct(product, box) {
 }
 
 
-
 // ==========================================================
 // DELETE PRODUCT
 // ==========================================================
 
-async function deleteProduct(product) {
+async function deleteProduct(
+    product
+) {
 
-    const confirmed = confirm(
-
-        `Delete "${product.name}"?`
-
-    );
-
+    const confirmed =
+        confirm(
+            `Delete "${product.name}"?`
+        );
 
 
     if (!confirmed) {
@@ -517,7 +562,6 @@ async function deleteProduct(product) {
         return;
 
     }
-
 
 
     try {
@@ -533,8 +577,9 @@ async function deleteProduct(product) {
         );
 
 
-
-        alert("Product Deleted!");
+        alert(
+            "Product Deleted!"
+        );
 
     }
 
@@ -554,7 +599,6 @@ async function deleteProduct(product) {
 }
 
 
-
 // ==========================================================
 // ADD PRODUCT
 // ==========================================================
@@ -565,59 +609,64 @@ addButton.addEventListener(
 );
 
 
-
 async function addNewProduct() {
 
     const name =
         document
-            .getElementById("newName")
+            .getElementById(
+                "newName"
+            )
             .value
             .trim();
-
 
 
     const price =
         Number(
             document
-                .getElementById("newPrice")
+                .getElementById(
+                    "newPrice"
+                )
                 .value
         );
-
 
 
     const stock =
         Number(
             document
-                .getElementById("newStock")
+                .getElementById(
+                    "newStock"
+                )
                 .value
         );
 
 
-
     const restock =
         document
-            .getElementById("newRestock")
+            .getElementById(
+                "newRestock"
+            )
             .value
             .trim();
-
 
 
     const image =
         document
-            .getElementById("newImage")
+            .getElementById(
+                "newImage"
+            )
             .value
             .trim();
 
 
-
     if (!name) {
 
-        alert("Enter a product name.");
+        alert(
+            "Enter a product name."
+        );
 
         return;
 
     }
-
 
 
     if (
@@ -625,12 +674,13 @@ async function addNewProduct() {
         price < 0
     ) {
 
-        alert("Enter a valid price.");
+        alert(
+            "Enter a valid price."
+        );
 
         return;
 
     }
-
 
 
     if (
@@ -638,17 +688,17 @@ async function addNewProduct() {
         stock < 0
     ) {
 
-        alert("Enter a valid stock amount.");
+        alert(
+            "Enter a valid stock amount."
+        );
 
         return;
 
     }
 
 
-
     const productId =
         Date.now().toString();
-
 
 
     const newProduct = {
@@ -668,7 +718,6 @@ async function addNewProduct() {
     };
 
 
-
     try {
 
         await setDoc(
@@ -684,12 +733,12 @@ async function addNewProduct() {
         );
 
 
-
         clearAddProductForm();
 
 
-
-        alert("Product Added!");
+        alert(
+            "Product Added!"
+        );
 
     }
 
@@ -709,7 +758,6 @@ async function addNewProduct() {
 }
 
 
-
 // ==========================================================
 // CLEAR ADD PRODUCT FORM
 // ==========================================================
@@ -721,11 +769,9 @@ function clearAddProductForm() {
     ).value = "";
 
 
-
     document.getElementById(
         "newPrice"
     ).value = "";
-
 
 
     document.getElementById(
@@ -733,11 +779,9 @@ function clearAddProductForm() {
     ).value = "";
 
 
-
     document.getElementById(
         "newRestock"
     ).value = "";
-
 
 
     document.getElementById(
@@ -745,7 +789,6 @@ function clearAddProductForm() {
     ).value = "";
 
 }
-
 
 
 // ==========================================================
@@ -756,35 +799,42 @@ logoutButton.addEventListener(
     "click",
     () => {
 
-        if (unsubscribeInventory) {
+        if (
+            unsubscribeInventory
+        ) {
 
             unsubscribeInventory();
 
-            unsubscribeInventory = null;
+            unsubscribeInventory =
+                null;
 
         }
 
 
-
         inventory = [];
 
-        adminProducts.innerHTML = "";
+        adminProducts.innerHTML =
+            "";
 
 
+        dashboard.classList.add(
+            "hidden"
+        );
 
-        dashboard.classList.add("hidden");
+        loginBox.classList.remove(
+            "hidden"
+        );
 
-        loginBox.classList.remove("hidden");
 
+        usernameInput.value = "";
 
+        passwordInput.value = "";
 
-        document.getElementById(
-            "password"
-        ).value = "";
+        loginMessage.textContent =
+            "";
 
     }
 );
-
 
 
 // ==========================================================
