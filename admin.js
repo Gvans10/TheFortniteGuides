@@ -6,28 +6,27 @@ Firebase Admin Dashboard
 ==========================================================
 */
 
-import { db } from "./firebase.js";
-
 import {
-    collection,
-    getDocs,
-    addDoc,
-    updateDoc,
-    deleteDoc,
-    doc
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+    loadInventory,
+    saveProduct,
+    addProduct,
+    deleteProduct
+} from "./inventory.js";
 
 
 
-// CHANGE YOUR LOGIN HERE
+// ==========================================================
+// ADMIN LOGIN
+// ==========================================================
 
 const ADMIN_USERNAME = "60340276";
 const ADMIN_PASSWORD = "5527GSS02";
 
 
 
-
-// Elements
+// ==========================================================
+// ELEMENTS
+// ==========================================================
 
 const loginBox = document.getElementById("loginBox");
 const dashboard = document.getElementById("dashboard");
@@ -39,22 +38,25 @@ const addButton = document.getElementById("addProduct");
 
 
 
-
-// Store products locally after loading
+// ==========================================================
+// CURRENT PRODUCTS
+// ==========================================================
 
 let products = [];
 
 
 
+// ==========================================================
+// LOGIN
+// ==========================================================
 
-// Login
+loginButton.addEventListener("click", async () => {
 
-loginButton.addEventListener("click", () => {
+    const username =
+        document.getElementById("username").value.trim();
 
-
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
-
+    const password =
+        document.getElementById("password").value;
 
 
     if (
@@ -62,102 +64,116 @@ loginButton.addEventListener("click", () => {
         password === ADMIN_PASSWORD
     ) {
 
+        loginMessage.textContent = "";
 
         loginBox.classList.add("hidden");
 
         dashboard.classList.remove("hidden");
 
 
-        loadAdminProducts();
-
+        await loadAdminProducts();
 
     }
 
     else {
 
-
-        loginMessage.textContent = "Incorrect login";
-
+        loginMessage.textContent =
+            "Incorrect username or password.";
 
     }
-
 
 });
 
 
 
-
-
-
-
-// Get products from Firebase
+// ==========================================================
+// LOAD PRODUCTS
+// ==========================================================
 
 async function loadAdminProducts() {
 
+    adminProducts.innerHTML = `
 
-    adminProducts.innerHTML = "";
+        <p>
+            Loading products...
+        </p>
 
-    products = [];
-
-
-    const snapshot = await getDocs(
-        collection(db, "inventory")
-    );
+    `;
 
 
+    try {
 
-    snapshot.forEach((item) => {
+        products = await loadInventory();
 
 
-        products.push({
+        adminProducts.innerHTML = "";
 
-            id: item.id,
 
-            ...item.data()
+        if (products.length === 0) {
+
+            adminProducts.innerHTML = `
+
+                <p>
+                    No products found.
+                </p>
+
+            `;
+
+            return;
+
+        }
+
+
+        products.forEach(product => {
+
+            createAdminProduct(product);
 
         });
 
+    }
 
-    });
+    catch (error) {
+
+        console.error(
+            "Error loading admin products:",
+            error
+        );
 
 
+        adminProducts.innerHTML = `
 
-    products.forEach(product => {
+            <p>
+                Unable to load products.
+            </p>
 
+        `;
 
-        createAdminCard(product);
-
-
-    });
-
+    }
 
 }
 
 
 
+// ==========================================================
+// CREATE ADMIN PRODUCT CARD
+// ==========================================================
+
+function createAdminProduct(product) {
+
+    const box =
+        document.createElement("div");
 
 
-
-
-// Create admin product card
-
-function createAdminCard(product) {
-
-
-    const box = document.createElement("div");
-
-
-    box.className = "admin-product";
-
+    box.className =
+        "admin-product";
 
 
     box.innerHTML = `
 
-
         <div class="product-image">
 
             <img
-                src="${product.image}"
+                src="${product.image || ""}"
                 alt="${product.name}"
                 onerror="this.src='https://placehold.co/100x100?text=No+Image'"
             >
@@ -165,11 +181,9 @@ function createAdminCard(product) {
         </div>
 
 
-
         <h3>
             ${product.name}
         </h3>
-
 
 
         <label>
@@ -183,8 +197,6 @@ function createAdminCard(product) {
         >
 
 
-
-
         <label>
             Price
         </label>
@@ -192,11 +204,11 @@ function createAdminCard(product) {
 
         <input
             id="price-${product.id}"
-            type="number"
             value="${product.price}"
+            type="number"
+            step="0.01"
+            min="0"
         >
-
-
 
 
         <label>
@@ -206,11 +218,10 @@ function createAdminCard(product) {
 
         <input
             id="stock-${product.id}"
-            type="number"
             value="${product.stock}"
+            type="number"
+            min="0"
         >
-
-
 
 
         <label>
@@ -224,209 +235,419 @@ function createAdminCard(product) {
         >
 
 
-
-
-        <button onclick="saveProduct('${product.id}')">
+        <button
+            onclick="saveProduct('${product.id}')"
+        >
 
             Save
 
         </button>
 
 
-
-
-        <button onclick="deleteProduct('${product.id}')">
+        <button
+            onclick="deleteProduct('${product.id}')"
+        >
 
             Delete
 
         </button>
 
-
     `;
 
 
-
     adminProducts.appendChild(box);
-
 
 }
 
 
 
-
-
-
-
-
-
-// Save Product
+// ==========================================================
+// SAVE PRODUCT
+// ==========================================================
 
 window.saveProduct = async function(id) {
 
+    try {
 
-    await updateDoc(
-
-        doc(db, "inventory", id),
-
-        {
-
-            image:
-            document.getElementById(
-                `image-${id}`
-            ).value,
+        const product =
+            products.find(
+                item =>
+                    item.id.toString() === id.toString()
+            );
 
 
-            price:
-            Number(
-                document.getElementById(
-                    `price-${id}`
-                ).value
-            ),
+        if (!product) {
 
+            alert("Product not found.");
 
-            stock:
-            Number(
-                document.getElementById(
-                    `stock-${id}`
-                ).value
-            ),
-
-
-            restock:
-            document.getElementById(
-                `restock-${id}`
-            ).value
+            return;
 
         }
 
-    );
+
+        const updatedProduct = {
+
+            id: product.id,
+
+            name: product.name,
+
+            image:
+                document.getElementById(
+                    `image-${id}`
+                ).value.trim(),
+
+            price:
+                Number(
+                    document.getElementById(
+                        `price-${id}`
+                    ).value
+                ),
+
+            stock:
+                Number(
+                    document.getElementById(
+                        `stock-${id}`
+                    ).value
+                ),
+
+            restock:
+                document.getElementById(
+                    `restock-${id}`
+                ).value.trim()
+
+        };
 
 
+        const success =
+            await saveProduct(
+                updatedProduct
+            );
 
-    alert("Product Updated");
+
+        if (!success) {
+
+            alert(
+                "There was a problem updating the product."
+            );
+
+            return;
+
+        }
 
 
-    loadAdminProducts();
+        alert(
+            "Product updated successfully!"
+        );
 
+
+        await loadAdminProducts();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Error saving product:",
+            error
+        );
+
+
+        alert(
+            "Something went wrong while saving the product."
+        );
+
+    }
 
 };
 
 
 
-
-
-
-
-
-
-// Delete Product
+// ==========================================================
+// DELETE PRODUCT
+// ==========================================================
 
 window.deleteProduct = async function(id) {
 
-
-    await deleteDoc(
-
-        doc(db, "inventory", id)
-
-    );
-
+    const product =
+        products.find(
+            item =>
+                item.id.toString() === id.toString()
+        );
 
 
-    loadAdminProducts();
+    if (!product) {
 
+        alert("Product not found.");
+
+        return;
+
+    }
+
+
+    const confirmed =
+        confirm(
+            `Are you sure you want to delete "${product.name}"?`
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const success =
+            await deleteProduct(id);
+
+
+        if (!success) {
+
+            alert(
+                "There was a problem deleting the product."
+            );
+
+            return;
+
+        }
+
+
+        alert(
+            "Product deleted successfully!"
+        );
+
+
+        await loadAdminProducts();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Error deleting product:",
+            error
+        );
+
+
+        alert(
+            "Something went wrong while deleting the product."
+        );
+
+    }
 
 };
 
 
 
-
-
-
-
-
-
-// Add Product
+// ==========================================================
+// ADD PRODUCT
+// ==========================================================
 
 addButton.addEventListener("click", async () => {
 
+    const name =
+        document.getElementById("newName")
+            .value.trim();
 
+
+    const price =
+        Number(
+            document.getElementById("newPrice")
+                .value
+        );
+
+
+    const stock =
+        Number(
+            document.getElementById("newStock")
+                .value
+        );
+
+
+    const restock =
+        document.getElementById("newRestock")
+            .value.trim();
+
+
+    const image =
+        document.getElementById("newImage")
+            .value.trim();
+
+
+
+    // Validation
+
+    if (!name) {
+
+        alert(
+            "Please enter a product name."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        isNaN(price) ||
+        price < 0
+    ) {
+
+        alert(
+            "Please enter a valid price."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        isNaN(stock) ||
+        stock < 0
+    ) {
+
+        alert(
+            "Please enter a valid stock amount."
+        );
+
+        return;
+
+    }
+
+
+
+    // Create product
 
     const newProduct = {
 
+        id: Date.now(),
 
-        name:
-        document.getElementById("newName").value,
+        name: name,
 
+        price: price,
 
+        stock: stock,
 
-        price:
-        Number(
-            document.getElementById("newPrice").value
-        ),
+        restock: restock,
 
-
-
-        stock:
-        Number(
-            document.getElementById("newStock").value
-        ),
-
-
-
-        restock:
-        document.getElementById("newRestock").value,
-
-
-
-        image:
-        document.getElementById("newImage").value
-
+        image: image
 
     };
 
 
 
+    try {
 
-    await addDoc(
+        addButton.disabled = true;
 
-        collection(db, "inventory"),
-
-        newProduct
-
-    );
+        addButton.textContent =
+            "Adding Product...";
 
 
+        const result =
+            await addProduct(
+                newProduct
+            );
 
 
-    alert("Product Added");
+        if (!result) {
+
+            alert(
+                "There was a problem adding the product."
+            );
+
+            return;
+
+        }
 
 
+        // Clear fields
 
-    loadAdminProducts();
+        document.getElementById(
+            "newName"
+        ).value = "";
 
+
+        document.getElementById(
+            "newPrice"
+        ).value = "";
+
+
+        document.getElementById(
+            "newStock"
+        ).value = "";
+
+
+        document.getElementById(
+            "newRestock"
+        ).value = "";
+
+
+        document.getElementById(
+            "newImage"
+        ).value = "";
+
+
+        alert(
+            "Product added successfully!"
+        );
+
+
+        await loadAdminProducts();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Error adding product:",
+            error
+        );
+
+
+        alert(
+            "Something went wrong while adding the product."
+        );
+
+    }
+
+    finally {
+
+        addButton.disabled = false;
+
+        addButton.textContent =
+            "Add Product";
+
+    }
 
 });
 
 
 
-
-
-
-
-
-
-// Logout
+// ==========================================================
+// LOGOUT
+// ==========================================================
 
 logoutButton.addEventListener("click", () => {
 
-
     dashboard.classList.add("hidden");
-
 
     loginBox.classList.remove("hidden");
 
 
-    document.getElementById("password").value = "";
+    document.getElementById(
+        "username"
+    ).value = "";
 
+
+    document.getElementById(
+        "password"
+    ).value = "";
+
+
+    loginMessage.textContent = "";
 
 });
