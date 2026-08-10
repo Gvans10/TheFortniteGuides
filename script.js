@@ -3,35 +3,121 @@
 Grayson's Snack Shop
 script.js
 Main Website
-Firebase Inventory + Promotions
+Firebase Inventory + Live Promotions
 ==========================================================
 */
+
 
 import {
     inventory,
     loadInventory
 } from "./inventory.js";
 
+
 import {
     db
 } from "./firebase.js";
 
+
 import {
     doc,
-    getDoc
+    onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
 
 
 // ==========================================================
 // ELEMENTS
 // ==========================================================
 
-const productContainer = document.getElementById("productContainer");
-const inventoryTable = document.getElementById("inventoryTable");
-const searchInput = document.getElementById("searchInput");
-const totalProducts = document.getElementById("totalProducts");
-const itemsInStock = document.getElementById("itemsInStock");
-const darkButton = document.getElementById("darkModeButton");
+const productContainer =
+    document.getElementById(
+        "productContainer"
+    );
+
+
+const inventoryTable =
+    document.getElementById(
+        "inventoryTable"
+    );
+
+
+const searchInput =
+    document.getElementById(
+        "searchInput"
+    );
+
+
+const totalProducts =
+    document.getElementById(
+        "totalProducts"
+    );
+
+
+const itemsInStock =
+    document.getElementById(
+        "itemsInStock"
+    );
+
+
+const darkButton =
+    document.getElementById(
+        "darkModeButton"
+    );
+
+
+
+// ==========================================================
+// PROMOTION ELEMENTS
+// ==========================================================
+
+const promotionSection =
+    document.getElementById(
+        "promotionSection"
+    );
+
+
+const promotionTitle =
+    document.getElementById(
+        "promotionTitle"
+    );
+
+
+const promotionDescriptionText =
+    document.getElementById(
+        "promotionDescriptionText"
+    );
+
+
+const promotionQualifyingProduct =
+    document.getElementById(
+        "promotionQualifyingProduct"
+    );
+
+
+const promotionReward =
+    document.getElementById(
+        "promotionReward"
+    );
+
+
+const promotionDates =
+    document.getElementById(
+        "promotionDates"
+    );
+
+
+const qualifyingProductBox =
+    document.getElementById(
+        "qualifyingProductBox"
+    );
+
+
+const rewardProductBox =
+    document.getElementById(
+        "rewardProductBox"
+    );
+
 
 
 // ==========================================================
@@ -40,14 +126,26 @@ const darkButton = document.getElementById("darkModeButton");
 
 function money(amount) {
 
-    const number = Number(amount);
+    const number =
+        Number(amount);
 
-    if (Number.isNaN(number)) {
+
+    if (
+        Number.isNaN(number)
+    ) {
+
         return "$0.00";
+
     }
 
-    return "$" + number.toFixed(2);
+
+    return (
+        "$" +
+        number.toFixed(2)
+    );
+
 }
+
 
 
 // ==========================================================
@@ -56,31 +154,58 @@ function money(amount) {
 
 function getStatus(product) {
 
-    const stock = Number(product.stock);
+    const stock =
+        Number(
+            product.stock
+        );
 
-    if (stock <= 0) {
+
+    if (
+        stock <= 0
+    ) {
 
         return {
-            text: "Out of Stock",
-            statusClass: "out-stock"
+
+            text:
+                "Out of Stock",
+
+            statusClass:
+                "out-stock"
+
         };
 
     }
 
-    if (stock <= 5) {
+
+    if (
+        stock <= 5
+    ) {
 
         return {
-            text: "Low Stock",
-            statusClass: "low-stock"
+
+            text:
+                "Low Stock",
+
+            statusClass:
+                "low-stock"
+
         };
 
     }
+
 
     return {
-        text: "In Stock",
-        statusClass: "in-stock"
+
+        text:
+            "In Stock",
+
+        statusClass:
+            "in-stock"
+
     };
+
 }
+
 
 
 // ==========================================================
@@ -89,55 +214,112 @@ function getStatus(product) {
 
 function createProduct(product) {
 
-    const status = getStatus(product);
+    const status =
+        getStatus(
+            product
+        );
 
-    const card = document.createElement("div");
 
-    card.className = "product-card";
+    const card =
+        document.createElement(
+            "div"
+        );
 
-    const image = product.image || "";
-    const name = product.name || "Unnamed Product";
-    const price = money(product.price);
-    const stock = Number(product.stock) || 0;
-    const restock = product.restock || "Not specified";
 
-    card.innerHTML =
-        '<div class="product-image">' +
-            '<img ' +
-                'src="' + image + '" ' +
-                'alt="' + name + '" ' +
-                'onerror="this.src=\'https://placehold.co/120x120?text=No+Image\'">' +
-        '</div>' +
+    card.className =
+        "product-card";
 
-        '<div class="product-info">' +
 
-            '<h3>' +
-                name +
-            '</h3>' +
+    const image =
+        product.image ||
+        "";
 
-            '<div class="product-price">' +
-                price +
-            '</div>' +
 
-            '<div class="product-stock">' +
-                'Available: ' + stock +
-            '</div>' +
+    const name =
+        product.name ||
+        "Unnamed Product";
 
-            '<span class="badge ' + status.statusClass + '">' +
-                status.text +
-            '</span>' +
 
-            '<p style="margin-top:15px;">' +
-                'Restock Date: ' +
-                '<strong>' +
-                    restock +
-                '</strong>' +
-            '</p>' +
+    const price =
+        money(
+            product.price
+        );
 
-        '</div>';
 
-    productContainer.appendChild(card);
+    const stock =
+        Number(
+            product.stock
+        ) || 0;
+
+
+    const restock =
+        product.restock ||
+        "Not specified";
+
+
+    card.innerHTML = `
+
+        <div class="product-image">
+
+            <img
+                src="${image}"
+                alt="${name}"
+                onerror="this.src='https://placehold.co/120x120?text=No+Image'"
+            >
+
+        </div>
+
+
+        <div class="product-info">
+
+            <h3>
+                ${name}
+            </h3>
+
+
+            <div class="product-price">
+
+                ${price}
+
+            </div>
+
+
+            <div class="product-stock">
+
+                Available:
+                ${stock}
+
+            </div>
+
+
+            <span class="badge ${status.statusClass}">
+
+                ${status.text}
+
+            </span>
+
+
+            <p style="margin-top:15px;">
+
+                Restock Date:
+
+                <strong>
+                    ${restock}
+                </strong>
+
+            </p>
+
+        </div>
+
+    `;
+
+
+    productContainer.appendChild(
+        card
+    );
+
 }
+
 
 
 // ==========================================================
@@ -146,40 +328,81 @@ function createProduct(product) {
 
 function createTableRow(product) {
 
-    const status = getStatus(product);
+    const status =
+        getStatus(
+            product
+        );
 
-    const row = document.createElement("tr");
 
-    const name = product.name || "Unnamed Product";
-    const price = money(product.price);
-    const stock = Number(product.stock) || 0;
-    const restock = product.restock || "Not specified";
+    const row =
+        document.createElement(
+            "tr"
+        );
 
-    row.innerHTML =
-        '<td>' +
-            name +
-        '</td>' +
 
-        '<td>' +
-            price +
-        '</td>' +
+    const name =
+        product.name ||
+        "Unnamed Product";
 
-        '<td>' +
-            stock +
-        '</td>' +
 
-        '<td>' +
-            '<span class="badge ' + status.statusClass + '">' +
-                status.text +
-            '</span>' +
-        '</td>' +
+    const price =
+        money(
+            product.price
+        );
 
-        '<td>' +
-            restock +
-        '</td>';
 
-    inventoryTable.appendChild(row);
+    const stock =
+        Number(
+            product.stock
+        ) || 0;
+
+
+    const restock =
+        product.restock ||
+        "Not specified";
+
+
+    row.innerHTML = `
+
+        <td>
+            ${name}
+        </td>
+
+
+        <td>
+            ${price}
+        </td>
+
+
+        <td>
+            ${stock}
+        </td>
+
+
+        <td>
+
+            <span class="badge ${status.statusClass}">
+
+                ${status.text}
+
+            </span>
+
+        </td>
+
+
+        <td>
+            ${restock}
+        </td>
+
+    `;
+
+
+    inventoryTable.appendChild(
+        row
+    );
+
 }
+
 
 
 // ==========================================================
@@ -188,26 +411,55 @@ function createTableRow(product) {
 
 function updateStats(products) {
 
-    let total = 0;
+    let total =
+        0;
 
-    products.forEach(function(product) {
 
-        const stock = Number(product.stock);
+    products.forEach(
+        function(product) {
 
-        if (!Number.isNaN(stock)) {
-            total += stock;
+            const stock =
+                Number(
+                    product.stock
+                );
+
+
+            if (
+                !Number.isNaN(
+                    stock
+                )
+            ) {
+
+                total +=
+                    stock;
+
+            }
+
         }
+    );
 
-    });
 
-    if (totalProducts) {
-        totalProducts.textContent = products.length;
+    if (
+        totalProducts
+    ) {
+
+        totalProducts.textContent =
+            products.length;
+
     }
 
-    if (itemsInStock) {
-        itemsInStock.textContent = total;
+
+    if (
+        itemsInStock
+    ) {
+
+        itemsInStock.textContent =
+            total;
+
     }
+
 }
+
 
 
 // ==========================================================
@@ -216,85 +468,156 @@ function updateStats(products) {
 
 function displayProducts(products) {
 
-    if (!productContainer || !inventoryTable) {
+    if (
+        !productContainer ||
+        !inventoryTable
+    ) {
 
         console.error(
             "Product containers were not found in index.html."
         );
 
         return;
+
     }
 
-    productContainer.innerHTML = "";
-    inventoryTable.innerHTML = "";
 
-    if (products.length === 0) {
+    productContainer.innerHTML =
+        "";
 
-        productContainer.innerHTML =
-            '<p style="' +
-                'text-align:center;' +
-                'width:100%;' +
-                'grid-column:1/-1;' +
-            '">' +
-                'No products found.' +
-            '</p>';
 
-        inventoryTable.innerHTML =
-            '<tr>' +
-                '<td colspan="5">' +
-                    'No products found.' +
-                '</td>' +
-            '</tr>';
+    inventoryTable.innerHTML =
+        "";
 
-        updateStats([]);
+
+    if (
+        products.length === 0
+    ) {
+
+        productContainer.innerHTML = `
+
+            <p
+                style="
+                    text-align:center;
+                    width:100%;
+                    grid-column:1/-1;
+                "
+            >
+
+                No products found.
+
+            </p>
+
+        `;
+
+
+        inventoryTable.innerHTML = `
+
+            <tr>
+
+                <td colspan="5">
+
+                    No products found.
+
+                </td>
+
+            </tr>
+
+        `;
+
+
+        updateStats(
+            []
+        );
+
 
         return;
+
     }
 
-    products.forEach(function(product) {
 
-        createProduct(product);
-        createTableRow(product);
+    products.forEach(
+        function(product) {
 
-    });
+            createProduct(
+                product
+            );
 
-    updateStats(products);
+
+            createTableRow(
+                product
+            );
+
+        }
+    );
+
+
+    updateStats(
+        products
+    );
+
 }
+
 
 
 // ==========================================================
 // SEARCH
 // ==========================================================
 
-if (searchInput) {
+if (
+    searchInput
+) {
 
     searchInput.addEventListener(
+
         "input",
+
         function() {
 
             const text =
-                searchInput.value
+
+                searchInput
+                    .value
                     .toLowerCase()
                     .trim();
 
+
             const filtered =
-                inventory.filter(function(product) {
 
-                    const name =
-                        String(
-                            product.name || ""
-                        ).toLowerCase();
+                inventory.filter(
 
-                    return name.includes(text);
+                    function(product) {
 
-                });
+                        const name =
 
-            displayProducts(filtered);
+                            String(
+                                product.name ||
+                                ""
+                            )
+                            .toLowerCase();
+
+
+                        return (
+                            name.includes(
+                                text
+                            )
+                        );
+
+                    }
+
+                );
+
+
+            displayProducts(
+                filtered
+            );
 
         }
+
     );
 
 }
+
 
 
 // ==========================================================
@@ -304,17 +627,28 @@ if (searchInput) {
 function loadDarkMode() {
 
     const savedMode =
-        localStorage.getItem("darkMode");
+
+        localStorage.getItem(
+            "darkMode"
+        );
+
 
     if (
-        savedMode === "enabled" &&
-        document.body
+        savedMode === "enabled"
     ) {
 
-        document.body.classList.add("dark");
+        document.body.classList.add(
+            "dark"
+        );
 
-        if (darkButton) {
-            darkButton.textContent = "☀️";
+
+        if (
+            darkButton
+        ) {
+
+            darkButton.textContent =
+                "☀️";
+
         }
 
     }
@@ -322,119 +656,238 @@ function loadDarkMode() {
 }
 
 
-if (darkButton) {
+
+if (
+    darkButton
+) {
 
     darkButton.addEventListener(
+
         "click",
+
         function() {
 
-            document.body.classList.toggle("dark");
+            document.body.classList.toggle(
+                "dark"
+            );
+
 
             const enabled =
-                document.body.classList.contains("dark");
 
-            if (enabled) {
+                document.body
+                    .classList
+                    .contains(
+                        "dark"
+                    );
+
+
+            if (
+                enabled
+            ) {
 
                 localStorage.setItem(
                     "darkMode",
                     "enabled"
                 );
 
-                darkButton.textContent = "☀️";
 
-            } else {
+                darkButton.textContent =
+                    "☀️";
+
+            }
+
+            else {
 
                 localStorage.setItem(
                     "darkMode",
                     "disabled"
                 );
 
-                darkButton.textContent = "🌙";
+
+                darkButton.textContent =
+                    "🌙";
 
             }
 
         }
+
     );
 
 }
 
 
+
 loadDarkMode();
 
 
+
 // ==========================================================
-// PROMOTION
+// DATE HELPERS
 // ==========================================================
 
-async function loadPromotion() {
+function parseLocalDate(
+    dateString,
+    endOfDay = false
+) {
 
-    try {
+    if (
+        !dateString
+    ) {
 
-        const promotionRef =
-            doc(
-                db,
-                "promotions",
-                "current"
-            );
-
-        const snapshot =
-            await getDoc(
-                promotionRef
-            );
-
-        if (!snapshot.exists()) {
-
-            console.log(
-                "No promotion currently saved."
-            );
-
-            return;
-
-        }
-
-        const promotion =
-            snapshot.data();
-
-        console.log(
-            "Promotion loaded:",
-            promotion
-        );
-
-        displayPromotion(promotion);
+        return null;
 
     }
 
-    catch (error) {
 
-        console.error(
-            "Error loading promotion:",
-            error
+    const parts =
+        dateString.split(
+            "-"
+        );
+
+
+    if (
+        parts.length !== 3
+    ) {
+
+        return null;
+
+    }
+
+
+    const year =
+        Number(
+            parts[0]
+        );
+
+
+    const month =
+        Number(
+            parts[1]
+        ) - 1;
+
+
+    const day =
+        Number(
+            parts[2]
+        );
+
+
+    if (
+        endOfDay
+    ) {
+
+        return new Date(
+
+            year,
+            month,
+            day,
+            23,
+            59,
+            59,
+            999
+
         );
 
     }
+
+
+    return new Date(
+
+        year,
+        month,
+        day,
+        0,
+        0,
+        0,
+        0
+
+    );
 
 }
 
 
+
 // ==========================================================
-// CHECK PROMOTION DATES
+// FORMAT PROMOTION DATE
 // ==========================================================
 
-function promotionIsCurrentlyActive(promotion) {
+function formatPromotionDate(
+    dateString
+) {
 
-    if (!promotion || promotion.active !== true) {
-        return false;
+    const date =
+        parseLocalDate(
+            dateString
+        );
+
+
+    if (
+        !date ||
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "";
+
     }
 
-    const now = new Date();
 
-    if (promotion.start) {
+    return date.toLocaleDateString(
+
+        undefined,
+
+        {
+            month:
+                "short",
+
+            day:
+                "numeric",
+
+            year:
+                "numeric"
+        }
+
+    );
+
+}
+
+
+
+// ==========================================================
+// CHECK IF PROMOTION IS ACTIVE
+// ==========================================================
+
+function promotionIsCurrentlyActive(
+    promotion
+) {
+
+    if (
+        !promotion ||
+        promotion.active !== true
+    ) {
+
+        return false;
+
+    }
+
+
+    const now =
+        new Date();
+
+
+    if (
+        promotion.startDate
+    ) {
 
         const startDate =
-            new Date(promotion.start);
+            parseLocalDate(
+                promotion.startDate
+            );
+
 
         if (
-            !Number.isNaN(startDate.getTime()) &&
+            startDate &&
             now < startDate
         ) {
 
@@ -444,13 +897,20 @@ function promotionIsCurrentlyActive(promotion) {
 
     }
 
-    if (promotion.end) {
+
+    if (
+        promotion.endDate
+    ) {
 
         const endDate =
-            new Date(promotion.end);
+            parseLocalDate(
+                promotion.endDate,
+                true
+            );
+
 
         if (
-            !Number.isNaN(endDate.getTime()) &&
+            endDate &&
             now > endDate
         ) {
 
@@ -460,112 +920,318 @@ function promotionIsCurrentlyActive(promotion) {
 
     }
 
+
     return true;
+
 }
+
+
+
+// ==========================================================
+// HIDE PROMOTION
+// ==========================================================
+
+function hidePromotion() {
+
+    if (
+        promotionSection
+    ) {
+
+        promotionSection.classList.add(
+            "hidden"
+        );
+
+    }
+
+}
+
 
 
 // ==========================================================
 // DISPLAY PROMOTION
 // ==========================================================
 
-function displayPromotion(promotion) {
+function displayPromotion(
+    promotion
+) {
 
-    if (!promotionIsCurrentlyActive(promotion)) {
+    if (
+        !promotionSection
+    ) {
 
-        console.log(
-            "Promotion exists but is not currently active."
+        console.error(
+            "Promotion section was not found in index.html."
         );
 
         return;
 
     }
 
-    let promotionBox =
-        document.getElementById(
-            "promotionBanner"
+
+    if (
+        !promotionIsCurrentlyActive(
+            promotion
+        )
+    ) {
+
+        hidePromotion();
+
+        console.log(
+            "Promotion is currently inactive."
         );
 
-    if (!promotionBox) {
-
-        promotionBox =
-            document.createElement("section");
-
-        promotionBox.id =
-            "promotionBanner";
-
-        promotionBox.style.cssText =
-            "margin:30px auto;" +
-            "max-width:1000px;" +
-            "padding:30px;" +
-            "border-radius:20px;" +
-            "background:#fff3e6;" +
-            "text-align:center;" +
-            "box-shadow:0 5px 20px rgba(0,0,0,0.12);";
-
-        const productsSection =
-            document.getElementById(
-                "products"
-            );
-
-        if (productsSection) {
-
-            productsSection.parentNode.insertBefore(
-                promotionBox,
-                productsSection
-            );
-
-        } else {
-
-            document.body.appendChild(
-                promotionBox
-            );
-
-        }
+        return;
 
     }
 
-    const promotionName =
-        promotion.name ||
-        "Special Promotion";
 
-    const qualifyingName =
-        promotion.qualifyingProductName ||
-        "a qualifying product";
+
+    const name =
+
+        promotion.name ||
+        "Current Promotion";
+
+
+
+    const description =
+
+        promotion.description ||
+        "Check out our current special offer!";
+
+
+
+    const qualifyingProduct =
+
+        promotion.qualifyingProduct ||
+        "";
+
+
+
+    const rewardProduct =
+
+        promotion.rewardProduct ||
+        "";
+
+
 
     const rewardQuantity =
-        promotion.rewardQuantity ||
-        1;
 
-    const rewardName =
-        promotion.rewardProductName ||
-        "reward";
+        Number(
+            promotion.rewardQuantity
+        ) || 1;
 
-    promotionBox.innerHTML =
-        '<h2 style="margin-bottom:10px;">' +
-            '🎉 ' +
-            promotionName +
-        '</h2>' +
 
-        '<p style="margin-bottom:10px;">' +
-            'Bring a new customer to ' +
-            "Grayson's Snack Shop!" +
-        '</p>' +
 
-        '<p>' +
-            'Buy: ' +
-            '<strong>' +
-                qualifyingName +
-            '</strong>' +
-            '<br>' +
-            'The person who referred them receives: ' +
-            '<strong>' +
-                rewardQuantity +
-                ' × ' +
-                rewardName +
-            '</strong>' +
-        '</p>';
+    promotionTitle.textContent =
+        "🎉 " + name;
+
+
+
+    promotionDescriptionText.textContent =
+        description;
+
+
+
+    if (
+        qualifyingProduct
+    ) {
+
+        qualifyingProductBox.classList.remove(
+            "hidden"
+        );
+
+
+        promotionQualifyingProduct.textContent =
+            qualifyingProduct;
+
+    }
+
+    else {
+
+        qualifyingProductBox.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+
+    if (
+        rewardProduct
+    ) {
+
+        rewardProductBox.classList.remove(
+            "hidden"
+        );
+
+
+        promotionReward.textContent =
+
+            rewardQuantity +
+            " × " +
+            rewardProduct;
+
+    }
+
+    else {
+
+        rewardProductBox.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+
+    const startText =
+        formatPromotionDate(
+            promotion.startDate
+        );
+
+
+    const endText =
+        formatPromotionDate(
+            promotion.endDate
+        );
+
+
+
+    if (
+        startText &&
+        endText
+    ) {
+
+        promotionDates.textContent =
+
+            "Promotion runs " +
+            startText +
+            " through " +
+            endText +
+            ".";
+
+    }
+
+    else if (
+        startText
+    ) {
+
+        promotionDates.textContent =
+
+            "Promotion starts " +
+            startText +
+            ".";
+
+    }
+
+    else if (
+        endText
+    ) {
+
+        promotionDates.textContent =
+
+            "Promotion ends " +
+            endText +
+            ".";
+
+    }
+
+    else {
+
+        promotionDates.textContent =
+            "";
+
+    }
+
+
+
+    promotionSection.classList.remove(
+        "hidden"
+    );
+
+
+    console.log(
+        "Active promotion displayed:",
+        promotion
+    );
 
 }
+
+
+
+// ==========================================================
+// LIVE PROMOTION LISTENER
+// ==========================================================
+
+function startPromotionListener() {
+
+    const promotionRef =
+
+        doc(
+
+            db,
+
+            "promotions",
+
+            "first-week-takis"
+
+        );
+
+
+    onSnapshot(
+
+        promotionRef,
+
+        function(snapshot) {
+
+            if (
+                !snapshot.exists()
+            ) {
+
+                console.log(
+                    "No promotion saved."
+                );
+
+
+                hidePromotion();
+
+
+                return;
+
+            }
+
+
+            const promotion =
+                snapshot.data();
+
+
+            console.log(
+                "Promotion updated:",
+                promotion
+            );
+
+
+            displayPromotion(
+                promotion
+            );
+
+        },
+
+        function(error) {
+
+            console.error(
+                "Promotion listener error:",
+                error
+            );
+
+
+            hidePromotion();
+
+        }
+
+    );
+
+}
+
 
 
 // ==========================================================
@@ -580,13 +1246,17 @@ async function startShop() {
             "Loading Grayson's Snack Shop..."
         );
 
+
         await loadInventory();
+
 
         displayProducts(
             inventory
         );
 
-        await loadPromotion();
+
+        startPromotionListener();
+
 
         console.log(
             "Grayson's Snack Shop Loaded From Firebase"
@@ -594,30 +1264,43 @@ async function startShop() {
 
     }
 
-    catch (error) {
+    catch (
+        error
+    ) {
 
         console.error(
             "Failed to start Grayson's Snack Shop:",
             error
         );
 
-        if (productContainer) {
 
-            productContainer.innerHTML =
-                '<p style="' +
-                    'text-align:center;' +
-                    'width:100%;' +
-                    'grid-column:1/-1;' +
-                '">' +
-                    'Unable to load the shop right now. ' +
-                    'Please refresh the page.' +
-                '</p>';
+        if (
+            productContainer
+        ) {
+
+            productContainer.innerHTML = `
+
+                <p
+                    style="
+                        text-align:center;
+                        width:100%;
+                        grid-column:1/-1;
+                    "
+                >
+
+                    Unable to load the shop right now.
+                    Please refresh the page.
+
+                </p>
+
+            `;
 
         }
 
     }
 
 }
+
 
 
 // ==========================================================
