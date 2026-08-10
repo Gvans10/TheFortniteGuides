@@ -1,115 +1,199 @@
-/*
-==========================================================
+# /*
+
 Grayson's Snack Shop
 admin.js
-Firebase Admin Dashboard + Promotions
-==========================================================
+Complete Admin Dashboard
+========================
+
 */
 
-import { auth, db } from "./firebase.js";
+import {
+auth,
+db
+} from "./firebase.js";
 
 import {
-    signInWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged
+signInWithEmailAndPassword,
+signOut,
+onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 import {
-    collection,
-    getDocs,
-    doc,
-    setDoc,
-    getDoc
+collection,
+doc,
+getDocs,
+getDoc,
+setDoc,
+updateDoc,
+deleteDoc
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 import {
-    loadInventory,
-    saveProduct as saveInventoryProduct,
-    addProduct,
-    deleteProduct as deleteInventoryProduct
+loadInventory,
+saveProduct,
+addProduct,
+deleteProduct
 } from "./inventory.js";
-
 
 // ==========================================================
 // ELEMENTS
 // ==========================================================
 
-const loginBox = document.getElementById("loginBox");
-const dashboard = document.getElementById("dashboard");
-const loginButton = document.getElementById("loginButton");
-const loginMessage = document.getElementById("loginMessage");
-const adminProducts = document.getElementById("adminProducts");
-const logoutButton = document.getElementById("logout");
-const addButton = document.getElementById("addProduct");
+const loginBox =
+document.getElementById("loginBox");
+
+const dashboard =
+document.getElementById("dashboard");
+
+const loginButton =
+document.getElementById("loginButton");
+
+const loginMessage =
+document.getElementById("loginMessage");
+
+const adminProducts =
+document.getElementById("adminProducts");
+
+const logoutButton =
+document.getElementById("logout");
+
+const addButton =
+document.getElementById("addProduct");
+
+const adminReferrals =
+document.getElementById("adminReferrals");
+
+const refreshReferralsButton =
+document.getElementById("refreshReferrals");
+
+const pendingReferralCount =
+document.getElementById("pendingReferralCount");
+
+const approvedReferralCount =
+document.getElementById("approvedReferralCount");
+
+const rewardDueCount =
+document.getElementById("rewardDueCount");
+
+const rewardedReferralCount =
+document.getElementById("rewardedReferralCount");
+
+const rejectedReferralCount =
+document.getElementById("rejectedReferralCount");
+
+const promotionName =
+document.getElementById("promotionName");
+
+const promotionActive =
+document.getElementById("promotionActive");
+
+const promotionStart =
+document.getElementById("promotionStart");
+
+const promotionEnd =
+document.getElementById("promotionEnd");
 
 const qualifyingProduct =
-    document.getElementById("qualifyingProduct");
+document.getElementById("qualifyingProduct");
 
 const rewardProduct =
-    document.getElementById("rewardProduct");
+document.getElementById("rewardProduct");
+
+const rewardQuantity =
+document.getElementById("rewardQuantity");
 
 const savePromotionButton =
-    document.getElementById("savePromotion");
+document.getElementById("savePromotion");
 
+const promotionMessage =
+document.getElementById("promotionMessage");
 
 // ==========================================================
-// PRODUCTS
+// DATA
 // ==========================================================
 
 let products = [];
 
+let referrals = [];
 
 // ==========================================================
-// PROMOTION DOCUMENT
+// FIRESTORE REFERENCES
 // ==========================================================
 
-const promotionRef = doc(
-    db,
-    "promotions",
-    "current"
+const referralsRef =
+collection(
+db,
+"referralUses"
 );
 
+const promotionsRef =
+collection(
+db,
+"promotions"
+);
 
 // ==========================================================
 // AUTHENTICATION
 // ==========================================================
 
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(
+auth,
+async (user) => {
 
+```
     if (user) {
 
-        loginBox.classList.add("hidden");
+        loginBox.classList.add(
+            "hidden"
+        );
 
-        dashboard.classList.remove("hidden");
+        dashboard.classList.remove(
+            "hidden"
+        );
 
-        loginMessage.textContent = "";
+        loginMessage.textContent =
+            "";
 
-        await loadAdminProducts();
-
-        await loadPromotion();
-
-    } else {
-
-        dashboard.classList.add("hidden");
-
-        loginBox.classList.remove("hidden");
+        await initializeDashboard();
 
     }
 
-});
+    else {
 
+        dashboard.classList.add(
+            "hidden"
+        );
+
+        loginBox.classList.remove(
+            "hidden"
+        );
+
+    }
+
+}
+```
+
+);
 
 // ==========================================================
 // LOGIN
 // ==========================================================
 
-loginButton.addEventListener("click", async () => {
+loginButton.addEventListener(
+"click",
+async () => {
 
+```
     const email =
-        document.getElementById("username").value.trim();
+        document
+            .getElementById("username")
+            .value
+            .trim();
 
     const password =
-        document.getElementById("password").value;
+        document
+            .getElementById("password")
+            .value;
 
 
     if (!email || !password) {
@@ -122,11 +206,14 @@ loginButton.addEventListener("click", async () => {
     }
 
 
-    loginButton.disabled = true;
+    loginButton.disabled =
+        true;
 
-    loginButton.textContent = "Logging In...";
+    loginButton.textContent =
+        "Logging In...";
 
-    loginMessage.textContent = "";
+    loginMessage.textContent =
+        "";
 
 
     try {
@@ -137,23 +224,64 @@ loginButton.addEventListener("click", async () => {
             password
         );
 
-    } catch (error) {
+    }
 
-        console.error("Login error:", error);
+    catch (error) {
+
+        console.error(
+            "Login error:",
+            error
+        );
+
 
         loginMessage.textContent =
             "Incorrect email or password.";
 
-    } finally {
+    }
 
-        loginButton.disabled = false;
+    finally {
 
-        loginButton.textContent = "Login";
+        loginButton.disabled =
+            false;
+
+        loginButton.textContent =
+            "Login";
 
     }
 
-});
+}
+```
 
+);
+
+// ==========================================================
+// INITIALIZE DASHBOARD
+// ==========================================================
+
+async function initializeDashboard() {
+
+```
+try {
+
+    await loadAdminProducts();
+
+    await loadPromotion();
+
+    await loadReferrals();
+
+}
+
+catch (error) {
+
+    console.error(
+        "Dashboard initialization error:",
+        error
+    );
+
+}
+```
+
+}
 
 // ==========================================================
 // LOAD PRODUCTS
@@ -161,337 +289,438 @@ loginButton.addEventListener("click", async () => {
 
 async function loadAdminProducts() {
 
-    adminProducts.innerHTML = `
-        <p>Loading products...</p>
-    `;
+```
+adminProducts.innerHTML = `
+    <p>
+        Loading products...
+    </p>
+`;
 
 
-    try {
+try {
 
-        products = await loadInventory();
-
-        adminProducts.innerHTML = "";
-
-
-        if (products.length === 0) {
-
-            adminProducts.innerHTML = `
-                <p>No products found.</p>
-            `;
-
-        } else {
-
-            products.forEach((product) => {
-
-                createAdminProduct(product);
-
-            });
-
-        }
+    products =
+        await loadInventory();
 
 
-        populatePromotionDropdowns();
+    adminProducts.innerHTML =
+        "";
 
-    } catch (error) {
 
-        console.error(
-            "Error loading products:",
-            error
-        );
+    if (
+        products.length === 0
+    ) {
 
         adminProducts.innerHTML = `
             <p>
-                Unable to load products.
+                No products found.
             </p>
         `;
 
+        populateProductDropdowns();
+
+        return;
+
     }
 
-}
 
+    products.forEach(
+        product => {
 
-// ==========================================================
-// CREATE PRODUCT ADMIN CARD
-// ==========================================================
+            createAdminProduct(
+                product
+            );
 
-function createAdminProduct(product) {
-
-    const box = document.createElement("div");
-
-    box.className = "admin-product";
-
-
-    const productId = String(
-        product.firebaseId || product.id
+        }
     );
 
 
-    box.innerHTML = `
-
-        <div class="product-image">
-
-            <img
-                src="${product.image || ""}"
-                alt="${product.name || "Product"}"
-                onerror="this.src='https://placehold.co/100x100?text=No+Image'"
-            >
-
-        </div>
-
-
-        <h3>
-            ${product.name || "Unnamed Product"}
-        </h3>
-
-
-        <label>
-            Image Filename
-        </label>
-
-        <input
-            id="image-${productId}"
-            value="${product.image || ""}"
-        >
-
-
-        <label>
-            Price
-        </label>
-
-        <input
-            id="price-${productId}"
-            type="number"
-            step="0.01"
-            min="0"
-            value="${product.price ?? 0}"
-        >
-
-
-        <label>
-            Stock
-        </label>
-
-        <input
-            id="stock-${productId}"
-            type="number"
-            min="0"
-            value="${product.stock ?? 0}"
-        >
-
-
-        <label>
-            Restock Date
-        </label>
-
-        <input
-            id="restock-${productId}"
-            value="${product.restock || ""}"
-        >
-
-
-        <div style="
-            display:flex;
-            gap:10px;
-            margin-top:15px;
-            flex-wrap:wrap;
-        ">
-
-            <button
-                type="button"
-                onclick="saveProduct('${productId}')"
-            >
-                Save
-            </button>
-
-
-            <button
-                type="button"
-                onclick="deleteProduct('${productId}')"
-            >
-                Delete
-            </button>
-
-        </div>
-
-    `;
-
-
-    adminProducts.appendChild(box);
+    populateProductDropdowns();
 
 }
 
+catch (error) {
+
+    console.error(
+        "Error loading products:",
+        error
+    );
+
+
+    adminProducts.innerHTML = `
+        <p>
+            Unable to load products.
+        </p>
+    `;
+
+}
+```
+
+}
+
+// ==========================================================
+// CREATE ADMIN PRODUCT
+// ==========================================================
+
+function createAdminProduct(
+product
+) {
+
+```
+const box =
+    document.createElement(
+        "div"
+    );
+
+
+box.className =
+    "admin-product";
+
+
+const safeId =
+    String(
+        product.firebaseId ||
+        product.id
+    )
+    .replace(
+        /[^a-zA-Z0-9_-]/g,
+        "_"
+    );
+
+
+box.innerHTML = `
+
+    <div class="product-image">
+
+        <img
+            src="${product.image || ""}"
+            alt="${product.name || "Product"}"
+            onerror="this.src='https://placehold.co/100x100?text=No+Image'"
+        >
+
+    </div>
+
+
+    <h3>
+        ${product.name || "Unnamed Product"}
+    </h3>
+
+
+    <label>
+        Image Filename
+    </label>
+
+    <input
+        id="image-${safeId}"
+        value="${product.image || ""}"
+    >
+
+
+    <label>
+        Price
+    </label>
+
+    <input
+        id="price-${safeId}"
+        value="${Number(product.price || 0).toFixed(2)}"
+        type="number"
+        step="0.01"
+        min="0"
+    >
+
+
+    <label>
+        Stock
+    </label>
+
+    <input
+        id="stock-${safeId}"
+        value="${Number(product.stock || 0)}"
+        type="number"
+        min="0"
+    >
+
+
+    <label>
+        Restock Date
+    </label>
+
+    <input
+        id="restock-${safeId}"
+        value="${product.restock || ""}"
+    >
+
+
+    <button
+        class="save-product-button"
+        data-product-id="${product.id}"
+        data-safe-id="${safeId}"
+        type="button"
+    >
+        Save
+    </button>
+
+
+    <button
+        class="delete-product-button"
+        data-product-id="${product.id}"
+        type="button"
+    >
+        Delete
+    </button>
+
+`;
+
+
+const saveButton =
+    box.querySelector(
+        ".save-product-button"
+    );
+
+
+saveButton.addEventListener(
+    "click",
+    async () => {
+
+        await saveProductFromForm(
+            product,
+            safeId
+        );
+
+    }
+);
+
+
+const deleteButton =
+    box.querySelector(
+        ".delete-product-button"
+    );
+
+
+deleteButton.addEventListener(
+    "click",
+    async () => {
+
+        await deleteProductFromAdmin(
+            product
+        );
+
+    }
+);
+
+
+adminProducts.appendChild(
+    box
+);
+```
+
+}
 
 // ==========================================================
 // SAVE PRODUCT
 // ==========================================================
 
-window.saveProduct = async function(id) {
+async function saveProductFromForm(
+product,
+safeId
+) {
 
-    try {
+```
+try {
 
-        const product = products.find((item) => {
+    const updatedProduct = {
 
-            return String(
-                item.firebaseId || item.id
-            ) === String(id);
+        ...product,
 
-        });
+        image:
+            document.getElementById(
+                `image-${safeId}`
+            ).value.trim(),
 
-
-        if (!product) {
-
-            alert("Product not found.");
-
-            return;
-
-        }
-
-
-        const updatedProduct = {
-
-            ...product,
-
-            image:
+        price:
+            Number(
                 document.getElementById(
-                    `image-${id}`
-                ).value.trim(),
+                    `price-${safeId}`
+                ).value
+            ),
 
-            price:
-                Number(
-                    document.getElementById(
-                        `price-${id}`
-                    ).value
-                ),
-
-            stock:
-                Number(
-                    document.getElementById(
-                        `stock-${id}`
-                    ).value
-                ),
-
-            restock:
+        stock:
+            Number(
                 document.getElementById(
-                    `restock-${id}`
-                ).value.trim()
+                    `stock-${safeId}`
+                ).value
+            ),
 
-        };
+        restock:
+            document.getElementById(
+                `restock-${safeId}`
+            ).value.trim()
+
+    };
 
 
-        await saveInventoryProduct(
-            updatedProduct
-        );
-
+    if (
+        Number.isNaN(
+            updatedProduct.price
+        ) ||
+        updatedProduct.price < 0
+    ) {
 
         alert(
-            "Product updated successfully!"
+            "Please enter a valid price."
         );
 
-
-        await loadAdminProducts();
-
-    } catch (error) {
-
-        console.error(
-            "Error saving product:",
-            error
-        );
-
-        alert(
-            "Something went wrong while saving the product."
-        );
+        return;
 
     }
 
-};
 
+    if (
+        Number.isNaN(
+            updatedProduct.stock
+        ) ||
+        updatedProduct.stock < 0
+    ) {
+
+        alert(
+            "Please enter a valid stock amount."
+        );
+
+        return;
+
+    }
+
+
+    await saveProduct(
+        updatedProduct
+    );
+
+
+    alert(
+        "Product updated successfully!"
+    );
+
+
+    await loadAdminProducts();
+
+}
+
+catch (error) {
+
+    console.error(
+        "Error saving product:",
+        error
+    );
+
+
+    alert(
+        "Something went wrong while saving the product."
+    );
+
+}
+```
+
+}
 
 // ==========================================================
 // DELETE PRODUCT
 // ==========================================================
 
-window.deleteProduct = async function(id) {
+async function deleteProductFromAdmin(
+product
+) {
 
-    const product = products.find((item) => {
-
-        return String(
-            item.firebaseId || item.id
-        ) === String(id);
-
-    });
-
-
-    if (!product) {
-
-        alert("Product not found.");
-
-        return;
-
-    }
-
-
-    const confirmed = confirm(
+```
+const confirmed =
+    confirm(
         `Are you sure you want to delete "${product.name}"?`
     );
 
 
-    if (!confirmed) {
+if (!confirmed) {
 
-        return;
+    return;
 
-    }
+}
 
 
-    try {
+try {
 
-        await deleteInventoryProduct(product);
+    await deleteProduct(
+        product
+    );
 
-        alert(
-            "Product deleted successfully!"
-        );
 
-        await loadAdminProducts();
+    alert(
+        "Product deleted successfully!"
+    );
 
-    } catch (error) {
 
-        console.error(
-            "Error deleting product:",
-            error
-        );
+    await loadAdminProducts();
 
-        alert(
-            "Something went wrong while deleting the product."
-        );
+}
 
-    }
+catch (error) {
 
-};
+    console.error(
+        "Error deleting product:",
+        error
+    );
 
+
+    alert(
+        "Something went wrong while deleting the product."
+    );
+
+}
+```
+
+}
 
 // ==========================================================
 // ADD PRODUCT
 // ==========================================================
 
-addButton.addEventListener("click", async () => {
+addButton.addEventListener(
+"click",
+async () => {
 
+```
     const name =
-        document.getElementById("newName").value.trim();
+        document
+            .getElementById("newName")
+            .value
+            .trim();
+
 
     const price =
         Number(
-            document.getElementById("newPrice").value
+            document
+                .getElementById("newPrice")
+                .value
         );
+
 
     const stock =
         Number(
-            document.getElementById("newStock").value
+            document
+                .getElementById("newStock")
+                .value
         );
 
+
     const restock =
-        document.getElementById("newRestock").value.trim();
+        document
+            .getElementById("newRestock")
+            .value
+            .trim();
+
 
     const image =
-        document.getElementById("newImage").value.trim();
+        document
+            .getElementById("newImage")
+            .value
+            .trim();
 
 
     if (!name) {
@@ -505,7 +734,10 @@ addButton.addEventListener("click", async () => {
     }
 
 
-    if (Number.isNaN(price) || price < 0) {
+    if (
+        Number.isNaN(price) ||
+        price < 0
+    ) {
 
         alert(
             "Please enter a valid price."
@@ -516,7 +748,10 @@ addButton.addEventListener("click", async () => {
     }
 
 
-    if (Number.isNaN(stock) || stock < 0) {
+    if (
+        Number.isNaN(stock) ||
+        stock < 0
+    ) {
 
         alert(
             "Please enter a valid stock amount."
@@ -529,47 +764,60 @@ addButton.addEventListener("click", async () => {
 
     const newProduct = {
 
-        id: Date.now(),
+        id:
+            Date.now(),
 
-        name: name,
+        name:
+            name,
 
-        price: price,
+        price:
+            price,
 
-        stock: stock,
+        stock:
+            stock,
 
-        restock: restock,
+        restock:
+            restock,
 
-        image: image
+        image:
+            image
 
     };
 
 
     try {
 
-        addButton.disabled = true;
+        addButton.disabled =
+            true;
 
         addButton.textContent =
             "Adding Product...";
 
 
-        await addProduct(newProduct);
+        await addProduct(
+            newProduct
+        );
 
 
         document.getElementById(
             "newName"
         ).value = "";
 
+
         document.getElementById(
             "newPrice"
         ).value = "";
+
 
         document.getElementById(
             "newStock"
         ).value = "";
 
+
         document.getElementById(
             "newRestock"
         ).value = "";
+
 
         document.getElementById(
             "newImage"
@@ -583,82 +831,119 @@ addButton.addEventListener("click", async () => {
 
         await loadAdminProducts();
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(
             "Error adding product:",
             error
         );
 
+
         alert(
             "Something went wrong while adding the product."
         );
 
-    } finally {
+    }
 
-        addButton.disabled = false;
+    finally {
+
+        addButton.disabled =
+            false;
 
         addButton.textContent =
             "Add Product";
 
     }
 
-});
+}
+```
 
+);
 
 // ==========================================================
-// PROMOTION DROPDOWNS
+// PRODUCT DROPDOWNS
 // ==========================================================
 
-function populatePromotionDropdowns() {
+function populateProductDropdowns() {
 
-    if (!qualifyingProduct || !rewardProduct) {
+```
+if (!qualifyingProduct ||
+    !rewardProduct) {
 
-        console.error(
-            "Promotion dropdowns not found in admin.html."
-        );
+    return;
 
-        return;
-
-    }
+}
 
 
-    qualifyingProduct.innerHTML = `
-        <option value="">
-            Select qualifying product
-        </option>
-    `;
+qualifyingProduct.innerHTML =
+    "";
+
+rewardProduct.innerHTML =
+    "";
 
 
-    rewardProduct.innerHTML = `
-        <option value="">
-            Select reward product
-        </option>
-    `;
+const defaultQualifying =
+    document.createElement(
+        "option"
+    );
 
 
-    products.forEach((product) => {
-
-        const productId = String(
-            product.firebaseId || product.id
-        );
+defaultQualifying.value =
+    "";
 
 
-        const productName =
-            product.name || "Unnamed Product";
+defaultQualifying.textContent =
+    "Select qualifying product";
 
 
-        const price =
-            Number(product.price || 0).toFixed(2);
+qualifyingProduct.appendChild(
+    defaultQualifying
+);
+
+
+const defaultReward =
+    document.createElement(
+        "option"
+    );
+
+
+defaultReward.value =
+    "";
+
+
+defaultReward.textContent =
+    "Select reward product";
+
+
+rewardProduct.appendChild(
+    defaultReward
+);
+
+
+products.forEach(
+    product => {
+
+        const productId =
+            String(
+                product.firebaseId ||
+                product.id
+            );
 
 
         const option1 =
-            document.createElement("option");
+            document.createElement(
+                "option"
+            );
 
-        option1.value = productId;
+
+        option1.value =
+            productId;
+
 
         option1.textContent =
-            `${productName} — $${price}`;
+            `${product.name} — $${Number(product.price || 0).toFixed(2)}`;
 
 
         qualifyingProduct.appendChild(
@@ -667,28 +952,28 @@ function populatePromotionDropdowns() {
 
 
         const option2 =
-            document.createElement("option");
+            document.createElement(
+                "option"
+            );
 
-        option2.value = productId;
+
+        option2.value =
+            productId;
+
 
         option2.textContent =
-            `${productName} — $${price}`;
+            `${product.name} — $${Number(product.price || 0).toFixed(2)}`;
 
 
         rewardProduct.appendChild(
             option2
         );
 
-    });
-
-
-    console.log(
-        "Promotion dropdowns populated:",
-        products.length
-    );
+    }
+);
+```
 
 }
-
 
 // ==========================================================
 // SAVE PROMOTION
@@ -696,215 +981,46 @@ function populatePromotionDropdowns() {
 
 if (savePromotionButton) {
 
-    savePromotionButton.addEventListener(
-        "click",
-        async () => {
+```
+savePromotionButton.addEventListener(
+    "click",
+    async () => {
 
-            const name =
-                document.getElementById(
-                    "promotionName"
-                ).value.trim();
+        const name =
+            promotionName.value.trim();
 
 
-            const active =
-                document.getElementById(
-                    "promotionActive"
-                ).checked;
+        const active =
+            promotionActive.checked;
 
 
-            const start =
-                document.getElementById(
-                    "promotionStart"
-                ).value;
+        const start =
+            promotionStart.value;
 
 
-            const end =
-                document.getElementById(
-                    "promotionEnd"
-                ).value;
+        const end =
+            promotionEnd.value;
 
 
-            const qualifyingId =
-                qualifyingProduct.value;
+        const qualifying =
+            qualifyingProduct.value;
 
 
-            const rewardId =
-                rewardProduct.value;
+        const reward =
+            rewardProduct.value;
 
 
-            const rewardQuantity =
-                Number(
-                    document.getElementById(
-                        "rewardQuantity"
-                    ).value
-                );
-
-
-            if (!name) {
-
-                alert(
-                    "Please enter a promotion name."
-                );
-
-                return;
-
-            }
-
-
-            if (!qualifyingId) {
-
-                alert(
-                    "Please select the qualifying product."
-                );
-
-                return;
-
-            }
-
-
-            if (!rewardId) {
-
-                alert(
-                    "Please select the reward product."
-                );
-
-                return;
-
-            }
-
-
-            if (
-                Number.isNaN(rewardQuantity) ||
-                rewardQuantity < 1
-            ) {
-
-                alert(
-                    "Please enter a valid reward quantity."
-                );
-
-                return;
-
-            }
-
-
-            try {
-
-                savePromotionButton.disabled =
-                    true;
-
-                savePromotionButton.textContent =
-                    "Saving Promotion...";
-
-
-                const qualifying =
-                    products.find((product) => {
-
-                        return String(
-                            product.firebaseId ||
-                            product.id
-                        ) === String(qualifyingId);
-
-                    });
-
-
-                const reward =
-                    products.find((product) => {
-
-                        return String(
-                            product.firebaseId ||
-                            product.id
-                        ) === String(rewardId);
-
-                    });
-
-
-                await setDoc(
-                    promotionRef,
-                    {
-
-                        name: name,
-
-                        active: active,
-
-                        start: start,
-
-                        end: end,
-
-                        qualifyingProductId:
-                            qualifyingId,
-
-                        qualifyingProductName:
-                            qualifying
-                                ? qualifying.name
-                                : "",
-
-                        rewardProductId:
-                            rewardId,
-
-                        rewardProductName:
-                            reward
-                                ? reward.name
-                                : "",
-
-                        rewardQuantity:
-                            rewardQuantity,
-
-                        updatedAt:
-                            new Date().toISOString()
-
-                    }
-                );
-
-
-                alert(
-                    "Promotion saved successfully!"
-                );
-
-            } catch (error) {
-
-                console.error(
-                    "Error saving promotion:",
-                    error
-                );
-
-                alert(
-                    "Could not save the promotion."
-                );
-
-            } finally {
-
-                savePromotionButton.disabled =
-                    false;
-
-                savePromotionButton.textContent =
-                    "Save Promotion";
-
-            }
-
-        }
-    );
-
-}
-
-
-// ==========================================================
-// LOAD PROMOTION
-// ==========================================================
-
-async function loadPromotion() {
-
-    try {
-
-        const snapshot =
-            await getDoc(
-                promotionRef
+        const quantity =
+            Number(
+                rewardQuantity.value
             );
 
 
-        if (!snapshot.exists()) {
+        if (!name) {
 
-            console.log(
-                "No promotion has been saved yet."
+            showPromotionMessage(
+                "Please enter a promotion name.",
+                false
             );
 
             return;
@@ -912,93 +1028,1174 @@ async function loadPromotion() {
         }
 
 
-        const promotion =
-            snapshot.data();
+        if (!qualifying) {
 
+            showPromotionMessage(
+                "Please select a qualifying product.",
+                false
+            );
 
-        document.getElementById(
-            "promotionName"
-        ).value =
-            promotion.name || "";
-
-
-        document.getElementById(
-            "promotionActive"
-        ).checked =
-            promotion.active === true;
-
-
-        document.getElementById(
-            "promotionStart"
-        ).value =
-            promotion.start || "";
-
-
-        document.getElementById(
-            "promotionEnd"
-        ).value =
-            promotion.end || "";
-
-
-        document.getElementById(
-            "rewardQuantity"
-        ).value =
-            promotion.rewardQuantity || 1;
-
-
-        if (qualifyingProduct) {
-
-            qualifyingProduct.value =
-                promotion.qualifyingProductId || "";
+            return;
 
         }
 
 
-        if (rewardProduct) {
+        if (!reward) {
 
-            rewardProduct.value =
-                promotion.rewardProductId || "";
+            showPromotionMessage(
+                "Please select a reward product.",
+                false
+            );
+
+            return;
 
         }
 
 
-        console.log(
-            "Promotion loaded:",
-            promotion
+        if (
+            !Number.isInteger(quantity) ||
+            quantity < 1
+        ) {
+
+            showPromotionMessage(
+                "Reward quantity must be at least 1.",
+                false
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            savePromotionButton.disabled =
+                true;
+
+            savePromotionButton.textContent =
+                "Saving...";
+
+
+            const promotion = {
+
+                name:
+                    name,
+
+                active:
+                    active,
+
+                start:
+                    start || null,
+
+                end:
+                    end || null,
+
+                qualifyingProductId:
+                    qualifying,
+
+                rewardProductId:
+                    reward,
+
+                rewardQuantity:
+                    quantity,
+
+                updatedAt:
+                    new Date().toISOString()
+
+            };
+
+
+            await setDoc(
+                doc(
+                    db,
+                    "promotions",
+                    "current"
+                ),
+                promotion
+            );
+
+
+            showPromotionMessage(
+                "Promotion saved successfully!",
+                true
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Error saving promotion:",
+                error
+            );
+
+
+            showPromotionMessage(
+                "Unable to save promotion.",
+                false
+            );
+
+        }
+
+        finally {
+
+            savePromotionButton.disabled =
+                false;
+
+            savePromotionButton.textContent =
+                "Save Promotion";
+
+        }
+
+    }
+);
+```
+
+}
+
+// ==========================================================
+// PROMOTION MESSAGE
+// ==========================================================
+
+function showPromotionMessage(
+message,
+success
+) {
+
+```
+if (!promotionMessage) {
+
+    return;
+
+}
+
+
+promotionMessage.textContent =
+    message;
+
+
+promotionMessage.style.color =
+    success
+        ? "green"
+        : "red";
+```
+
+}
+
+// ==========================================================
+// LOAD PROMOTION
+// ==========================================================
+
+async function loadPromotion() {
+
+```
+try {
+
+    const snapshot =
+        await getDoc(
+            doc(
+                db,
+                "promotions",
+                "current"
+            )
         );
 
-    } catch (error) {
 
-        console.error(
-            "Error loading promotion:",
-            error
-        );
+    if (
+        !snapshot.exists()
+    ) {
+
+        return;
+
+    }
+
+
+    const promotion =
+        snapshot.data();
+
+
+    promotionName.value =
+        promotion.name || "";
+
+
+    promotionActive.checked =
+        promotion.active === true;
+
+
+    promotionStart.value =
+        promotion.start || "";
+
+
+    promotionEnd.value =
+        promotion.end || "";
+
+
+    rewardQuantity.value =
+        promotion.rewardQuantity || 1;
+
+
+    populateProductDropdowns();
+
+
+    if (
+        promotion.qualifyingProductId
+    ) {
+
+        qualifyingProduct.value =
+            promotion.qualifyingProductId;
+
+    }
+
+
+    if (
+        promotion.rewardProductId
+    ) {
+
+        rewardProduct.value =
+            promotion.rewardProductId;
 
     }
 
 }
 
+catch (error) {
+
+    console.error(
+        "Error loading promotion:",
+        error
+    );
+
+}
+```
+
+}
+
+// ==========================================================
+// LOAD REFERRALS
+// ==========================================================
+
+async function loadReferrals() {
+
+```
+if (!adminReferrals) {
+
+    return;
+
+}
+
+
+adminReferrals.innerHTML = `
+    <p>
+        Loading referrals...
+    </p>
+`;
+
+
+try {
+
+    const snapshot =
+        await getDocs(
+            referralsRef
+        );
+
+
+    referrals = [];
+
+
+    snapshot.forEach(
+        item => {
+
+            referrals.push({
+
+                id:
+                    item.id,
+
+                ...item.data()
+
+            });
+
+        }
+    );
+
+
+    referrals.sort(
+        (a, b) => {
+
+            const dateA =
+                new Date(
+                    a.createdAt || 0
+                );
+
+
+            const dateB =
+                new Date(
+                    b.createdAt || 0
+                );
+
+
+            return dateB - dateA;
+
+        }
+    );
+
+
+    updateReferralStats();
+
+    displayReferrals();
+
+}
+
+catch (error) {
+
+    console.error(
+        "Error loading referrals:",
+        error
+    );
+
+
+    adminReferrals.innerHTML = `
+        <p>
+            Unable to load referrals.
+        </p>
+    `;
+
+}
+```
+
+}
+
+// ==========================================================
+// REFERRAL STATS
+// ==========================================================
+
+function updateReferralStats() {
+
+```
+let pending =
+    0;
+
+let approved =
+    0;
+
+let rewardDue =
+    0;
+
+let rewarded =
+    0;
+
+let rejected =
+    0;
+
+
+referrals.forEach(
+    referral => {
+
+        const status =
+            referral.status || "pending";
+
+
+        const rewardStatus =
+            referral.rewardStatus || "none";
+
+
+        if (
+            status === "pending"
+        ) {
+
+            pending++;
+
+        }
+
+
+        if (
+            status === "approved"
+        ) {
+
+            approved++;
+
+        }
+
+
+        if (
+            rewardStatus === "pending"
+        ) {
+
+            rewardDue++;
+
+        }
+
+
+        if (
+            status === "rewarded" ||
+            rewardStatus === "given"
+        ) {
+
+            rewarded++;
+
+        }
+
+
+        if (
+            status === "rejected"
+        ) {
+
+            rejected++;
+
+        }
+
+    }
+);
+
+
+pendingReferralCount.textContent =
+    pending;
+
+
+approvedReferralCount.textContent =
+    approved;
+
+
+rewardDueCount.textContent =
+    rewardDue;
+
+
+rewardedReferralCount.textContent =
+    rewarded;
+
+
+rejectedReferralCount.textContent =
+    rejected;
+```
+
+}
+
+// ==========================================================
+// DISPLAY REFERRALS
+// ==========================================================
+
+function displayReferrals() {
+
+```
+adminReferrals.innerHTML =
+    "";
+
+
+if (
+    referrals.length === 0
+) {
+
+    adminReferrals.innerHTML = `
+        <div class="admin-info-box">
+
+            <h3>
+                No Referrals Yet
+            </h3>
+
+            <p>
+                When a customer uses a referral
+                code, it will appear here.
+            </p>
+
+        </div>
+    `;
+
+    return;
+
+}
+
+
+referrals.forEach(
+    referral => {
+
+        createReferralCard(
+            referral
+        );
+
+    }
+);
+```
+
+}
+
+// ==========================================================
+// CREATE REFERRAL CARD
+// ==========================================================
+
+function createReferralCard(
+referral
+) {
+
+```
+const card =
+    document.createElement(
+        "div"
+    );
+
+
+card.className =
+    "admin-referral-card";
+
+
+const status =
+    referral.status ||
+    "pending";
+
+
+const rewardStatus =
+    referral.rewardStatus ||
+    "none";
+
+
+const createdDate =
+    referral.createdAt
+        ? new Date(
+            referral.createdAt
+          ).toLocaleString()
+        : "Unknown";
+
+
+let statusText =
+    "Pending";
+
+let statusClass =
+    "referral-pending";
+
+
+if (
+    status === "approved"
+) {
+
+    statusText =
+        "Purchase Approved";
+
+    statusClass =
+        "referral-approved";
+
+}
+
+
+if (
+    status === "rejected"
+) {
+
+    statusText =
+        "Rejected";
+
+    statusClass =
+        "referral-rejected";
+
+}
+
+
+if (
+    status === "rewarded"
+) {
+
+    statusText =
+        "Reward Given";
+
+    statusClass =
+        "referral-rewarded";
+
+}
+
+
+card.innerHTML = `
+
+    <div class="referral-card-header">
+
+        <div>
+
+            <h3>
+                ${referral.referrerName || "Unknown Referrer"}
+            </h3>
+
+            <p>
+                Referral Code:
+                <strong>
+                    ${referral.referralCode || "Unknown"}
+                </strong>
+            </p>
+
+        </div>
+
+
+        <span
+            class="referral-status ${statusClass}"
+        >
+            ${statusText}
+        </span>
+
+    </div>
+
+
+    <div class="referral-card-details">
+
+        <p>
+            <strong>Referral ID:</strong>
+            ${referral.id}
+        </p>
+
+
+        <p>
+            <strong>Submitted:</strong>
+            ${createdDate}
+        </p>
+
+
+        <p>
+            <strong>Reward:</strong>
+            ${rewardStatus === "given"
+                ? "Given"
+                : rewardStatus === "pending"
+                    ? "Ready to give"
+                    : "Not earned yet"}
+        </p>
+
+    </div>
+
+
+    <div
+        class="referral-card-actions"
+        data-actions="${referral.id}"
+    >
+
+    </div>
+
+`;
+
+
+const actions =
+    card.querySelector(
+        ".referral-card-actions"
+    );
+
+
+// ------------------------------------------------------
+// PENDING
+// ------------------------------------------------------
+
+if (
+    status === "pending"
+) {
+
+    const approveButton =
+        createActionButton(
+            "Approve Purchase",
+            "approve-referral"
+        );
+
+
+    approveButton.addEventListener(
+        "click",
+        async () => {
+
+            await approveReferral(
+                referral
+            );
+
+        }
+    );
+
+
+    actions.appendChild(
+        approveButton
+    );
+
+
+    const rejectButton =
+        createActionButton(
+            "Reject",
+            "reject-referral"
+        );
+
+
+    rejectButton.addEventListener(
+        "click",
+        async () => {
+
+            await rejectReferral(
+                referral
+            );
+
+        }
+    );
+
+
+    actions.appendChild(
+        rejectButton
+    );
+
+}
+
+
+// ------------------------------------------------------
+// APPROVED / REWARD DUE
+// ------------------------------------------------------
+
+else if (
+    status === "approved" &&
+    rewardStatus === "pending"
+) {
+
+    const rewardButton =
+        createActionButton(
+            "🎁 Mark Reward Given",
+            "reward-referral"
+        );
+
+
+    rewardButton.addEventListener(
+        "click",
+        async () => {
+
+            await markRewardGiven(
+                referral
+            );
+
+        }
+    );
+
+
+    actions.appendChild(
+        rewardButton
+    );
+
+}
+
+
+// ------------------------------------------------------
+// REWARDED
+// ------------------------------------------------------
+
+else if (
+    status === "rewarded"
+) {
+
+    const completed =
+        document.createElement(
+            "p"
+        );
+
+
+    completed.textContent =
+        "✅ This referral has been completed.";
+
+
+    actions.appendChild(
+        completed
+    );
+
+}
+
+
+// ------------------------------------------------------
+// REJECTED
+// ------------------------------------------------------
+
+else if (
+    status === "rejected"
+) {
+
+    const rejected =
+        document.createElement(
+            "p"
+        );
+
+
+    rejected.textContent =
+        "❌ This referral was rejected.";
+
+
+    actions.appendChild(
+        rejected
+    );
+
+}
+
+
+adminReferrals.appendChild(
+    card
+);
+```
+
+}
+
+// ==========================================================
+// CREATE ACTION BUTTON
+// ==========================================================
+
+function createActionButton(
+text,
+className
+) {
+
+```
+const button =
+    document.createElement(
+        "button"
+    );
+
+
+button.type =
+    "button";
+
+
+button.textContent =
+    text;
+
+
+button.className =
+    className;
+
+
+return button;
+```
+
+}
+
+// ==========================================================
+// APPROVE REFERRAL
+// ==========================================================
+
+async function approveReferral(
+referral
+) {
+
+```
+const confirmed =
+    confirm(
+        `Approve the purchase for the referral from ${referral.referrerName || "this customer"}?`
+    );
+
+
+if (!confirmed) {
+
+    return;
+
+}
+
+
+try {
+
+    await updateDoc(
+        doc(
+            db,
+            "referralUses",
+            referral.id
+        ),
+        {
+
+            status:
+                "approved",
+
+            rewardStatus:
+                "pending",
+
+            approvedAt:
+                new Date().toISOString()
+
+        }
+    );
+
+
+    alert(
+        "Purchase approved. The reward is now due."
+    );
+
+
+    await loadReferrals();
+
+}
+
+catch (error) {
+
+    console.error(
+        "Error approving referral:",
+        error
+    );
+
+
+    alert(
+        "Unable to approve this referral."
+    );
+
+}
+```
+
+}
+
+// ==========================================================
+// REJECT REFERRAL
+// ==========================================================
+
+async function rejectReferral(
+referral
+) {
+
+```
+const confirmed =
+    confirm(
+        `Reject the referral from ${referral.referrerName || "this customer"}?`
+    );
+
+
+if (!confirmed) {
+
+    return;
+
+}
+
+
+try {
+
+    await updateDoc(
+        doc(
+            db,
+            "referralUses",
+            referral.id
+        ),
+        {
+
+            status:
+                "rejected",
+
+            rewardStatus:
+                "none",
+
+            rejectedAt:
+                new Date().toISOString()
+
+        }
+    );
+
+
+    alert(
+        "Referral rejected."
+    );
+
+
+    await loadReferrals();
+
+}
+
+catch (error) {
+
+    console.error(
+        "Error rejecting referral:",
+        error
+    );
+
+
+    alert(
+        "Unable to reject this referral."
+    );
+
+}
+```
+
+}
+
+// ==========================================================
+// MARK REWARD GIVEN
+// ==========================================================
+
+async function markRewardGiven(
+referral
+) {
+
+```
+const confirmed =
+    confirm(
+        `Confirm that you gave the reward to ${referral.referrerName || "the referrer"}?`
+    );
+
+
+if (!confirmed) {
+
+    return;
+
+}
+
+
+try {
+
+    await updateDoc(
+        doc(
+            db,
+            "referralUses",
+            referral.id
+        ),
+        {
+
+            status:
+                "rewarded",
+
+            rewardStatus:
+                "given",
+
+            rewardedAt:
+                new Date().toISOString()
+
+        }
+    );
+
+
+    // --------------------------------------------------
+    // Update referrer's total
+    // --------------------------------------------------
+
+    if (
+        referral.referralCode
+    ) {
+
+        const referrerRef =
+            doc(
+                db,
+                "referrals",
+                referral.referralCode
+            );
+
+
+        const referrerSnapshot =
+            await getDoc(
+                referrerRef
+            );
+
+
+        if (
+            referrerSnapshot.exists()
+        ) {
+
+            const referrer =
+                referrerSnapshot.data();
+
+
+            const currentSuccessful =
+                Number(
+                    referrer.successfulReferrals || 0
+                );
+
+
+            const currentRewards =
+                Number(
+                    referrer.rewardsEarned || 0
+                );
+
+
+            await updateDoc(
+                referrerRef,
+                {
+
+                    successfulReferrals:
+                        currentSuccessful + 1,
+
+                    rewardsEarned:
+                        currentRewards + 1
+
+                }
+            );
+
+        }
+
+    }
+
+
+    alert(
+        "Reward marked as given!"
+    );
+
+
+    await loadReferrals();
+
+}
+
+catch (error) {
+
+    console.error(
+        "Error marking reward:",
+        error
+    );
+
+
+    alert(
+        "Unable to mark the reward as given."
+    );
+
+}
+```
+
+}
+
+// ==========================================================
+// REFRESH REFERRALS
+// ==========================================================
+
+if (
+refreshReferralsButton
+) {
+
+```
+refreshReferralsButton.addEventListener(
+    "click",
+    async () => {
+
+        refreshReferralsButton.disabled =
+            true;
+
+        refreshReferralsButton.textContent =
+            "Refreshing...";
+
+
+        try {
+
+            await loadReferrals();
+
+        }
+
+        finally {
+
+            refreshReferralsButton.disabled =
+                false;
+
+            refreshReferralsButton.textContent =
+                "Refresh Referrals";
+
+        }
+
+    }
+);
+```
+
+}
 
 // ==========================================================
 // LOGOUT
 // ==========================================================
 
 logoutButton.addEventListener(
-    "click",
-    async () => {
+"click",
+async () => {
 
-        try {
+```
+    try {
 
-            await signOut(auth);
-
-        } catch (error) {
-
-            console.error(
-                "Logout error:",
-                error
-            );
-
-        }
+        await signOut(
+            auth
+        );
 
     }
+
+    catch (error) {
+
+        console.error(
+            "Logout error:",
+            error
+        );
+
+    }
+
+}
+```
+
 );
