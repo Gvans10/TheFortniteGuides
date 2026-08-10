@@ -3,7 +3,7 @@
 Grayson's Snack Shop
 script.js
 Main Website
-Firebase Inventory + Live Promotions
+Inventory + Live Promotions
 ==========================================================
 */
 
@@ -35,30 +35,25 @@ const productContainer =
         "productContainer"
     );
 
-
 const inventoryTable =
     document.getElementById(
         "inventoryTable"
     );
-
 
 const searchInput =
     document.getElementById(
         "searchInput"
     );
 
-
 const totalProducts =
     document.getElementById(
         "totalProducts"
     );
 
-
 const itemsInStock =
     document.getElementById(
         "itemsInStock"
     );
-
 
 const darkButton =
     document.getElementById(
@@ -76,41 +71,72 @@ const promotionSection =
         "promotionSection"
     );
 
-
 const referralSection =
     document.getElementById(
         "referralSection"
     );
 
+const rewardsNavLink =
+    document.getElementById(
+        "rewardsNavLink"
+    );
+
+const heroRewardsButton =
+    document.getElementById(
+        "heroRewardsButton"
+    );
 
 const promotionTitle =
     document.getElementById(
         "promotionTitle"
     );
 
-
 const promotionDescriptionText =
     document.getElementById(
         "promotionDescriptionText"
     );
-
 
 const promotionQualifyingProduct =
     document.getElementById(
         "promotionQualifyingProduct"
     );
 
-
 const promotionReward =
     document.getElementById(
         "promotionReward"
     );
 
-
 const promotionDates =
     document.getElementById(
         "promotionDates"
     );
+
+const referralRewardSummary =
+    document.getElementById(
+        "referralRewardSummary"
+    );
+
+const referralQualifyingSummary =
+    document.getElementById(
+        "referralQualifyingSummary"
+    );
+
+
+
+// ==========================================================
+// SAFE HTML
+// ==========================================================
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
 
 
 
@@ -123,7 +149,6 @@ function money(amount) {
     const number =
         Number(amount);
 
-
     if (
         Number.isNaN(number)
     ) {
@@ -131,7 +156,6 @@ function money(amount) {
         return "$0.00";
 
     }
-
 
     return (
         "$" +
@@ -153,49 +177,31 @@ function getStatus(product) {
             product.stock
         );
 
-
     if (
         stock <= 0
     ) {
 
         return {
-
-            text:
-                "Out of Stock",
-
-            statusClass:
-                "out-stock"
-
+            text: "Out of Stock",
+            statusClass: "out-stock"
         };
 
     }
-
 
     if (
         stock <= 5
     ) {
 
         return {
-
-            text:
-                "Low Stock",
-
-            statusClass:
-                "low-stock"
-
+            text: "Low Stock",
+            statusClass: "low-stock"
         };
 
     }
 
-
     return {
-
-        text:
-            "In Stock",
-
-        statusClass:
-            "in-stock"
-
+        text: "In Stock",
+        statusClass: "in-stock"
     };
 
 }
@@ -203,7 +209,7 @@ function getStatus(product) {
 
 
 // ==========================================================
-// CREATE PRODUCT CARD
+// PRODUCT CARD
 // ==========================================================
 
 function createProduct(product) {
@@ -213,42 +219,41 @@ function createProduct(product) {
             product
         );
 
-
     const card =
         document.createElement(
-            "div"
+            "article"
         );
-
 
     card.className =
         "product-card";
 
 
     const image =
-        product.image ||
-        "";
-
+        escapeHtml(
+            product.image || ""
+        );
 
     const name =
-        product.name ||
-        "Unnamed Product";
-
+        escapeHtml(
+            product.name ||
+            "Unnamed Product"
+        );
 
     const price =
         money(
             product.price
         );
 
-
     const stock =
         Number(
             product.stock
         ) || 0;
 
-
     const restock =
-        product.restock ||
-        "Not specified";
+        escapeHtml(
+            product.restock ||
+            "Not specified"
+        );
 
 
     card.innerHTML = `
@@ -259,11 +264,10 @@ function createProduct(product) {
                 src="${image}"
                 alt="${name}"
                 draggable="false"
-                onerror="this.src='https://placehold.co/120x120?text=No+Image'"
+                onerror="this.src='https://placehold.co/160x160?text=No+Image'"
             >
 
         </div>
-
 
         <div class="product-info">
 
@@ -271,31 +275,30 @@ function createProduct(product) {
                 ${name}
             </h3>
 
-
             <div class="product-price">
                 ${price}
             </div>
 
+            <div class="product-card-bottom">
 
-            <div class="product-stock">
-                Available: ${stock}
+                <span>
+                    ${stock} available
+                </span>
+
+                <span class="badge ${status.statusClass}">
+                    ${status.text}
+                </span>
+
             </div>
 
+            <div class="product-restock">
 
-            <span class="badge ${status.statusClass}">
-                ${status.text}
-            </span>
-
-
-            <p style="margin-top:15px;">
-
-                Restock Date:
-
+                Restock:
                 <strong>
                     ${restock}
                 </strong>
 
-            </p>
+            </div>
 
         </div>
 
@@ -311,7 +314,7 @@ function createProduct(product) {
 
 
 // ==========================================================
-// INVENTORY TABLE
+// TABLE ROW
 // ==========================================================
 
 function createTableRow(product) {
@@ -321,47 +324,23 @@ function createTableRow(product) {
             product
         );
 
-
     const row =
         document.createElement(
             "tr"
         );
 
-
-    const name =
-        product.name ||
-        "Unnamed Product";
-
-
-    const price =
-        money(
-            product.price
-        );
-
-
-    const stock =
-        Number(
-            product.stock
-        ) || 0;
-
-
-    const restock =
-        product.restock ||
-        "Not specified";
-
-
     row.innerHTML = `
 
         <td>
-            ${name}
+            ${escapeHtml(product.name || "Unnamed Product")}
         </td>
 
         <td>
-            ${price}
+            ${money(product.price)}
         </td>
 
         <td>
-            ${stock}
+            ${Number(product.stock) || 0}
         </td>
 
         <td>
@@ -373,11 +352,10 @@ function createTableRow(product) {
         </td>
 
         <td>
-            ${restock}
+            ${escapeHtml(product.restock || "Not specified")}
         </td>
 
     `;
-
 
     inventoryTable.appendChild(
         row
@@ -393,25 +371,23 @@ function createTableRow(product) {
 
 function updateStats(products) {
 
-    let total =
+    let stockTotal =
         0;
-
 
     products.forEach(
         (product) => {
 
-            const stock =
+            const amount =
                 Number(
                     product.stock
                 );
 
-
             if (
-                !Number.isNaN(stock)
+                !Number.isNaN(amount)
             ) {
 
-                total +=
-                    stock;
+                stockTotal +=
+                    amount;
 
             }
 
@@ -434,7 +410,7 @@ function updateStats(products) {
     ) {
 
         itemsInStock.textContent =
-            total;
+            stockTotal;
 
     }
 
@@ -443,24 +419,13 @@ function updateStats(products) {
 
 
 // ==========================================================
-// DISPLAY PRODUCTS
+// DISPLAY INVENTORY
 // ==========================================================
 
 function displayProducts(products) {
 
-    if (
-        !productContainer ||
-        !inventoryTable
-    ) {
-
-        return;
-
-    }
-
-
     productContainer.innerHTML =
         "";
-
 
     inventoryTable.innerHTML =
         "";
@@ -472,38 +437,31 @@ function displayProducts(products) {
 
         productContainer.innerHTML = `
 
-            <p
-                style="
-                    text-align:center;
-                    width:100%;
-                    grid-column:1/-1;
-                "
-            >
+            <div class="empty-state">
 
-                No products found.
+                No matching products found.
 
-            </p>
+            </div>
 
         `;
-
 
         inventoryTable.innerHTML = `
 
             <tr>
 
                 <td colspan="5">
-                    No products found.
+
+                    No matching products found.
+
                 </td>
 
             </tr>
 
         `;
 
-
         updateStats(
             []
         );
-
 
         return;
 
@@ -516,7 +474,6 @@ function displayProducts(products) {
             createProduct(
                 product
             );
-
 
             createTableRow(
                 product
@@ -548,42 +505,32 @@ if (
 
         () => {
 
-            const text =
-
+            const query =
                 searchInput
                     .value
-                    .toLowerCase()
-                    .trim();
+                    .trim()
+                    .toLowerCase();
 
 
-            const filtered =
-
+            const results =
                 inventory.filter(
-
                     (product) => {
 
-                        const name =
-
-                            String(
-                                product.name ||
-                                ""
-                            )
-                            .toLowerCase();
-
-
-                        return (
-                            name.includes(
-                                text
-                            )
-                        );
+                        return String(
+                            product.name ||
+                            ""
+                        )
+                            .toLowerCase()
+                            .includes(
+                                query
+                            );
 
                     }
-
                 );
 
 
             displayProducts(
-                filtered
+                results
             );
 
         }
@@ -600,31 +547,21 @@ if (
 
 function loadDarkMode() {
 
-    const savedMode =
-
+    const saved =
         localStorage.getItem(
             "darkMode"
         );
 
-
     if (
-        savedMode ===
-        "enabled"
+        saved === "enabled"
     ) {
 
         document.body.classList.add(
             "dark"
         );
 
-
-        if (
-            darkButton
-        ) {
-
-            darkButton.textContent =
-                "☀️";
-
-        }
+        darkButton.textContent =
+            "☀️";
 
     }
 
@@ -646,43 +583,24 @@ if (
                 "dark"
             );
 
-
-            const enabled =
-
+            const dark =
                 document.body
                     .classList
                     .contains(
                         "dark"
                     );
 
+            localStorage.setItem(
+                "darkMode",
+                dark
+                    ? "enabled"
+                    : "disabled"
+            );
 
-            if (
-                enabled
-            ) {
-
-                localStorage.setItem(
-                    "darkMode",
-                    "enabled"
-                );
-
-
-                darkButton.textContent =
-                    "☀️";
-
-            }
-
-            else {
-
-                localStorage.setItem(
-                    "darkMode",
-                    "disabled"
-                );
-
-
-                darkButton.textContent =
-                    "🌙";
-
-            }
+            darkButton.textContent =
+                dark
+                    ? "☀️"
+                    : "🌙";
 
         }
 
@@ -691,13 +609,12 @@ if (
 }
 
 
-
 loadDarkMode();
 
 
 
 // ==========================================================
-// FORMAT PROMOTION DATE
+// PROMOTION DATE
 // ==========================================================
 
 function formatPromotionDate(
@@ -718,7 +635,6 @@ function formatPromotionDate(
             "-"
         );
 
-
     if (
         parts.length !== 3
     ) {
@@ -730,44 +646,19 @@ function formatPromotionDate(
 
     const date =
         new Date(
-
             Number(parts[0]),
-
             Number(parts[1]) - 1,
-
             Number(parts[2])
-
         );
 
 
-    if (
-        Number.isNaN(
-            date.getTime()
-        )
-    ) {
-
-        return dateString;
-
-    }
-
-
     return date.toLocaleDateString(
-
         undefined,
-
         {
-
-            month:
-                "short",
-
-            day:
-                "numeric",
-
-            year:
-                "numeric"
-
+            month: "short",
+            day: "numeric",
+            year: "numeric"
         }
-
     );
 
 }
@@ -780,33 +671,28 @@ function formatPromotionDate(
 
 function hidePromotion() {
 
-    if (
-        promotionSection
-    ) {
+    promotionSection.classList.add(
+        "hidden"
+    );
 
-        promotionSection.classList.add(
-            "hidden"
-        );
+    referralSection.classList.add(
+        "hidden"
+    );
 
-    }
+    rewardsNavLink.classList.add(
+        "hidden"
+    );
 
-
-    if (
-        referralSection
-    ) {
-
-        referralSection.classList.add(
-            "hidden"
-        );
-
-    }
+    heroRewardsButton.classList.add(
+        "hidden"
+    );
 
 }
 
 
 
 // ==========================================================
-// DISPLAY PROMOTION
+// SHOW PROMOTION
 // ==========================================================
 
 function displayPromotion(
@@ -820,123 +706,80 @@ function displayPromotion(
 
         hidePromotion();
 
-
-        console.log(
-            "Promotion turned off."
-        );
-
-
         return;
 
     }
 
 
     const name =
-
         promotion.name ||
-        "Current Promotion";
-
+        "Referral Promotion";
 
     const description =
-
         promotion.description ||
-        "Refer a friend and earn a reward!";
-
+        "Refer a friend and earn a reward.";
 
     const qualifyingProduct =
-
         promotion.qualifyingProduct ||
-        "Qualifying Product";
-
+        "Qualifying product";
 
     const rewardProduct =
-
         promotion.rewardProduct ||
         "Reward";
 
-
     const rewardQuantity =
-
         Number(
             promotion.rewardQuantity
         ) || 1;
 
 
-
     promotionTitle.textContent =
-
-        "🎉 " +
         name;
 
-
-
     promotionDescriptionText.textContent =
-
         description;
 
-
-
     promotionQualifyingProduct.textContent =
+        qualifyingProduct;
 
+    promotionReward.textContent =
+        `${rewardQuantity} × ${rewardProduct}`;
+
+
+    referralRewardSummary.textContent =
+        `${rewardQuantity} × ${rewardProduct}`;
+
+    referralQualifyingSummary.textContent =
         qualifyingProduct;
 
 
-
-    promotionReward.textContent =
-
-        rewardQuantity +
-        " × " +
-        rewardProduct;
-
-
-
-    const startText =
-
+    const start =
         formatPromotionDate(
             promotion.startDate
         );
 
-
-    const endText =
-
+    const end =
         formatPromotionDate(
             promotion.endDate
         );
 
 
     if (
-        startText &&
-        endText
+        start &&
+        end
     ) {
 
         promotionDates.textContent =
-
-            "Promotion dates: " +
-            startText +
-            " – " +
-            endText;
+            `${start} – ${end}`;
 
     }
 
     else if (
-        startText
+        end
     ) {
 
         promotionDates.textContent =
-
-            "Starts: " +
-            startText;
-
-    }
-
-    else if (
-        endText
-    ) {
-
-        promotionDates.textContent =
-
-            "Ends: " +
-            endText;
+            `Ends ${end}`;
 
     }
 
@@ -952,15 +795,16 @@ function displayPromotion(
         "hidden"
     );
 
-
     referralSection.classList.remove(
         "hidden"
     );
 
+    rewardsNavLink.classList.remove(
+        "hidden"
+    );
 
-    console.log(
-        "Promotion is LIVE:",
-        promotion
+    heroRewardsButton.classList.remove(
+        "hidden"
     );
 
 }
@@ -968,21 +812,16 @@ function displayPromotion(
 
 
 // ==========================================================
-// LIVE PROMOTION LISTENER
+// LIVE PROMOTION
 // ==========================================================
 
 function startPromotionListener() {
 
     const promotionRef =
-
         doc(
-
             db,
-
             "promotions",
-
             "first-week-takis"
-
         );
 
 
@@ -997,7 +836,6 @@ function startPromotionListener() {
             ) {
 
                 hidePromotion();
-
 
                 return;
 
@@ -1017,7 +855,6 @@ function startPromotionListener() {
                 error
             );
 
-
             hidePromotion();
 
         }
@@ -1029,7 +866,7 @@ function startPromotionListener() {
 
 
 // ==========================================================
-// START
+// START SITE
 // ==========================================================
 
 async function startShop() {
@@ -1038,17 +875,15 @@ async function startShop() {
 
         await loadInventory();
 
-
         displayProducts(
             inventory
         );
-
 
         startPromotionListener();
 
 
         console.log(
-            "Grayson's Snack Shop Loaded From Firebase"
+            "Grayson's Snack Shop loaded."
         );
 
     }
@@ -1058,14 +893,13 @@ async function startShop() {
     ) {
 
         console.error(
-            "Failed to start shop:",
+            "Shop loading error:",
             error
         );
 
     }
 
 }
-
 
 
 startShop();
