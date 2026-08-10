@@ -1,4 +1,3 @@
-```javascript
 /*
 ==========================================================
 Grayson's Snack Shop
@@ -7,22 +6,13 @@ Firebase Admin Dashboard + Promotions
 ==========================================================
 */
 
-import {
-    auth
-} from "./firebase.js";
+import { auth, db } from "./firebase.js";
 
 import {
     signInWithEmailAndPassword,
     signOut,
     onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-
-import {
-    loadInventory,
-    saveProduct as saveInventoryProduct,
-    addProduct,
-    deleteProduct as deleteInventoryProduct
-} from "./inventory.js";
 
 import {
     collection,
@@ -33,34 +23,24 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 import {
-    db
-} from "./firebase.js";
+    loadInventory,
+    saveProduct as saveInventoryProduct,
+    addProduct,
+    deleteProduct as deleteInventoryProduct
+} from "./inventory.js";
 
 
 // ==========================================================
 // ELEMENTS
 // ==========================================================
 
-const loginBox =
-    document.getElementById("loginBox");
-
-const dashboard =
-    document.getElementById("dashboard");
-
-const loginButton =
-    document.getElementById("loginButton");
-
-const loginMessage =
-    document.getElementById("loginMessage");
-
-const adminProducts =
-    document.getElementById("adminProducts");
-
-const logoutButton =
-    document.getElementById("logout");
-
-const addButton =
-    document.getElementById("addProduct");
+const loginBox = document.getElementById("loginBox");
+const dashboard = document.getElementById("dashboard");
+const loginButton = document.getElementById("loginButton");
+const loginMessage = document.getElementById("loginMessage");
+const adminProducts = document.getElementById("adminProducts");
+const logoutButton = document.getElementById("logout");
+const addButton = document.getElementById("addProduct");
 
 const qualifyingProduct =
     document.getElementById("qualifyingProduct");
@@ -80,126 +60,103 @@ let products = [];
 
 
 // ==========================================================
-// FIRESTORE PROMOTION
+// PROMOTION DOCUMENT
 // ==========================================================
 
-const promotionRef =
-    doc(
-        db,
-        "promotions",
-        "current"
-    );
+const promotionRef = doc(
+    db,
+    "promotions",
+    "current"
+);
 
 
 // ==========================================================
 // AUTHENTICATION
 // ==========================================================
 
-onAuthStateChanged(
-    auth,
-    async (user) => {
+onAuthStateChanged(auth, async (user) => {
 
-        if (user) {
+    if (user) {
 
-            loginBox.classList.add("hidden");
+        loginBox.classList.add("hidden");
 
-            dashboard.classList.remove("hidden");
+        dashboard.classList.remove("hidden");
 
-            loginMessage.textContent = "";
+        loginMessage.textContent = "";
 
-            await loadAdminProducts();
+        await loadAdminProducts();
 
-            await loadPromotion();
+        await loadPromotion();
 
-        }
+    } else {
 
-        else {
+        dashboard.classList.add("hidden");
 
-            dashboard.classList.add("hidden");
-
-            loginBox.classList.remove("hidden");
-
-        }
+        loginBox.classList.remove("hidden");
 
     }
-);
+
+});
 
 
 // ==========================================================
 // LOGIN
 // ==========================================================
 
-loginButton.addEventListener(
-    "click",
-    async () => {
+loginButton.addEventListener("click", async () => {
 
-        const email =
-            document
-                .getElementById("username")
-                .value
-                .trim();
+    const email =
+        document.getElementById("username").value.trim();
 
-        const password =
-            document
-                .getElementById("password")
-                .value;
+    const password =
+        document.getElementById("password").value;
 
 
-        if (!email || !password) {
+    if (!email || !password) {
 
-            loginMessage.textContent =
-                "Please enter your email and password.";
+        loginMessage.textContent =
+            "Please enter your email and password.";
 
-            return;
-
-        }
-
-
-        loginButton.disabled = true;
-
-        loginButton.textContent =
-            "Logging In...";
-
-        loginMessage.textContent = "";
-
-
-        try {
-
-            await signInWithEmailAndPassword(
-                auth,
-                email,
-                password
-            );
-
-        }
-
-        catch (error) {
-
-            console.error(
-                "Login error:",
-                error
-            );
-
-            loginMessage.textContent =
-                "Incorrect email or password.";
-
-        }
-
-        finally {
-
-            loginButton.disabled = false;
-
-            loginButton.textContent =
-                "Login";
-
-        }
+        return;
 
     }
-);
+
+
+    loginButton.disabled = true;
+
+    loginButton.textContent = "Logging In...";
+
+    loginMessage.textContent = "";
+
+
+    try {
+
+        await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+        );
+
+    } catch (error) {
+
+        console.error("Login error:", error);
+
+        loginMessage.textContent =
+            "Incorrect email or password.";
+
+    } finally {
+
+        loginButton.disabled = false;
+
+        loginButton.textContent = "Login";
+
+    }
+
+});
 
 
 // ==========================================================
-// LOAD ADMIN PRODUCTS
+// LOAD PRODUCTS
 // ==========================================================
 
 async function loadAdminProducts() {
@@ -211,9 +168,7 @@ async function loadAdminProducts() {
 
     try {
 
-        products =
-            await loadInventory();
-
+        products = await loadInventory();
 
         adminProducts.innerHTML = "";
 
@@ -224,35 +179,25 @@ async function loadAdminProducts() {
                 <p>No products found.</p>
             `;
 
-            populatePromotionDropdowns();
+        } else {
 
-            return;
+            products.forEach((product) => {
+
+                createAdminProduct(product);
+
+            });
 
         }
 
 
-        products.forEach(
-            product => {
-
-                createAdminProduct(
-                    product
-                );
-
-            }
-        );
-
-
         populatePromotionDropdowns();
 
-    }
-
-    catch (error) {
+    } catch (error) {
 
         console.error(
             "Error loading products:",
             error
         );
-
 
         adminProducts.innerHTML = `
             <p>
@@ -266,24 +211,19 @@ async function loadAdminProducts() {
 
 
 // ==========================================================
-// CREATE ADMIN PRODUCT
+// CREATE PRODUCT ADMIN CARD
 // ==========================================================
 
 function createAdminProduct(product) {
 
-    const box =
-        document.createElement("div");
+    const box = document.createElement("div");
+
+    box.className = "admin-product";
 
 
-    box.className =
-        "admin-product";
-
-
-    const productId =
-        String(
-            product.firebaseId ||
-            product.id
-        );
+    const productId = String(
+        product.firebaseId || product.id
+    );
 
 
     box.innerHTML = `
@@ -320,10 +260,10 @@ function createAdminProduct(product) {
 
         <input
             id="price-${productId}"
-            value="${product.price ?? 0}"
             type="number"
             step="0.01"
             min="0"
+            value="${product.price ?? 0}"
         >
 
 
@@ -333,9 +273,9 @@ function createAdminProduct(product) {
 
         <input
             id="stock-${productId}"
-            value="${product.stock ?? 0}"
             type="number"
             min="0"
+            value="${product.stock ?? 0}"
         >
 
 
@@ -357,6 +297,7 @@ function createAdminProduct(product) {
         ">
 
             <button
+                type="button"
                 onclick="saveProduct('${productId}')"
             >
                 Save
@@ -364,6 +305,7 @@ function createAdminProduct(product) {
 
 
             <button
+                type="button"
                 onclick="deleteProduct('${productId}')"
             >
                 Delete
@@ -383,354 +325,297 @@ function createAdminProduct(product) {
 // SAVE PRODUCT
 // ==========================================================
 
-window.saveProduct =
-    async function(id) {
+window.saveProduct = async function(id) {
 
-        try {
+    try {
 
-            const product =
-                products.find(
-                    item =>
-                        String(
-                            item.firebaseId ||
-                            item.id
-                        ) === String(id)
-                );
+        const product = products.find((item) => {
+
+            return String(
+                item.firebaseId || item.id
+            ) === String(id);
+
+        });
 
 
-            if (!product) {
+        if (!product) {
 
-                alert(
-                    "Product not found."
-                );
+            alert("Product not found.");
 
-                return;
-
-            }
-
-
-            const updatedProduct = {
-
-                ...product,
-
-                image:
-                    document.getElementById(
-                        `image-${id}`
-                    ).value.trim(),
-
-                price:
-                    Number(
-                        document.getElementById(
-                            `price-${id}`
-                        ).value
-                    ),
-
-                stock:
-                    Number(
-                        document.getElementById(
-                            `stock-${id}`
-                        ).value
-                    ),
-
-                restock:
-                    document.getElementById(
-                        `restock-${id}`
-                    ).value.trim()
-
-            };
-
-
-            await saveInventoryProduct(
-                updatedProduct
-            );
-
-
-            alert(
-                "Product updated successfully!"
-            );
-
-
-            await loadAdminProducts();
-
+            return;
 
         }
 
-        catch (error) {
 
-            console.error(
-                "Error saving product:",
-                error
-            );
+        const updatedProduct = {
+
+            ...product,
+
+            image:
+                document.getElementById(
+                    `image-${id}`
+                ).value.trim(),
+
+            price:
+                Number(
+                    document.getElementById(
+                        `price-${id}`
+                    ).value
+                ),
+
+            stock:
+                Number(
+                    document.getElementById(
+                        `stock-${id}`
+                    ).value
+                ),
+
+            restock:
+                document.getElementById(
+                    `restock-${id}`
+                ).value.trim()
+
+        };
 
 
-            alert(
-                "Something went wrong while saving the product."
-            );
+        await saveInventoryProduct(
+            updatedProduct
+        );
 
-        }
 
-    };
+        alert(
+            "Product updated successfully!"
+        );
+
+
+        await loadAdminProducts();
+
+    } catch (error) {
+
+        console.error(
+            "Error saving product:",
+            error
+        );
+
+        alert(
+            "Something went wrong while saving the product."
+        );
+
+    }
+
+};
 
 
 // ==========================================================
 // DELETE PRODUCT
 // ==========================================================
 
-window.deleteProduct =
-    async function(id) {
+window.deleteProduct = async function(id) {
 
-        const product =
-            products.find(
-                item =>
-                    String(
-                        item.firebaseId ||
-                        item.id
-                    ) === String(id)
-            );
+    const product = products.find((item) => {
+
+        return String(
+            item.firebaseId || item.id
+        ) === String(id);
+
+    });
 
 
-        if (!product) {
+    if (!product) {
 
-            alert(
-                "Product not found."
-            );
+        alert("Product not found.");
 
-            return;
+        return;
 
-        }
+    }
 
 
-        const confirmed =
-            confirm(
-                `Are you sure you want to delete "${product.name}"?`
-            );
+    const confirmed = confirm(
+        `Are you sure you want to delete "${product.name}"?`
+    );
 
 
-        if (!confirmed) {
+    if (!confirmed) {
 
-            return;
+        return;
 
-        }
-
-
-        try {
-
-            await deleteInventoryProduct(
-                product
-            );
+    }
 
 
-            alert(
-                "Product deleted successfully!"
-            );
+    try {
 
+        await deleteInventoryProduct(product);
 
-            await loadAdminProducts();
+        alert(
+            "Product deleted successfully!"
+        );
 
-        }
+        await loadAdminProducts();
 
-        catch (error) {
+    } catch (error) {
 
-            console.error(
-                "Error deleting product:",
-                error
-            );
+        console.error(
+            "Error deleting product:",
+            error
+        );
 
+        alert(
+            "Something went wrong while deleting the product."
+        );
 
-            alert(
-                "Something went wrong while deleting the product."
-            );
+    }
 
-        }
-
-    };
+};
 
 
 // ==========================================================
 // ADD PRODUCT
 // ==========================================================
 
-addButton.addEventListener(
-    "click",
-    async () => {
+addButton.addEventListener("click", async () => {
 
-        const name =
-            document
-                .getElementById("newName")
-                .value
-                .trim();
+    const name =
+        document.getElementById("newName").value.trim();
 
+    const price =
+        Number(
+            document.getElementById("newPrice").value
+        );
 
-        const price =
-            Number(
-                document
-                    .getElementById("newPrice")
-                    .value
-            );
+    const stock =
+        Number(
+            document.getElementById("newStock").value
+        );
 
+    const restock =
+        document.getElementById("newRestock").value.trim();
 
-        const stock =
-            Number(
-                document
-                    .getElementById("newStock")
-                    .value
-            );
+    const image =
+        document.getElementById("newImage").value.trim();
 
 
-        const restock =
-            document
-                .getElementById("newRestock")
-                .value
-                .trim();
+    if (!name) {
 
+        alert(
+            "Please enter a product name."
+        );
 
-        const image =
-            document
-                .getElementById("newImage")
-                .value
-                .trim();
-
-
-        if (!name) {
-
-            alert(
-                "Please enter a product name."
-            );
-
-            return;
-
-        }
-
-
-        if (
-            Number.isNaN(price) ||
-            price < 0
-        ) {
-
-            alert(
-                "Please enter a valid price."
-            );
-
-            return;
-
-        }
-
-
-        if (
-            Number.isNaN(stock) ||
-            stock < 0
-        ) {
-
-            alert(
-                "Please enter a valid stock amount."
-            );
-
-            return;
-
-        }
-
-
-        const newProduct = {
-
-            id: Date.now(),
-
-            name: name,
-
-            price: price,
-
-            stock: stock,
-
-            restock: restock,
-
-            image: image
-
-        };
-
-
-        try {
-
-            addButton.disabled = true;
-
-            addButton.textContent =
-                "Adding Product...";
-
-
-            await addProduct(
-                newProduct
-            );
-
-
-            document.getElementById(
-                "newName"
-            ).value = "";
-
-
-            document.getElementById(
-                "newPrice"
-            ).value = "";
-
-
-            document.getElementById(
-                "newStock"
-            ).value = "";
-
-
-            document.getElementById(
-                "newRestock"
-            ).value = "";
-
-
-            document.getElementById(
-                "newImage"
-            ).value = "";
-
-
-            alert(
-                "Product added successfully!"
-            );
-
-
-            await loadAdminProducts();
-
-        }
-
-        catch (error) {
-
-            console.error(
-                "Error adding product:",
-                error
-            );
-
-
-            alert(
-                "Something went wrong while adding the product."
-            );
-
-        }
-
-        finally {
-
-            addButton.disabled = false;
-
-            addButton.textContent =
-                "Add Product";
-
-        }
+        return;
 
     }
-);
+
+
+    if (Number.isNaN(price) || price < 0) {
+
+        alert(
+            "Please enter a valid price."
+        );
+
+        return;
+
+    }
+
+
+    if (Number.isNaN(stock) || stock < 0) {
+
+        alert(
+            "Please enter a valid stock amount."
+        );
+
+        return;
+
+    }
+
+
+    const newProduct = {
+
+        id: Date.now(),
+
+        name: name,
+
+        price: price,
+
+        stock: stock,
+
+        restock: restock,
+
+        image: image
+
+    };
+
+
+    try {
+
+        addButton.disabled = true;
+
+        addButton.textContent =
+            "Adding Product...";
+
+
+        await addProduct(newProduct);
+
+
+        document.getElementById(
+            "newName"
+        ).value = "";
+
+        document.getElementById(
+            "newPrice"
+        ).value = "";
+
+        document.getElementById(
+            "newStock"
+        ).value = "";
+
+        document.getElementById(
+            "newRestock"
+        ).value = "";
+
+        document.getElementById(
+            "newImage"
+        ).value = "";
+
+
+        alert(
+            "Product added successfully!"
+        );
+
+
+        await loadAdminProducts();
+
+    } catch (error) {
+
+        console.error(
+            "Error adding product:",
+            error
+        );
+
+        alert(
+            "Something went wrong while adding the product."
+        );
+
+    } finally {
+
+        addButton.disabled = false;
+
+        addButton.textContent =
+            "Add Product";
+
+    }
+
+});
 
 
 // ==========================================================
-// POPULATE PROMOTION DROPDOWNS
+// PROMOTION DROPDOWNS
 // ==========================================================
 
 function populatePromotionDropdowns() {
 
     if (!qualifyingProduct || !rewardProduct) {
 
-        console.warn(
-            "Promotion dropdowns were not found."
+        console.error(
+            "Promotion dropdowns not found in admin.html."
         );
 
         return;
@@ -752,62 +637,54 @@ function populatePromotionDropdowns() {
     `;
 
 
-    products.forEach(
-        product => {
+    products.forEach((product) => {
 
-            const productId =
-                String(
-                    product.firebaseId ||
-                    product.id
-                );
+        const productId = String(
+            product.firebaseId || product.id
+        );
 
 
-            const productName =
-                product.name ||
-                "Unnamed Product";
+        const productName =
+            product.name || "Unnamed Product";
 
 
-            const option1 =
-                document.createElement(
-                    "option"
-                );
-
-            option1.value =
-                productId;
-
-            option1.textContent =
-                `${productName} — $${Number(product.price || 0).toFixed(2)}`;
+        const price =
+            Number(product.price || 0).toFixed(2);
 
 
-            qualifyingProduct.appendChild(
-                option1
-            );
+        const option1 =
+            document.createElement("option");
+
+        option1.value = productId;
+
+        option1.textContent =
+            `${productName} — $${price}`;
 
 
-            const option2 =
-                document.createElement(
-                    "option"
-                );
-
-            option2.value =
-                productId;
-
-            option2.textContent =
-                `${productName} — $${Number(product.price || 0).toFixed(2)}`;
+        qualifyingProduct.appendChild(
+            option1
+        );
 
 
-            rewardProduct.appendChild(
-                option2
-            );
+        const option2 =
+            document.createElement("option");
 
-        }
-    );
+        option2.value = productId;
+
+        option2.textContent =
+            `${productName} — $${price}`;
+
+
+        rewardProduct.appendChild(
+            option2
+        );
+
+    });
 
 
     console.log(
         "Promotion dropdowns populated:",
-        products.length,
-        "products"
+        products.length
     );
 
 }
@@ -824,36 +701,27 @@ if (savePromotionButton) {
         async () => {
 
             const name =
-                document
-                    .getElementById(
-                        "promotionName"
-                    )
-                    .value
-                    .trim();
+                document.getElementById(
+                    "promotionName"
+                ).value.trim();
 
 
             const active =
-                document
-                    .getElementById(
-                        "promotionActive"
-                    )
-                    .checked;
+                document.getElementById(
+                    "promotionActive"
+                ).checked;
 
 
             const start =
-                document
-                    .getElementById(
-                        "promotionStart"
-                    )
-                    .value;
+                document.getElementById(
+                    "promotionStart"
+                ).value;
 
 
             const end =
-                document
-                    .getElementById(
-                        "promotionEnd"
-                    )
-                    .value;
+                document.getElementById(
+                    "promotionEnd"
+                ).value;
 
 
             const qualifyingId =
@@ -866,11 +734,9 @@ if (savePromotionButton) {
 
             const rewardQuantity =
                 Number(
-                    document
-                        .getElementById(
-                            "rewardQuantity"
-                        )
-                        .value
+                    document.getElementById(
+                        "rewardQuantity"
+                    ).value
                 );
 
 
@@ -908,7 +774,7 @@ if (savePromotionButton) {
 
 
             if (
-                !rewardQuantity ||
+                Number.isNaN(rewardQuantity) ||
                 rewardQuantity < 1
             ) {
 
@@ -931,25 +797,25 @@ if (savePromotionButton) {
 
 
                 const qualifying =
-                    products.find(
-                        product =>
-                            String(
-                                product.firebaseId ||
-                                product.id
-                            ) ===
-                            String(qualifyingId)
-                    );
+                    products.find((product) => {
+
+                        return String(
+                            product.firebaseId ||
+                            product.id
+                        ) === String(qualifyingId);
+
+                    });
 
 
                 const reward =
-                    products.find(
-                        product =>
-                            String(
-                                product.firebaseId ||
-                                product.id
-                            ) ===
-                            String(rewardId)
-                    );
+                    products.find((product) => {
+
+                        return String(
+                            product.firebaseId ||
+                            product.id
+                        ) === String(rewardId);
+
+                    });
 
 
                 await setDoc(
@@ -994,23 +860,18 @@ if (savePromotionButton) {
                     "Promotion saved successfully!"
                 );
 
-            }
-
-            catch (error) {
+            } catch (error) {
 
                 console.error(
                     "Error saving promotion:",
                     error
                 );
 
-
                 alert(
                     "Could not save the promotion."
                 );
 
-            }
-
-            finally {
+            } finally {
 
                 savePromotionButton.disabled =
                     false;
@@ -1106,9 +967,7 @@ async function loadPromotion() {
             promotion
         );
 
-    }
-
-    catch (error) {
+    } catch (error) {
 
         console.error(
             "Error loading promotion:",
@@ -1130,13 +989,9 @@ logoutButton.addEventListener(
 
         try {
 
-            await signOut(
-                auth
-            );
+            await signOut(auth);
 
-        }
-
-        catch (error) {
+        } catch (error) {
 
             console.error(
                 "Logout error:",
@@ -1147,4 +1002,3 @@ logoutButton.addEventListener(
 
     }
 );
-```
