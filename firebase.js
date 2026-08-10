@@ -10,11 +10,9 @@ import {
     initializeApp
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 
-
 import {
     getFirestore
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-
 
 import {
     getAuth
@@ -23,7 +21,7 @@ import {
 
 
 // ==========================================================
-// FIREBASE CONFIGURATION
+// FIREBASE CONFIG
 // ==========================================================
 
 const firebaseConfig = {
@@ -68,8 +66,18 @@ export const db =
 
 
 // ==========================================================
-// FIREBASE AUTHENTICATION
+// AUTHENTICATION
 // ==========================================================
 
 export const auth =
     getAuth(app);
+
+
+
+// ==========================================================
+// CONFIRM CONNECTION
+// ==========================================================
+
+console.log(
+    "Firebase connected successfully!"
+);
