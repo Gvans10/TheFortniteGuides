@@ -3,308 +3,245 @@
 Grayson's Snack Shop
 admin.js
 Firebase Admin Dashboard
-Inventory + Promotions
 ==========================================================
 */
 
-import { auth, db } from "./firebase.js";
 
-import {
-    signInWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import { db } from "./firebase.js";
 
 import {
     collection,
-    getDocs,
     doc,
     setDoc,
     updateDoc,
     deleteDoc,
-    serverTimestamp
+    onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-import {
-    loadInventory,
-    saveProduct,
-    addProduct,
-    deleteProduct
-} from "./inventory.js";
+
+
+// ==========================================================
+// ADMIN LOGIN
+// ==========================================================
+
+const ADMIN_USERNAME = "60340276";
+const ADMIN_PASSWORD = "5527GSS02";
+
+
+
+// ==========================================================
+// FIRESTORE
+// ==========================================================
+
+const inventoryRef = collection(db, "inventory");
+
+let inventory = [];
+
+let unsubscribeInventory = null;
+
 
 
 // ==========================================================
 // ELEMENTS
 // ==========================================================
 
-const loginBox =
-    document.getElementById("loginBox");
+const loginBox = document.getElementById("loginBox");
 
-const dashboard =
-    document.getElementById("dashboard");
+const dashboard = document.getElementById("dashboard");
 
-const loginButton =
-    document.getElementById("loginButton");
+const loginButton = document.getElementById("loginButton");
 
-const loginMessage =
-    document.getElementById("loginMessage");
+const loginMessage = document.getElementById("loginMessage");
 
-const adminProducts =
-    document.getElementById("adminProducts");
+const adminProducts = document.getElementById("adminProducts");
 
-const logoutButton =
-    document.getElementById("logout");
+const logoutButton = document.getElementById("logout");
 
-const addButton =
-    document.getElementById("addProduct");
+const addButton = document.getElementById("addProduct");
 
-
-// Promotion elements
-
-const promotionName =
-    document.getElementById("promotionName");
-
-const promotionActive =
-    document.getElementById("promotionActive");
-
-const promotionStart =
-    document.getElementById("promotionStart");
-
-const promotionEnd =
-    document.getElementById("promotionEnd");
-
-const qualifyingProduct =
-    document.getElementById("qualifyingProduct");
-
-const rewardProduct =
-    document.getElementById("rewardProduct");
-
-const rewardQuantity =
-    document.getElementById("rewardQuantity");
-
-const savePromotionButton =
-    document.getElementById("savePromotion");
-
-
-// ==========================================================
-// DATA
-// ==========================================================
-
-let products = [];
-
-let promotions = [];
-
-
-// ==========================================================
-// AUTHENTICATION
-// ==========================================================
-
-onAuthStateChanged(
-    auth,
-    async (user) => {
-
-        if (user) {
-
-            console.log(
-                "Admin authenticated:",
-                user.email
-            );
-
-            loginBox.classList.add("hidden");
-
-            dashboard.classList.remove("hidden");
-
-            loginMessage.textContent = "";
-
-            await loadAdminProducts();
-
-            await loadPromotionProducts();
-
-            await loadPromotions();
-
-        }
-
-        else {
-
-            dashboard.classList.add("hidden");
-
-            loginBox.classList.remove("hidden");
-
-        }
-
-    }
-);
 
 
 // ==========================================================
 // LOGIN
 // ==========================================================
 
-loginButton.addEventListener(
-    "click",
-    async () => {
-
-        const email =
-            document
-                .getElementById("username")
-                .value
-                .trim();
-
-        const password =
-            document
-                .getElementById("password")
-                .value;
+loginButton.addEventListener("click", login);
 
 
-        if (!email || !password) {
 
-            loginMessage.textContent =
-                "Please enter your email and password.";
+document
+    .getElementById("password")
+    .addEventListener("keydown", (event) => {
 
-            return;
+        if (event.key === "Enter") {
+
+            login();
 
         }
 
+    });
 
-        loginButton.disabled = true;
 
-        loginButton.textContent =
-            "Logging In...";
+
+function login() {
+
+    const username =
+        document.getElementById("username").value.trim();
+
+    const password =
+        document.getElementById("password").value;
+
+
+
+    if (
+        username === ADMIN_USERNAME &&
+        password === ADMIN_PASSWORD
+    ) {
 
         loginMessage.textContent = "";
 
+        loginBox.classList.add("hidden");
 
-        try {
+        dashboard.classList.remove("hidden");
 
-            await signInWithEmailAndPassword(
-                auth,
-                email,
-                password
-            );
-
-        }
-
-        catch (error) {
-
-            console.error(
-                "Login error:",
-                error
-            );
-
-            loginMessage.textContent =
-                "Incorrect email or password.";
-
-        }
-
-        finally {
-
-            loginButton.disabled = false;
-
-            loginButton.textContent =
-                "Login";
-
-        }
-
-    }
-);
-
-
-// ==========================================================
-// LOAD INVENTORY
-// ==========================================================
-
-async function loadAdminProducts() {
-
-    if (!adminProducts) {
-
-        return;
+        startInventoryListener();
 
     }
 
+    else {
 
-    adminProducts.innerHTML = `
-
-        <p>
-            Loading products...
-        </p>
-
-    `;
-
-
-    try {
-
-        products =
-            await loadInventory();
-
-
-        adminProducts.innerHTML = "";
-
-
-        if (!products.length) {
-
-            adminProducts.innerHTML = `
-
-                <p>
-                    No products found.
-                </p>
-
-            `;
-
-            return;
-
-        }
-
-
-        products.forEach(
-            product => {
-
-                createAdminProduct(
-                    product
-                );
-
-            }
-        );
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Error loading products:",
-            error
-        );
-
-
-        adminProducts.innerHTML = `
-
-            <p>
-                Unable to load products.
-            </p>
-
-        `;
+        loginMessage.textContent = "Incorrect login";
 
     }
 
 }
 
 
+
 // ==========================================================
-// CREATE ADMIN PRODUCT
+// FIRESTORE LIVE INVENTORY
+// ==========================================================
+
+function startInventoryListener() {
+
+    if (unsubscribeInventory) {
+
+        unsubscribeInventory();
+
+    }
+
+
+
+    unsubscribeInventory = onSnapshot(
+
+        inventoryRef,
+
+        (snapshot) => {
+
+            inventory = [];
+
+
+
+            snapshot.forEach((item) => {
+
+                inventory.push({
+
+                    firestoreId: item.id,
+
+                    ...item.data()
+
+                });
+
+            });
+
+
+
+            inventory.sort((a, b) => {
+
+                return String(a.name || "").localeCompare(
+                    String(b.name || "")
+                );
+
+            });
+
+
+
+            console.log(
+                "Admin Firebase Inventory:",
+                inventory
+            );
+
+
+
+            loadAdminProducts();
+
+        },
+
+        (error) => {
+
+            console.error(
+                "Firestore inventory error:",
+                error
+            );
+
+            alert(
+                "Could not load inventory from Firebase. Check the console."
+            );
+
+        }
+
+    );
+
+}
+
+
+
+// ==========================================================
+// DISPLAY ADMIN PRODUCTS
+// ==========================================================
+
+function loadAdminProducts() {
+
+    adminProducts.innerHTML = "";
+
+
+
+    if (inventory.length === 0) {
+
+        const emptyMessage =
+            document.createElement("p");
+
+        emptyMessage.textContent =
+            "No products are currently in Firestore.";
+
+        adminProducts.appendChild(emptyMessage);
+
+        return;
+
+    }
+
+
+
+    inventory.forEach((product) => {
+
+        createAdminProduct(product);
+
+    });
+
+}
+
+
+
+// ==========================================================
+// CREATE ADMIN PRODUCT BOX
 // ==========================================================
 
 function createAdminProduct(product) {
 
-    const box =
-        document.createElement("div");
+    const box = document.createElement("div");
 
+    box.className = "admin-product";
 
-    box.className =
-        "admin-product";
-
-
-    const safeId =
-        String(product.id)
-            .replace(/[^a-zA-Z0-9_-]/g, "_");
 
 
     box.innerHTML = `
@@ -326,12 +263,23 @@ function createAdminProduct(product) {
 
 
         <label>
+            Product Name
+        </label>
+
+        <input
+            class="admin-name-input"
+            value="${product.name || ""}"
+        >
+
+
+        <label>
             Image Filename
         </label>
 
         <input
-            id="image-${safeId}"
+            class="admin-image-input"
             value="${product.image || ""}"
+            placeholder="example.png"
         >
 
 
@@ -340,11 +288,11 @@ function createAdminProduct(product) {
         </label>
 
         <input
-            id="price-${safeId}"
-            value="${product.price ?? 0}"
+            class="admin-price-input"
+            value="${Number(product.price || 0)}"
             type="number"
-            step="0.01"
             min="0"
+            step="0.01"
         >
 
 
@@ -353,10 +301,11 @@ function createAdminProduct(product) {
         </label>
 
         <input
-            id="stock-${safeId}"
-            value="${product.stock ?? 0}"
+            class="admin-stock-input"
+            value="${Number(product.stock || 0)}"
             type="number"
             min="0"
+            step="1"
         >
 
 
@@ -365,177 +314,182 @@ function createAdminProduct(product) {
         </label>
 
         <input
-            id="restock-${safeId}"
+            class="admin-restock-input"
             value="${product.restock || ""}"
+            placeholder="8/9/2026"
         >
-
-
-        <button
-            class="save-product-button"
-            data-product-id="${product.id}"
-        >
-            Save
-        </button>
-
-
-        <button
-            class="delete-product-button"
-            data-product-id="${product.id}"
-        >
-            Delete
-        </button>
 
     `;
 
 
-    adminProducts.appendChild(box);
 
+    // SAVE BUTTON
 
     const saveButton =
-        box.querySelector(
-            ".save-product-button"
-        );
+        document.createElement("button");
 
-
-    const deleteButton =
-        box.querySelector(
-            ".delete-product-button"
-        );
-
+    saveButton.textContent = "Save";
 
     saveButton.addEventListener(
         "click",
-        () => {
-
-            saveAdminProduct(
-                product,
-                safeId
-            );
-
-        }
+        () => saveProduct(product, box)
     );
 
+
+
+    // DELETE BUTTON
+
+    const deleteButton =
+        document.createElement("button");
+
+    deleteButton.textContent = "Delete";
+
+    deleteButton.style.marginLeft = "10px";
 
     deleteButton.addEventListener(
         "click",
-        () => {
-
-            deleteAdminProduct(
-                product
-            );
-
-        }
+        () => deleteProduct(product)
     );
 
+
+
+    box.appendChild(saveButton);
+
+    box.appendChild(deleteButton);
+
+
+
+    adminProducts.appendChild(box);
+
 }
+
 
 
 // ==========================================================
 // SAVE PRODUCT
 // ==========================================================
 
-async function saveAdminProduct(
-    product,
-    safeId
-) {
+async function saveProduct(product, box) {
+
+    const name =
+        box
+            .querySelector(".admin-name-input")
+            .value
+            .trim();
+
+
+
+    const image =
+        box
+            .querySelector(".admin-image-input")
+            .value
+            .trim();
+
+
+
+    const price =
+        Number(
+            box
+                .querySelector(".admin-price-input")
+                .value
+        );
+
+
+
+    const stock =
+        Number(
+            box
+                .querySelector(".admin-stock-input")
+                .value
+        );
+
+
+
+    const restock =
+        box
+            .querySelector(".admin-restock-input")
+            .value
+            .trim();
+
+
+
+    if (!name) {
+
+        alert("Product name cannot be empty.");
+
+        return;
+
+    }
+
+
+
+    if (
+        Number.isNaN(price) ||
+        price < 0
+    ) {
+
+        alert("Enter a valid price.");
+
+        return;
+
+    }
+
+
+
+    if (
+        Number.isNaN(stock) ||
+        stock < 0
+    ) {
+
+        alert("Enter a valid stock amount.");
+
+        return;
+
+    }
+
+
 
     try {
 
-        const updatedProduct = {
+        await updateDoc(
 
-            ...product,
+            doc(
+                db,
+                "inventory",
+                product.firestoreId
+            ),
 
-            image:
-                document
-                    .getElementById(
-                        `image-${safeId}`
-                    )
-                    .value
-                    .trim(),
+            {
 
-            price:
-                Number(
-                    document
-                        .getElementById(
-                            `price-${safeId}`
-                        )
-                        .value
-                ),
+                name: name,
 
-            stock:
-                Number(
-                    document
-                        .getElementById(
-                            `stock-${safeId}`
-                        )
-                        .value
-                ),
+                image: image,
 
-            restock:
-                document
-                    .getElementById(
-                        `restock-${safeId}`
-                    )
-                    .value
-                    .trim()
+                price: price,
 
-        };
+                stock: stock,
 
+                restock: restock
 
-        if (
-            isNaN(updatedProduct.price) ||
-            updatedProduct.price < 0
-        ) {
+            }
 
-            alert(
-                "Please enter a valid price."
-            );
-
-            return;
-
-        }
-
-
-        if (
-            isNaN(updatedProduct.stock) ||
-            updatedProduct.stock < 0
-        ) {
-
-            alert(
-                "Please enter a valid stock amount."
-            );
-
-            return;
-
-        }
-
-
-        await saveProduct(
-            updatedProduct
         );
 
 
-        alert(
-            "Product updated successfully!"
-        );
 
-
-        await loadAdminProducts();
-
-        await loadPromotionProducts();
+        alert("Product Updated!");
 
     }
 
     catch (error) {
 
         console.error(
-            "Error saving product:",
+            "Error updating product:",
             error
         );
 
-
         alert(
-            "Something went wrong while saving the product."
+            "There was an error updating the product."
         );
 
     }
@@ -543,16 +497,19 @@ async function saveAdminProduct(
 }
 
 
+
 // ==========================================================
 // DELETE PRODUCT
 // ==========================================================
 
-async function deleteAdminProduct(product) {
+async function deleteProduct(product) {
 
-    const confirmed =
-        confirm(
-            `Are you sure you want to delete "${product.name}"?`
-        );
+    const confirmed = confirm(
+
+        `Delete "${product.name}"?`
+
+    );
+
 
 
     if (!confirmed) {
@@ -562,21 +519,22 @@ async function deleteAdminProduct(product) {
     }
 
 
+
     try {
 
-        await deleteProduct(
-            product
+        await deleteDoc(
+
+            doc(
+                db,
+                "inventory",
+                product.firestoreId
+            )
+
         );
 
 
-        alert(
-            "Product deleted successfully!"
-        );
 
-
-        await loadAdminProducts();
-
-        await loadPromotionProducts();
+        alert("Product Deleted!");
 
     }
 
@@ -587,961 +545,252 @@ async function deleteAdminProduct(product) {
             error
         );
 
-
         alert(
-            "Something went wrong while deleting the product."
+            "There was an error deleting the product."
         );
 
     }
 
 }
+
 
 
 // ==========================================================
 // ADD PRODUCT
 // ==========================================================
 
-if (addButton) {
+addButton.addEventListener(
+    "click",
+    addNewProduct
+);
 
-    addButton.addEventListener(
-        "click",
-        async () => {
 
-            const name =
-                document
-                    .getElementById("newName")
-                    .value
-                    .trim();
 
+async function addNewProduct() {
 
-            const price =
-                Number(
-                    document
-                        .getElementById("newPrice")
-                        .value
-                );
+    const name =
+        document
+            .getElementById("newName")
+            .value
+            .trim();
 
 
-            const stock =
-                Number(
-                    document
-                        .getElementById("newStock")
-                        .value
-                );
 
+    const price =
+        Number(
+            document
+                .getElementById("newPrice")
+                .value
+        );
 
-            const restock =
-                document
-                    .getElementById("newRestock")
-                    .value
-                    .trim();
 
 
-            const image =
-                document
-                    .getElementById("newImage")
-                    .value
-                    .trim();
+    const stock =
+        Number(
+            document
+                .getElementById("newStock")
+                .value
+        );
 
 
-            if (!name) {
 
-                alert(
-                    "Please enter a product name."
-                );
+    const restock =
+        document
+            .getElementById("newRestock")
+            .value
+            .trim();
 
-                return;
 
-            }
 
+    const image =
+        document
+            .getElementById("newImage")
+            .value
+            .trim();
 
-            if (
-                isNaN(price) ||
-                price < 0
-            ) {
 
-                alert(
-                    "Please enter a valid price."
-                );
 
-                return;
+    if (!name) {
 
-            }
+        alert("Enter a product name.");
 
+        return;
 
-            if (
-                isNaN(stock) ||
-                stock < 0
-            ) {
+    }
 
-                alert(
-                    "Please enter a valid stock amount."
-                );
 
-                return;
-
-            }
-
-
-            const newProduct = {
-
-                id: Date.now(),
-
-                name: name,
-
-                price: price,
-
-                stock: stock,
-
-                restock: restock,
-
-                image: image
-
-            };
-
-
-            try {
-
-                addButton.disabled = true;
-
-                addButton.textContent =
-                    "Adding Product...";
-
-
-                await addProduct(
-                    newProduct
-                );
-
-
-                document
-                    .getElementById("newName")
-                    .value = "";
-
-
-                document
-                    .getElementById("newPrice")
-                    .value = "";
-
-
-                document
-                    .getElementById("newStock")
-                    .value = "";
-
-
-                document
-                    .getElementById("newRestock")
-                    .value = "";
-
-
-                document
-                    .getElementById("newImage")
-                    .value = "";
-
-
-                alert(
-                    "Product added successfully!"
-                );
-
-
-                await loadAdminProducts();
-
-                await loadPromotionProducts();
-
-            }
-
-            catch (error) {
-
-                console.error(
-                    "Error adding product:",
-                    error
-                );
-
-
-                alert(
-                    "Something went wrong while adding the product."
-                );
-
-            }
-
-            finally {
-
-                addButton.disabled = false;
-
-                addButton.textContent =
-                    "Add Product";
-
-            }
-
-        }
-    );
-
-}
-
-
-// ==========================================================
-// LOAD PRODUCTS INTO PROMOTION DROPDOWNS
-// ==========================================================
-
-async function loadPromotionProducts() {
 
     if (
-        !qualifyingProduct ||
-        !rewardProduct
+        Number.isNaN(price) ||
+        price < 0
     ) {
 
-        console.log(
-            "Promotion dropdowns not found."
-        );
+        alert("Enter a valid price.");
 
         return;
 
     }
 
 
-    try {
 
-        products =
-            await loadInventory();
+    if (
+        Number.isNaN(stock) ||
+        stock < 0
+    ) {
 
-
-        qualifyingProduct.innerHTML = "";
-
-        rewardProduct.innerHTML = "";
-
-
-        if (!products.length) {
-
-            qualifyingProduct.innerHTML = `
-                <option value="">
-                    No products available
-                </option>
-            `;
-
-            rewardProduct.innerHTML = `
-                <option value="">
-                    No products available
-                </option>
-            `;
-
-            return;
-
-        }
-
-
-        const defaultOption1 =
-            document.createElement("option");
-
-        defaultOption1.value = "";
-
-        defaultOption1.textContent =
-            "Select qualifying product";
-
-        qualifyingProduct.appendChild(
-            defaultOption1
-        );
-
-
-        const defaultOption2 =
-            document.createElement("option");
-
-        defaultOption2.value = "";
-
-        defaultOption2.textContent =
-            "Select reward product";
-
-        rewardProduct.appendChild(
-            defaultOption2
-        );
-
-
-        products.forEach(
-            product => {
-
-                const option1 =
-                    document.createElement("option");
-
-                option1.value =
-                    String(product.id);
-
-                option1.textContent =
-                    `${product.name} — $${Number(product.price).toFixed(2)}`;
-
-                qualifyingProduct.appendChild(
-                    option1
-                );
-
-
-                const option2 =
-                    document.createElement("option");
-
-                option2.value =
-                    String(product.id);
-
-                option2.textContent =
-                    `${product.name} — $${Number(product.price).toFixed(2)}`;
-
-                rewardProduct.appendChild(
-                    option2
-                );
-
-            }
-        );
-
-
-        console.log(
-            "Promotion product dropdowns loaded:",
-            products.length
-        );
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Error loading promotion products:",
-            error
-        );
-
-
-        qualifyingProduct.innerHTML = `
-            <option value="">
-                Error loading products
-            </option>
-        `;
-
-
-        rewardProduct.innerHTML = `
-            <option value="">
-                Error loading products
-            </option>
-        `;
-
-    }
-
-}
-
-
-// ==========================================================
-// PROMOTION COLLECTION
-// ==========================================================
-
-const promotionsRef =
-    collection(
-        db,
-        "promotions"
-    );
-
-
-// ==========================================================
-// SAVE PROMOTION
-// ==========================================================
-
-if (savePromotionButton) {
-
-    savePromotionButton.addEventListener(
-        "click",
-        async () => {
-
-            try {
-
-                const name =
-                    promotionName
-                        ? promotionName.value.trim()
-                        : "";
-
-
-                const active =
-                    promotionActive
-                        ? promotionActive.checked
-                        : false;
-
-
-                const start =
-                    promotionStart
-                        ? promotionStart.value
-                        : "";
-
-
-                const end =
-                    promotionEnd
-                        ? promotionEnd.value
-                        : "";
-
-
-                const qualifyingId =
-                    qualifyingProduct
-                        ? qualifyingProduct.value
-                        : "";
-
-
-                const rewardId =
-                    rewardProduct
-                        ? rewardProduct.value
-                        : "";
-
-
-                const quantity =
-                    rewardQuantity
-                        ? Number(
-                            rewardQuantity.value
-                        )
-                        : 1;
-
-
-                if (!name) {
-
-                    alert(
-                        "Please enter a promotion name."
-                    );
-
-                    return;
-
-                }
-
-
-                if (!qualifyingId) {
-
-                    alert(
-                        "Please select the qualifying product."
-                    );
-
-                    return;
-
-                }
-
-
-                if (!rewardId) {
-
-                    alert(
-                        "Please select the reward product."
-                    );
-
-                    return;
-
-                }
-
-
-                if (
-                    isNaN(quantity) ||
-                    quantity < 1
-                ) {
-
-                    alert(
-                        "Please enter a valid reward quantity."
-                    );
-
-                    return;
-
-                }
-
-
-                if (
-                    start &&
-                    end &&
-                    new Date(start) >= new Date(end)
-                ) {
-
-                    alert(
-                        "The promotion end date must be after the start date."
-                    );
-
-                    return;
-
-                }
-
-
-                const qualifying =
-                    products.find(
-                        product =>
-                            String(product.id) ===
-                            String(qualifyingId)
-                    );
-
-
-                const reward =
-                    products.find(
-                        product =>
-                            String(product.id) ===
-                            String(rewardId)
-                    );
-
-
-                if (!qualifying || !reward) {
-
-                    alert(
-                        "Could not find the selected products."
-                    );
-
-                    return;
-
-                }
-
-
-                const promotionId =
-                    `promotion-${Date.now()}`;
-
-
-                const promotion = {
-
-                    id: promotionId,
-
-                    name: name,
-
-                    active: active,
-
-                    start: start,
-
-                    end: end,
-
-                    qualifyingProductId:
-                        qualifying.id,
-
-                    qualifyingProductName:
-                        qualifying.name,
-
-                    rewardProductId:
-                        reward.id,
-
-                    rewardProductName:
-                        reward.name,
-
-                    rewardQuantity:
-                        quantity,
-
-                    type:
-                        "referral",
-
-                    createdAt:
-                        serverTimestamp()
-
-                };
-
-
-                savePromotionButton.disabled =
-                    true;
-
-
-                savePromotionButton.textContent =
-                    "Saving...";
-
-
-                await setDoc(
-                    doc(
-                        db,
-                        "promotions",
-                        promotionId
-                    ),
-                    promotion
-                );
-
-
-                alert(
-                    "Promotion saved successfully!"
-                );
-
-
-                if (promotionName) {
-
-                    promotionName.value = "";
-
-                }
-
-
-                if (promotionActive) {
-
-                    promotionActive.checked =
-                        false;
-
-                }
-
-
-                if (promotionStart) {
-
-                    promotionStart.value = "";
-
-                }
-
-
-                if (promotionEnd) {
-
-                    promotionEnd.value = "";
-
-                }
-
-
-                if (qualifyingProduct) {
-
-                    qualifyingProduct.value = "";
-
-                }
-
-
-                if (rewardProduct) {
-
-                    rewardProduct.value = "";
-
-                }
-
-
-                if (rewardQuantity) {
-
-                    rewardQuantity.value = "1";
-
-                }
-
-
-                await loadPromotions();
-
-            }
-
-            catch (error) {
-
-                console.error(
-                    "Error saving promotion:",
-                    error
-                );
-
-
-                alert(
-                    "Something went wrong while saving the promotion."
-                );
-
-            }
-
-            finally {
-
-                savePromotionButton.disabled =
-                    false;
-
-                savePromotionButton.textContent =
-                    "Save Promotion";
-
-            }
-
-        }
-    );
-
-}
-
-
-// ==========================================================
-// LOAD PROMOTIONS
-// ==========================================================
-
-async function loadPromotions() {
-
-    const promotionList =
-        document.getElementById(
-            "promotionList"
-        );
-
-
-    if (!promotionList) {
-
-        console.log(
-            "promotionList element not found."
-        );
+        alert("Enter a valid stock amount.");
 
         return;
 
     }
 
 
-    promotionList.innerHTML = `
 
-        <p>
-            Loading promotions...
-        </p>
+    const productId =
+        Date.now().toString();
 
-    `;
+
+
+    const newProduct = {
+
+        id: Number(productId),
+
+        name: name,
+
+        price: price,
+
+        stock: stock,
+
+        restock: restock,
+
+        image: image
+
+    };
+
 
 
     try {
 
-        const snapshot =
-            await getDocs(
-                promotionsRef
-            );
+        await setDoc(
 
-
-        promotions = [];
-
-
-        snapshot.forEach(
-            item => {
-
-                promotions.push({
-
-                    firebaseId:
-                        item.id,
-
-                    ...item.data()
-
-                });
-
-            }
-        );
-
-
-        promotionList.innerHTML = "";
-
-
-        if (!promotions.length) {
-
-            promotionList.innerHTML = `
-
-                <p>
-                    No promotions created yet.
-                </p>
-
-            `;
-
-            return;
-
-        }
-
-
-        promotions.forEach(
-            promotion => {
-
-                createPromotionCard(
-                    promotion,
-                    promotionList
-                );
-
-            }
-        );
-
-
-        console.log(
-            "Promotions loaded:",
-            promotions
-        );
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Error loading promotions:",
-            error
-        );
-
-
-        promotionList.innerHTML = `
-
-            <p>
-                Unable to load promotions.
-            </p>
-
-        `;
-
-    }
-
-}
-
-
-// ==========================================================
-// CREATE PROMOTION CARD
-// ==========================================================
-
-function createPromotionCard(
-    promotion,
-    container
-) {
-
-    const card =
-        document.createElement("div");
-
-
-    card.className =
-        "admin-promotion";
-
-
-    const activeText =
-        promotion.active
-            ? "Active"
-            : "Inactive";
-
-
-    card.innerHTML = `
-
-        <div>
-
-            <h3>
-                ${promotion.name || "Unnamed Promotion"}
-            </h3>
-
-
-            <p>
-                Status:
-                <strong>
-                    ${activeText}
-                </strong>
-            </p>
-
-
-            <p>
-                Customer buys:
-                <strong>
-                    ${promotion.qualifyingProductName || "Unknown product"}
-                </strong>
-            </p>
-
-
-            <p>
-                Referrer receives:
-                <strong>
-                    ${promotion.rewardQuantity || 1}
-                    ×
-                    ${promotion.rewardProductName || "Unknown product"}
-                </strong>
-            </p>
-
-
-            ${
-                promotion.start
-                    ? `<p>Starts: ${promotion.start}</p>`
-                    : ""
-            }
-
-
-            ${
-                promotion.end
-                    ? `<p>Ends: ${promotion.end}</p>`
-                    : ""
-            }
-
-
-            <button
-                class="delete-promotion-button"
-            >
-                Delete Promotion
-            </button>
-
-        </div>
-
-    `;
-
-
-    container.appendChild(card);
-
-
-    const deleteButton =
-        card.querySelector(
-            ".delete-promotion-button"
-        );
-
-
-    deleteButton.addEventListener(
-        "click",
-        async () => {
-
-            await deletePromotion(
-                promotion.firebaseId
-            );
-
-        }
-    );
-
-}
-
-
-// ==========================================================
-// DELETE PROMOTION
-// ==========================================================
-
-async function deletePromotion(
-    promotionId
-) {
-
-    const confirmed =
-        confirm(
-            "Are you sure you want to delete this promotion?"
-        );
-
-
-    if (!confirmed) {
-
-        return;
-
-    }
-
-
-    try {
-
-        await deleteDoc(
             doc(
                 db,
-                "promotions",
-                promotionId
-            )
+                "inventory",
+                productId
+            ),
+
+            newProduct
+
         );
 
 
-        alert(
-            "Promotion deleted successfully!"
-        );
+
+        clearAddProductForm();
 
 
-        await loadPromotions();
+
+        alert("Product Added!");
 
     }
 
     catch (error) {
 
         console.error(
-            "Error deleting promotion:",
+            "Error adding product:",
             error
         );
 
-
         alert(
-            "Something went wrong while deleting the promotion."
+            "There was an error adding the product."
         );
 
     }
 
 }
+
+
+
+// ==========================================================
+// CLEAR ADD PRODUCT FORM
+// ==========================================================
+
+function clearAddProductForm() {
+
+    document.getElementById(
+        "newName"
+    ).value = "";
+
+
+
+    document.getElementById(
+        "newPrice"
+    ).value = "";
+
+
+
+    document.getElementById(
+        "newStock"
+    ).value = "";
+
+
+
+    document.getElementById(
+        "newRestock"
+    ).value = "";
+
+
+
+    document.getElementById(
+        "newImage"
+    ).value = "";
+
+}
+
 
 
 // ==========================================================
 // LOGOUT
 // ==========================================================
 
-if (logoutButton) {
+logoutButton.addEventListener(
+    "click",
+    () => {
 
-    logoutButton.addEventListener(
-        "click",
-        async () => {
+        if (unsubscribeInventory) {
 
-            try {
+            unsubscribeInventory();
 
-                await signOut(
-                    auth
-                );
-
-            }
-
-            catch (error) {
-
-                console.error(
-                    "Logout error:",
-                    error
-                );
-
-            }
+            unsubscribeInventory = null;
 
         }
-    );
 
-}
+
+
+        inventory = [];
+
+        adminProducts.innerHTML = "";
+
+
+
+        dashboard.classList.add("hidden");
+
+        loginBox.classList.remove("hidden");
+
+
+
+        document.getElementById(
+            "password"
+        ).value = "";
+
+    }
+);
+
 
 
 // ==========================================================
-// INITIAL CONSOLE MESSAGE
+// READY
 // ==========================================================
 
 console.log(
-    "Grayson's Snack Shop Admin Loaded"
+    "Grayson's Snack Shop Admin Firebase Loaded"
 );
