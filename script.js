@@ -1,664 +1,685 @@
-# /*
-
+```javascript
+/*
+==========================================================
 Grayson's Snack Shop
-referrals.js
-Customer Referral System
-========================
-
+script.js
+Main Website JavaScript
+==========================================================
 */
 
-import { db } from "./firebase.js";
+import {
+    db
+} from "./firebase.js";
 
 import {
-collection,
-doc,
-getDoc,
-setDoc,
-query,
-where,
-getDocs
+    collection,
+    getDocs,
+    doc,
+    getDoc
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-// ==========================================================
-// FIRESTORE COLLECTION
-// ==========================================================
+import {
+    inventory,
+    loadInventory
+} from "./inventory.js";
 
-const referralsRef = collection(
-db,
-"referrals"
-);
 
 // ==========================================================
 // ELEMENTS
 // ==========================================================
 
-const referralName =
-document.getElementById(
-"referralName"
-);
+const productContainer =
+    document.getElementById("productContainer");
 
-const generateReferralButton =
-document.getElementById(
-"generateReferralButton"
-);
+const inventoryTable =
+    document.getElementById("inventoryTable");
 
-const referralMessage =
-document.getElementById(
-"referralMessage"
-);
+const searchInput =
+    document.getElementById("searchInput");
 
-const referralResult =
-document.getElementById(
-"referralResult"
-);
+const totalProducts =
+    document.getElementById("totalProducts");
 
-const referralCode =
-document.getElementById(
-"referralCode"
-);
+const itemsInStock =
+    document.getElementById("itemsInStock");
 
-const copyReferralButton =
-document.getElementById(
-"copyReferralButton"
-);
+const darkButton =
+    document.getElementById("darkModeButton");
 
-const referralCount =
-document.getElementById(
-"referralCount"
-);
+const promotionContainer =
+    document.getElementById("promotionContainer");
 
-const useReferralCode =
-document.getElementById(
-"useReferralCode"
-);
-
-const submitReferralButton =
-document.getElementById(
-"submitReferralButton"
-);
-
-const useReferralMessage =
-document.getElementById(
-"useReferralMessage"
-);
 
 // ==========================================================
-// GENERATE RANDOM CODE
+// MONEY FORMAT
 // ==========================================================
 
-function generateCode() {
+function money(amount) {
 
-```
-const characters =
-    "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-
-let code = "GS-";
-
-
-for (
-    let i = 0;
-    i < 6;
-    i++
-) {
-
-    const randomIndex =
-        Math.floor(
-            Math.random() *
-            characters.length
-        );
-
-    code +=
-        characters[randomIndex];
+    return "$" + Number(amount).toFixed(2);
 
 }
 
 
-return code;
-```
-
-}
-
 // ==========================================================
-// CREATE UNIQUE CODE
+// STOCK STATUS
 // ==========================================================
 
-async function createUniqueCode() {
+function getStatus(product) {
 
-```
-let code = "";
+    if (Number(product.stock) <= 0) {
 
-let exists = true;
-
-
-while (exists) {
-
-    code = generateCode();
-
-
-    const codeRef =
-        doc(
-            db,
-            "referrals",
-            code
-        );
-
-
-    const snapshot =
-        await getDoc(codeRef);
-
-
-    exists =
-        snapshot.exists();
-
-}
-
-
-return code;
-```
-
-}
-
-// ==========================================================
-// SHOW MESSAGE
-// ==========================================================
-
-function showReferralMessage(
-message,
-success = false
-) {
-
-```
-if (!referralMessage) {
-
-    return;
-
-}
-
-
-referralMessage.textContent =
-    message;
-
-
-referralMessage.style.color =
-    success
-        ? "green"
-        : "red";
-```
-
-}
-
-// ==========================================================
-// GENERATE REFERRAL
-// ==========================================================
-
-if (generateReferralButton) {
-
-```
-generateReferralButton.addEventListener(
-    "click",
-    async () => {
-
-        const name =
-            referralName.value.trim();
-
-
-        if (!name) {
-
-            showReferralMessage(
-                "Please enter your name."
-            );
-
-            return;
-
-        }
-
-
-        generateReferralButton.disabled =
-            true;
-
-
-        generateReferralButton.textContent =
-            "Generating...";
-
-
-        try {
-
-            const code =
-                await createUniqueCode();
-
-
-            await setDoc(
-                doc(
-                    db,
-                    "referrals",
-                    code
-                ),
-                {
-
-                    code: code,
-
-                    referrerName:
-                        name,
-
-                    active: true,
-
-                    successfulReferrals:
-                        0,
-
-                    rewardsEarned:
-                        0,
-
-                    createdAt:
-                        new Date().toISOString()
-
-                }
-            );
-
-
-            referralCode.textContent =
-                code;
-
-
-            referralResult.classList.remove(
-                "hidden"
-            );
-
-
-            referralName.value =
-                name;
-
-
-            showReferralMessage(
-                "Your referral code was created!",
-                true
-            );
-
-
-            localStorage.setItem(
-                "myReferralCode",
-                code
-            );
-
-
-            localStorage.setItem(
-                "myReferralName",
-                name
-            );
-
-
-            updateReferralCount(
-                code
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                "Error creating referral code:",
-                error
-            );
-
-
-            showReferralMessage(
-                "Unable to create your referral code. Please try again."
-            );
-
-        } finally {
-
-            generateReferralButton.disabled =
-                false;
-
-
-            generateReferralButton.textContent =
-                "Generate My Referral Code";
-
-        }
+        return {
+            text: "Out of Stock",
+            class: "out-stock"
+        };
 
     }
-);
-```
+
+
+    if (Number(product.stock) <= 5) {
+
+        return {
+            text: "Low Stock",
+            class: "low-stock"
+        };
+
+    }
+
+
+    return {
+        text: "In Stock",
+        class: "in-stock"
+    };
 
 }
 
+
 // ==========================================================
-// LOAD EXISTING CUSTOMER CODE
+// CREATE PRODUCT CARD
 // ==========================================================
 
-async function loadMyReferralCode() {
+function createProduct(product) {
 
-```
-const savedCode =
-    localStorage.getItem(
-        "myReferralCode"
+    const status =
+        getStatus(product);
+
+
+    const card =
+        document.createElement("div");
+
+
+    card.className =
+        "product-card";
+
+
+    card.innerHTML = `
+
+        <div class="product-image">
+
+            <img
+                src="${product.image || ""}"
+                alt="${product.name || "Product"}"
+                onerror="this.src='https://placehold.co/120x120?text=No+Image'"
+            >
+
+        </div>
+
+
+        <div class="product-info">
+
+            <h3>
+                ${product.name || "Unnamed Product"}
+            </h3>
+
+
+            <div class="product-price">
+
+                ${money(product.price)}
+
+            </div>
+
+
+            <div class="product-stock">
+
+                Available:
+                ${Number(product.stock)}
+
+            </div>
+
+
+            <span class="badge ${status.class}">
+
+                ${status.text}
+
+            </span>
+
+
+            <p style="margin-top:15px;">
+
+                Restock Date:
+
+                <strong>
+                    ${product.restock || "Not specified"}
+                </strong>
+
+            </p>
+
+        </div>
+
+    `;
+
+
+    productContainer.appendChild(card);
+
+}
+
+
+// ==========================================================
+// CREATE INVENTORY TABLE ROW
+// ==========================================================
+
+function createTableRow(product) {
+
+    const status =
+        getStatus(product);
+
+
+    const row =
+        document.createElement("tr");
+
+
+    row.innerHTML = `
+
+        <td>
+            ${product.name || "Unnamed Product"}
+        </td>
+
+
+        <td>
+            ${money(product.price)}
+        </td>
+
+
+        <td>
+            ${Number(product.stock)}
+        </td>
+
+
+        <td>
+
+            <span class="badge ${status.class}">
+
+                ${status.text}
+
+            </span>
+
+        </td>
+
+
+        <td>
+            ${product.restock || "Not specified"}
+        </td>
+
+    `;
+
+
+    inventoryTable.appendChild(row);
+
+}
+
+
+// ==========================================================
+// UPDATE STATS
+// ==========================================================
+
+function updateStats(products) {
+
+    let total =
+        0;
+
+
+    products.forEach((product) => {
+
+        total +=
+            Number(product.stock) || 0;
+
+    });
+
+
+    totalProducts.textContent =
+        products.length;
+
+
+    itemsInStock.textContent =
+        total;
+
+}
+
+
+// ==========================================================
+// DISPLAY PRODUCTS
+// ==========================================================
+
+function displayProducts(products) {
+
+    productContainer.innerHTML =
+        "";
+
+    inventoryTable.innerHTML =
+        "";
+
+
+    products.forEach((product) => {
+
+        createProduct(product);
+
+        createTableRow(product);
+
+    });
+
+
+    updateStats(products);
+
+}
+
+
+// ==========================================================
+// SEARCH
+// ==========================================================
+
+if (searchInput) {
+
+    searchInput.addEventListener(
+        "input",
+        () => {
+
+            const text =
+                searchInput.value
+                    .toLowerCase()
+                    .trim();
+
+
+            const filtered =
+                inventory.filter((product) => {
+
+                    return String(
+                        product.name || ""
+                    )
+                        .toLowerCase()
+                        .includes(text);
+
+                });
+
+
+            displayProducts(filtered);
+
+        }
     );
 
+}
 
-const savedName =
-    localStorage.getItem(
-        "myReferralName"
-    );
 
+// ==========================================================
+// DARK MODE
+// ==========================================================
 
 if (
-    !savedCode ||
-    !savedName
+    localStorage.getItem("darkMode") ===
+    "enabled"
 ) {
 
-    return;
-
-}
-
-
-try {
-
-    const snapshot =
-        await getDoc(
-            doc(
-                db,
-                "referrals",
-                savedCode
-            )
-        );
+    document.body.classList.add(
+        "dark"
+    );
 
 
-    if (!snapshot.exists()) {
+    if (darkButton) {
 
-        localStorage.removeItem(
-            "myReferralCode"
-        );
-
-        localStorage.removeItem(
-            "myReferralName"
-        );
-
-        return;
+        darkButton.textContent =
+            "☀️";
 
     }
 
-
-    const referral =
-        snapshot.data();
-
-
-    referralName.value =
-        referral.referrerName;
-
-
-    referralCode.textContent =
-        referral.code;
-
-
-    referralResult.classList.remove(
-        "hidden"
-    );
-
-
-    showReferralMessage(
-        "Your referral code is ready!",
-        true
-    );
-
-
-    updateReferralCount(
-        savedCode
-    );
-
-} catch (error) {
-
-    console.error(
-        "Error loading referral code:",
-        error
-    );
-
-}
-```
-
 }
 
-// ==========================================================
-// UPDATE REFERRAL COUNT
-// ==========================================================
 
-async function updateReferralCount(
-code
-) {
+if (darkButton) {
 
-```
-try {
+    darkButton.addEventListener(
+        "click",
+        () => {
 
-    const snapshot =
-        await getDoc(
-            doc(
-                db,
-                "referrals",
-                code
-            )
-        );
-
-
-    if (!snapshot.exists()) {
-
-        return;
-
-    }
-
-
-    const data =
-        snapshot.data();
-
-
-    const successful =
-        Number(
-            data.successfulReferrals || 0
-        );
-
-
-    if (referralCount) {
-
-        referralCount.textContent =
-            `Successful Referrals: ${successful}`;
-
-    }
-
-} catch (error) {
-
-    console.error(
-        "Error loading referral count:",
-        error
-    );
-
-}
-```
-
-}
-
-// ==========================================================
-// COPY CODE
-// ==========================================================
-
-if (copyReferralButton) {
-
-```
-copyReferralButton.addEventListener(
-    "click",
-    async () => {
-
-        const code =
-            referralCode.textContent.trim();
-
-
-        if (
-            !code ||
-            code === "------"
-        ) {
-
-            return;
-
-        }
-
-
-        try {
-
-            await navigator.clipboard.writeText(
-                code
+            document.body.classList.toggle(
+                "dark"
             );
-
-
-            copyReferralButton.textContent =
-                "Copied!";
-
-
-            setTimeout(() => {
-
-                copyReferralButton.textContent =
-                    "Copy";
-
-            }, 1500);
-
-        } catch (error) {
-
-            console.error(
-                "Copy error:",
-                error
-            );
-
-        }
-
-    }
-);
-```
-
-}
-
-// ==========================================================
-// USE REFERRAL CODE
-// ==========================================================
-
-if (submitReferralButton) {
-
-```
-submitReferralButton.addEventListener(
-    "click",
-    async () => {
-
-        const code =
-            useReferralCode.value
-                .trim()
-                .toUpperCase();
-
-
-        if (!code) {
-
-            useReferralMessage.textContent =
-                "Please enter a referral code.";
-
-            return;
-
-        }
-
-
-        submitReferralButton.disabled =
-            true;
-
-
-        submitReferralButton.textContent =
-            "Checking...";
-
-
-        try {
-
-            const snapshot =
-                await getDoc(
-                    doc(
-                        db,
-                        "referrals",
-                        code
-                    )
-                );
-
-
-            if (!snapshot.exists()) {
-
-                useReferralMessage.textContent =
-                    "That referral code does not exist.";
-
-                return;
-
-            }
-
-
-            const referral =
-                snapshot.data();
 
 
             if (
-                referral.active !== true
+                document.body.classList.contains(
+                    "dark"
+                )
             ) {
 
-                useReferralMessage.textContent =
-                    "That referral code is no longer active.";
+                localStorage.setItem(
+                    "darkMode",
+                    "enabled"
+                );
+
+
+                darkButton.textContent =
+                    "☀️";
+
+            }
+
+            else {
+
+                localStorage.setItem(
+                    "darkMode",
+                    "disabled"
+                );
+
+
+                darkButton.textContent =
+                    "🌙";
+
+            }
+
+        }
+    );
+
+}
+
+
+// ==========================================================
+// LOAD PROMOTION
+// ==========================================================
+
+async function loadPromotion() {
+
+    if (!promotionContainer) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const promotionRef =
+            doc(
+                db,
+                "promotions",
+                "current"
+            );
+
+
+        const snapshot =
+            await getDoc(
+                promotionRef
+            );
+
+
+        if (!snapshot.exists()) {
+
+            promotionContainer.innerHTML = `
+
+                <h3>
+                    No Current Promotion
+                </h3>
+
+                <p>
+                    Check back soon for special offers!
+                </p>
+
+            `;
+
+            return;
+
+        }
+
+
+        const promotion =
+            snapshot.data();
+
+
+        if (
+            promotion.active !== true
+        ) {
+
+            promotionContainer.innerHTML = `
+
+                <h3>
+                    No Current Promotion
+                </h3>
+
+                <p>
+                    Check back soon for special offers!
+                </p>
+
+            `;
+
+            return;
+
+        }
+
+
+        const now =
+            new Date();
+
+
+        if (promotion.start) {
+
+            const start =
+                new Date(
+                    promotion.start
+                );
+
+
+            if (
+                !Number.isNaN(start.getTime()) &&
+                now < start
+            ) {
+
+                promotionContainer.innerHTML = `
+
+                    <h3>
+                        🎉 ${promotion.name || "Special Promotion"}
+                    </h3>
+
+                    <p>
+                        This promotion starts soon!
+                    </p>
+
+                    <p>
+                        Qualifying Product:
+                        <strong>
+                            ${promotion.qualifyingProductName || "Product"}
+                        </strong>
+                    </p>
+
+                `;
 
                 return;
 
             }
 
-
-            localStorage.setItem(
-                "activeReferralCode",
-                code
-            );
+        }
 
 
-            useReferralMessage.textContent =
-                `Referral code ${code} accepted!`;
+        if (promotion.end) {
 
-            useReferralMessage.style.color =
-                "green";
-
-
-            useReferralCode.value =
-                code;
+            const end =
+                new Date(
+                    promotion.end
+                );
 
 
-        } catch (error) {
+            if (
+                !Number.isNaN(end.getTime()) &&
+                now > end
+            ) {
 
-            console.error(
-                "Referral code error:",
-                error
-            );
+                promotionContainer.innerHTML = `
+
+                    <h3>
+                        Promotion Ended
+                    </h3>
+
+                    <p>
+                        Check back soon for our next promotion!
+                    </p>
+
+                `;
+
+                return;
+
+            }
+
+        }
 
 
-            useReferralMessage.textContent =
-                "Unable to verify the referral code.";
+        promotionContainer.innerHTML = `
 
-        } finally {
-
-            submitReferralButton.disabled =
-                false;
+            <h2>
+                🎉 ${promotion.name || "Special Promotion"}
+            </h2>
 
 
-            submitReferralButton.textContent =
-                "Use Referral Code";
+            <p style="margin:15px 0;">
+
+                Bring a friend who has never purchased
+                from Grayson's Snack Shop before!
+
+            </p>
+
+
+            <p>
+
+                When they purchase:
+
+                <strong>
+                    ${promotion.qualifyingProductName || "the qualifying product"}
+                </strong>
+
+            </p>
+
+
+            <p>
+
+                You receive:
+
+                <strong>
+                    ${promotion.rewardQuantity || 1}
+                    ×
+                    ${promotion.rewardProductName || "your reward"}
+                </strong>
+
+            </p>
+
+
+            <p style="margin-top:15px;">
+
+                <strong>
+                    Referral rewards are given after
+                    the purchase is approved.
+                </strong>
+
+            </p>
+
+        `;
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Error loading promotion:",
+            error
+        );
+
+
+        promotionContainer.innerHTML = `
+
+            <h3>
+                Promotion Currently Unavailable
+            </h3>
+
+            <p>
+                Please check back later.
+            </p>
+
+        `;
+
+    }
+
+}
+
+
+// ==========================================================
+// START WEBSITE
+// ==========================================================
+
+async function startShop() {
+
+    try {
+
+        console.log(
+            "Starting Grayson's Snack Shop..."
+        );
+
+
+        await loadInventory();
+
+
+        displayProducts(
+            inventory
+        );
+
+
+        await loadPromotion();
+
+
+        console.log(
+            "Grayson's Snack Shop Loaded Successfully"
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Failed to start Grayson's Snack Shop:",
+            error
+        );
+
+
+        if (productContainer) {
+
+            productContainer.innerHTML = `
+
+                <p style="
+                    text-align:center;
+                    padding:30px;
+                ">
+
+                    Unable to load the shop right now.
+                    Please refresh the page.
+
+                </p>
+
+            `;
 
         }
 
     }
-);
-```
 
 }
+
 
 // ==========================================================
 // START
 // ==========================================================
 
-loadMyReferralCode();
-
-// ==========================================================
-// EXPORTS
-// ==========================================================
-
-export {
-generateCode,
-createUniqueCode
-};
+startShop();
+```
