@@ -1,2831 +1,2865 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-
-<meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
-
-<title>
-Grayson's Snack Shop — Admin
-</title>
-
-<link
-    rel="icon"
-    type="image/png"
-    href="graysonslogos.png"
->
-
-<link
-    rel="preconnect"
-    href="https://fonts.googleapis.com"
->
-
-<link
-    rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin
->
-
-<link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet"
->
-
-
-<style>
-
 /*
 ==========================================================
-GRAYSon's SNACK SHOP
-ADMIN DASHBOARD
-Standalone Design
+Grayson's Snack Shop
+admin.js
+
+Inventory
+Promotions
+Referral Management
 ==========================================================
 */
 
 
-:root {
+import { db } from "./firebase.js";
 
-    --orange:
-        #ff7200;
 
-    --orange-hover:
-        #e96800;
+import {
+    collection,
+    doc,
+    setDoc,
+    updateDoc,
+    deleteDoc,
+    onSnapshot,
+    runTransaction,
+    writeBatch
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-    --orange-soft:
-        #fff3e8;
 
-    --page:
-        #f6f6f4;
 
-    --surface:
-        #ffffff;
+// ==========================================================
+// ADMIN LOGIN
+// ==========================================================
 
-    --surface-soft:
-        #f8f7f5;
+const ADMIN_USERNAME =
+    "60340276";
 
-    --text:
-        #171717;
+const ADMIN_PASSWORD =
+    "5527GSS02";
 
-    --muted:
-        #747474;
 
-    --border:
-        #e7e5e2;
 
-    --green:
-        #188b49;
+// ==========================================================
+// FIRESTORE REFERENCES
+// ==========================================================
 
-    --green-soft:
-        #eaf8f0;
+const inventoryRef =
+    collection(
+        db,
+        "inventory"
+    );
 
-    --red:
-        #d54141;
 
-    --red-soft:
-        #fff0f0;
+const referralUsesRef =
+    collection(
+        db,
+        "referralUses"
+    );
 
-    --blue:
-        #3478d4;
 
-    --blue-soft:
-        #edf5ff;
+const referralsRef =
+    collection(
+        db,
+        "referrals"
+    );
 
-    --yellow:
-        #b87a08;
 
-    --yellow-soft:
-        #fff8df;
+const promotionRef =
+    doc(
+        db,
+        "promotions",
+        "first-week-takis"
+    );
 
-    --shadow:
-        0 18px 50px
-        rgba(
-            0,
-            0,
-            0,
-            .07
+
+
+// ==========================================================
+// LOGIN ELEMENTS
+// ==========================================================
+
+const loginBox =
+    document.getElementById(
+        "loginBox"
+    );
+
+
+const dashboard =
+    document.getElementById(
+        "dashboard"
+    );
+
+
+const username =
+    document.getElementById(
+        "username"
+    );
+
+
+const password =
+    document.getElementById(
+        "password"
+    );
+
+
+const loginButton =
+    document.getElementById(
+        "loginButton"
+    );
+
+
+const loginMessage =
+    document.getElementById(
+        "loginMessage"
+    );
+
+
+const logoutButton =
+    document.getElementById(
+        "logout"
+    );
+
+
+
+// ==========================================================
+// TAB ELEMENTS
+// ==========================================================
+
+const inventoryTabButton =
+    document.getElementById(
+        "inventoryTabButton"
+    );
+
+
+const promotionsTabButton =
+    document.getElementById(
+        "promotionsTabButton"
+    );
+
+
+const inventoryTab =
+    document.getElementById(
+        "inventoryTab"
+    );
+
+
+const promotionsTab =
+    document.getElementById(
+        "promotionsTab"
+    );
+
+
+
+// ==========================================================
+// INVENTORY ELEMENTS
+// ==========================================================
+
+const adminProducts =
+    document.getElementById(
+        "adminProducts"
+    );
+
+
+const newName =
+    document.getElementById(
+        "newName"
+    );
+
+
+const newPrice =
+    document.getElementById(
+        "newPrice"
+    );
+
+
+const newStock =
+    document.getElementById(
+        "newStock"
+    );
+
+
+const newRestock =
+    document.getElementById(
+        "newRestock"
+    );
+
+
+const newImage =
+    document.getElementById(
+        "newImage"
+    );
+
+
+const addProductButton =
+    document.getElementById(
+        "addProduct"
+    );
+
+
+
+// ==========================================================
+// PROMOTION ELEMENTS
+// ==========================================================
+
+const promotionActive =
+    document.getElementById(
+        "promotionActive"
+    );
+
+
+const promotionName =
+    document.getElementById(
+        "promotionName"
+    );
+
+
+const promotionStart =
+    document.getElementById(
+        "promotionStart"
+    );
+
+
+const promotionEnd =
+    document.getElementById(
+        "promotionEnd"
+    );
+
+
+const promotionQualifyingProduct =
+    document.getElementById(
+        "promotionQualifyingProduct"
+    );
+
+
+const promotionRewardProduct =
+    document.getElementById(
+        "promotionRewardProduct"
+    );
+
+
+const promotionRewardQuantity =
+    document.getElementById(
+        "promotionRewardQuantity"
+    );
+
+
+const promotionDescription =
+    document.getElementById(
+        "promotionDescription"
+    );
+
+
+const savePromotionButton =
+    document.getElementById(
+        "savePromotion"
+    );
+
+
+const promotionMessage =
+    document.getElementById(
+        "promotionMessage"
+    );
+
+
+const inventoryProductNames =
+    document.getElementById(
+        "inventoryProductNames"
+    );
+
+
+
+// ==========================================================
+// REFERRAL ELEMENTS
+// ==========================================================
+
+const pendingReferralCount =
+    document.getElementById(
+        "pendingReferralCount"
+    );
+
+
+const approvedReferralCount =
+    document.getElementById(
+        "approvedReferralCount"
+    );
+
+
+const outstandingRewardCount =
+    document.getElementById(
+        "outstandingRewardCount"
+    );
+
+
+const totalReferralCodes =
+    document.getElementById(
+        "totalReferralCodes"
+    );
+
+
+const referralRequests =
+    document.getElementById(
+        "referralRequests"
+    );
+
+
+const referralCodes =
+    document.getElementById(
+        "referralCodes"
+    );
+
+
+
+// ==========================================================
+// STATE
+// ==========================================================
+
+let inventory =
+    [];
+
+
+let referralUses =
+    [];
+
+
+let referrals =
+    [];
+
+
+let unsubscribeInventory =
+    null;
+
+
+let unsubscribePromotion =
+    null;
+
+
+let unsubscribeReferralUses =
+    null;
+
+
+let unsubscribeReferrals =
+    null;
+
+
+
+// ==========================================================
+// ESCAPE HTML
+// ==========================================================
+
+function escapeHtml(value) {
+
+    return String(
+        value ?? ""
+    )
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+        .replaceAll(
+            "'",
+            "&#039;"
         );
 
 }
 
 
-* {
 
-    margin:
-        0;
+// ==========================================================
+// FORMAT DATE
+// ==========================================================
 
-    padding:
-        0;
+function formatDate(value) {
 
-    box-sizing:
-        border-box;
+    if (
+        !value
+    ) {
 
-    font-family:
-        "Poppins",
-        sans-serif;
+        return "Not recorded";
 
-}
+    }
 
 
-body {
-
-    min-height:
-        100vh;
-
-    background:
-        var(--page);
-
-    color:
-        var(--text);
-
-}
-
-
-button,
-input,
-textarea,
-select {
-
-    font:
-        inherit;
-
-}
-
-
-button {
-
-    cursor:
-        pointer;
-
-}
-
-
-.hidden {
-
-    display:
-        none !important;
-
-}
-
-
-
-/* ========================================================
-LOGIN
-======================================================== */
-
-.login-page {
-
-    min-height:
-        100vh;
-
-    display:
-        grid;
-
-    place-items:
-        center;
-
-    padding:
-        30px;
-
-    background:
-
-        radial-gradient(
-            circle at 15% 20%,
-            rgba(
-                255,
-                114,
-                0,
-                .11
-            ),
-            transparent 32%
-        ),
-
-        radial-gradient(
-            circle at 85% 80%,
-            rgba(
-                255,
-                157,
-                70,
-                .1
-            ),
-            transparent 30%
-        ),
-
-        #f8f7f5;
-
-}
-
-
-.login-card {
-
-    width:
-        min(
-            460px,
-            100%
+    const date =
+        new Date(
+            value
         );
 
-    padding:
-        42px;
 
-    background:
-        white;
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
 
-    border:
-        1px solid
-        var(--border);
-
-    border-radius:
-        26px;
-
-    box-shadow:
-        var(--shadow);
-
-}
-
-
-.login-logo {
-
-    width:
-        58px;
-
-    height:
-        58px;
-
-    display:
-        grid;
-
-    place-items:
-        center;
-
-    margin-bottom:
-        24px;
-
-    border-radius:
-        17px;
-
-    background:
-        var(--orange-soft);
-
-    font-size:
-        28px;
-
-}
-
-
-.login-eyebrow {
-
-    color:
-        var(--orange);
-
-    font-size:
-        10px;
-
-    font-weight:
-        800;
-
-    letter-spacing:
-        1.8px;
-
-}
-
-
-.login-card h1 {
-
-    margin-top:
-        7px;
-
-    font-size:
-        31px;
-
-    letter-spacing:
-        -1.2px;
-
-}
-
-
-.login-card > p {
-
-    margin-top:
-        8px;
-
-    color:
-        var(--muted);
-
-    font-size:
-        12px;
-
-    line-height:
-        1.6;
-
-}
-
-
-.login-field {
-
-    margin-top:
-        22px;
-
-}
-
-
-.login-field label {
-
-    display:
-        block;
-
-    margin-bottom:
-        7px;
-
-    font-size:
-        11px;
-
-    font-weight:
-        700;
-
-}
-
-
-.login-field input {
-
-    width:
-        100%;
-
-    height:
-        49px;
-
-    padding:
-        0 15px;
-
-    border:
-        1px solid
-        #dcdad6;
-
-    border-radius:
-        11px;
-
-    outline:
-        none;
-
-    background:
-        white;
-
-}
-
-
-.login-field input:focus {
-
-    border-color:
-        var(--orange);
-
-    box-shadow:
-        0 0 0 4px
-        rgba(
-            255,
-            114,
-            0,
-            .07
+        return String(
+            value
         );
 
-}
+    }
 
 
-#loginButton {
-
-    width:
-        100%;
-
-    min-height:
-        50px;
-
-    margin-top:
-        22px;
-
-    border:
-        none;
-
-    border-radius:
-        11px;
-
-    background:
-        var(--orange);
-
-    color:
-        white;
-
-    font-size:
-        12px;
-
-    font-weight:
-        800;
-
-}
-
-
-#loginButton:hover {
-
-    background:
-        var(--orange-hover);
-
-}
-
-
-#loginMessage {
-
-    min-height:
-        18px;
-
-    margin-top:
-        12px;
-
-    color:
-        var(--red);
-
-    font-size:
-        11px;
-
-    font-weight:
-        600;
+    return date.toLocaleString();
 
 }
 
 
 
-/* ========================================================
-DASHBOARD
-======================================================== */
+// ==========================================================
+// LOGIN
+// ==========================================================
 
-.dashboard {
+function login() {
 
-    min-height:
-        100vh;
+    const enteredUsername =
+        username.value.trim();
+
+
+    const enteredPassword =
+        password.value;
+
+
+    if (
+        enteredUsername === ADMIN_USERNAME &&
+        enteredPassword === ADMIN_PASSWORD
+    ) {
+
+        loginMessage.textContent =
+            "";
+
+
+        showDashboard();
+
+    }
+
+    else {
+
+        loginMessage.textContent =
+            "Incorrect username or password.";
+
+    }
 
 }
 
 
-.admin-header {
 
-    height:
-        72px;
+// ==========================================================
+// SHOW DASHBOARD
+// ==========================================================
 
-    position:
-        sticky;
+function showDashboard() {
 
-    top:
-        0;
+    loginBox.classList.add(
+        "hidden"
+    );
 
-    z-index:
-        50;
 
-    display:
-        flex;
+    dashboard.classList.remove(
+        "hidden"
+    );
 
-    align-items:
-        center;
 
-    justify-content:
-        space-between;
+    sessionStorage.setItem(
+        "gssAdminLoggedIn",
+        "true"
+    );
 
-    gap:
-        20px;
 
-    padding:
-        0 30px;
+    startListeners();
 
-    background:
-        rgba(
-            255,
-            255,
-            255,
-            .95
+}
+
+
+
+// ==========================================================
+// LOGIN EVENTS
+// ==========================================================
+
+loginButton.addEventListener(
+    "click",
+    login
+);
+
+
+username.addEventListener(
+
+    "keydown",
+
+    (event) => {
+
+        if (
+            event.key ===
+            "Enter"
+        ) {
+
+            login();
+
+        }
+
+    }
+
+);
+
+
+password.addEventListener(
+
+    "keydown",
+
+    (event) => {
+
+        if (
+            event.key ===
+            "Enter"
+        ) {
+
+            login();
+
+        }
+
+    }
+
+);
+
+
+
+// ==========================================================
+// LOGOUT
+// ==========================================================
+
+logoutButton.addEventListener(
+
+    "click",
+
+    () => {
+
+        stopListeners();
+
+
+        sessionStorage.removeItem(
+            "gssAdminLoggedIn"
         );
 
-    backdrop-filter:
-        blur(18px);
 
-    border-bottom:
-        1px solid
-        var(--border);
-
-}
-
-
-.admin-brand {
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    gap:
-        12px;
-
-}
-
-
-.admin-brand-icon {
-
-    font-size:
-        24px;
-
-}
-
-
-.admin-brand strong {
-
-    display:
-        block;
-
-    font-size:
-        14px;
-
-}
-
-
-.admin-brand span {
-
-    display:
-        block;
-
-    margin-top:
-        1px;
-
-    color:
-        var(--muted);
-
-    font-size:
-        9px;
-
-    font-weight:
-        600;
-
-    letter-spacing:
-        1px;
-
-}
-
-
-.header-actions {
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    gap:
-        9px;
-
-}
-
-
-.header-button {
-
-    min-height:
-        39px;
-
-    padding:
-        0 14px;
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius:
-        10px;
-
-    background:
-        white;
-
-    color:
-        var(--text);
-
-    text-decoration:
-        none;
-
-    display:
-        inline-flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    font-size:
-        10px;
-
-    font-weight:
-        700;
-
-}
-
-
-.header-button:hover {
-
-    background:
-        var(--surface-soft);
-
-}
-
-
-#logout {
-
-    background:
-        var(--text);
-
-    color:
-        white;
-
-    border-color:
-        var(--text);
-
-}
-
-
-
-/* ========================================================
-ADMIN LAYOUT
-======================================================== */
-
-.admin-layout {
-
-    width:
-        min(
-            1480px,
-            100%
+        dashboard.classList.add(
+            "hidden"
         );
 
-    margin:
-        auto;
 
-    display:
-        grid;
-
-    grid-template-columns:
-        240px 1fr;
-
-    gap:
-        0;
-
-}
+        loginBox.classList.remove(
+            "hidden"
+        );
 
 
-.admin-sidebar {
-
-    min-height:
-        calc(100vh - 72px);
-
-    padding:
-        30px 20px;
-
-    border-right:
-        1px solid
-        var(--border);
-
-    background:
-        white;
-
-}
+        username.value =
+            "";
 
 
-.sidebar-title {
+        password.value =
+            "";
 
-    padding:
-        0 10px 12px;
+    }
 
-    color:
-        #a0a0a0;
-
-    font-size:
-        8px;
-
-    font-weight:
-        800;
-
-    letter-spacing:
-        1.5px;
-
-}
+);
 
 
-.admin-tab-button {
 
-    width:
-        100%;
+// ==========================================================
+// TABS
+// ==========================================================
 
-    display:
-        flex;
+function showInventoryTab() {
 
-    align-items:
-        center;
-
-    gap:
-        11px;
-
-    margin-bottom:
-        5px;
-
-    padding:
-        12px 13px;
-
-    border:
-        none;
-
-    border-radius:
-        10px;
-
-    background:
-        transparent;
-
-    color:
-        #666;
-
-    text-align:
-        left;
-
-    font-size:
-        11px;
-
-    font-weight:
-        600;
-
-}
+    inventoryTab.classList.remove(
+        "hidden"
+    );
 
 
-.admin-tab-button:hover {
-
-    background:
-        #f7f6f4;
-
-    color:
-        var(--text);
-
-}
+    promotionsTab.classList.add(
+        "hidden"
+    );
 
 
-.admin-tab-button.active {
-
-    background:
-        var(--orange-soft);
-
-    color:
-        var(--orange);
-
-    font-weight:
-        700;
-
-}
+    inventoryTabButton.classList.add(
+        "active"
+    );
 
 
-.admin-content {
-
-    min-width:
-        0;
-
-    padding:
-        38px;
+    promotionsTabButton.classList.remove(
+        "active"
+    );
 
 }
 
 
 
-/* ========================================================
-PAGE HEADINGS
-======================================================== */
+function showPromotionsTab() {
 
-.page-heading {
-
-    display:
-        flex;
-
-    align-items:
-        flex-end;
-
-    justify-content:
-        space-between;
-
-    gap:
-        20px;
-
-    margin-bottom:
-        28px;
-
-}
+    promotionsTab.classList.remove(
+        "hidden"
+    );
 
 
-.page-heading span {
-
-    color:
-        var(--orange);
-
-    font-size:
-        9px;
-
-    font-weight:
-        800;
-
-    letter-spacing:
-        1.6px;
-
-}
+    inventoryTab.classList.add(
+        "hidden"
+    );
 
 
-.page-heading h1 {
-
-    margin-top:
-        4px;
-
-    font-size:
-        32px;
-
-    letter-spacing:
-        -1.3px;
-
-}
+    promotionsTabButton.classList.add(
+        "active"
+    );
 
 
-.page-heading p {
-
-    margin-top:
-        6px;
-
-    color:
-        var(--muted);
-
-    font-size:
-        11px;
+    inventoryTabButton.classList.remove(
+        "active"
+    );
 
 }
 
 
 
-/* ========================================================
-CARDS
-======================================================== */
-
-.admin-card {
-
-    margin-bottom:
-        22px;
-
-    padding:
-        26px;
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius:
-        19px;
-
-    background:
-        var(--surface);
-
-}
+inventoryTabButton.addEventListener(
+    "click",
+    showInventoryTab
+);
 
 
-.card-heading {
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        space-between;
-
-    gap:
-        15px;
-
-    margin-bottom:
-        21px;
-
-}
-
-
-.card-heading h2 {
-
-    font-size:
-        16px;
-
-}
-
-
-.card-heading p {
-
-    margin-top:
-        4px;
-
-    color:
-        var(--muted);
-
-    font-size:
-        10px;
-
-}
+promotionsTabButton.addEventListener(
+    "click",
+    showPromotionsTab
+);
 
 
 
-/* ========================================================
-FORMS
-======================================================== */
+// ==========================================================
+// RENDER INVENTORY
+// ==========================================================
 
-.admin-form-grid {
+function renderInventory() {
 
-    display:
-        grid;
+    inventoryProductNames.innerHTML =
+        "";
 
-    grid-template-columns:
-        repeat(
-            3,
-            minmax(
-                0,
-                1fr
+
+    inventory.forEach(
+        (product) => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                product.name ||
+                "";
+
+
+            inventoryProductNames.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    if (
+        inventory.length === 0
+    ) {
+
+        adminProducts.innerHTML = `
+
+            <div class="admin-empty">
+
+                No products found.
+
+            </div>
+
+        `;
+
+
+        return;
+
+    }
+
+
+    adminProducts.innerHTML =
+        inventory
+            .map(
+                (product) => {
+
+                    return `
+
+                        <div
+                            class="product-admin-card"
+                            data-product-id="${escapeHtml(product.firestoreId)}"
+                        >
+
+                            <div class="admin-product-image">
+
+                                <img
+                                    src="${escapeHtml(product.image || "")}"
+                                    alt="${escapeHtml(product.name || "")}"
+                                    onerror="this.src='https://placehold.co/100x100?text=No+Image'"
+                                >
+
+                            </div>
+
+
+                            <div class="product-edit-grid">
+
+                                <input
+                                    data-field="name"
+                                    value="${escapeHtml(product.name || "")}"
+                                    placeholder="Product Name"
+                                >
+
+
+                                <input
+                                    data-field="price"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    value="${Number(product.price) || 0}"
+                                >
+
+
+                                <input
+                                    data-field="stock"
+                                    type="number"
+                                    min="0"
+                                    step="1"
+                                    value="${Number(product.stock) || 0}"
+                                >
+
+
+                                <input
+                                    data-field="restock"
+                                    value="${escapeHtml(product.restock || "")}"
+                                    placeholder="Restock Date"
+                                >
+
+
+                                <input
+                                    data-field="image"
+                                    value="${escapeHtml(product.image || "")}"
+                                    placeholder="Image Filename"
+                                >
+
+                            </div>
+
+
+                            <div class="product-buttons">
+
+                                <button
+                                    class="small-button save-button"
+                                    data-action="save-product"
+                                    type="button"
+                                >
+
+                                    Save
+
+                                </button>
+
+
+                                <button
+                                    class="small-button delete-button"
+                                    data-action="delete-product"
+                                    type="button"
+                                >
+
+                                    Delete
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                }
             )
-        );
-
-    gap:
-        15px;
+            .join("");
 
 }
 
 
-.admin-field {
 
-    min-width:
-        0;
+// ==========================================================
+// ADD PRODUCT
+// ==========================================================
 
-}
+addProductButton.addEventListener(
 
+    "click",
 
-.admin-field.full-width {
+    async () => {
 
-    grid-column:
-        1 / -1;
+        const name =
+            newName.value.trim();
 
-}
 
-
-.admin-field label {
-
-    display:
-        block;
-
-    margin-bottom:
-        7px;
-
-    color:
-        #555;
-
-    font-size:
-        10px;
-
-    font-weight:
-        700;
-
-}
-
-
-.admin-field input,
-.admin-field textarea,
-.admin-field select {
-
-    width:
-        100%;
-
-    min-height:
-        44px;
-
-    padding:
-        10px 12px;
-
-    border:
-        1px solid
-        #dedbd7;
-
-    border-radius:
-        10px;
-
-    background:
-        white;
-
-    color:
-        var(--text);
-
-    outline:
-        none;
-
-    font-size:
-        11px;
-
-}
-
-
-.admin-field textarea {
-
-    min-height:
-        100px;
-
-    resize:
-        vertical;
-
-}
-
-
-.admin-field input:focus,
-.admin-field textarea:focus,
-.admin-field select:focus {
-
-    border-color:
-        var(--orange);
-
-    box-shadow:
-        0 0 0 4px
-        rgba(
-            255,
-            114,
-            0,
-            .06
-        );
-
-}
-
-
-.checkbox-row {
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    gap:
-        9px;
-
-    margin-bottom:
-        20px;
-
-}
-
-
-.checkbox-row input {
-
-    width:
-        17px;
-
-    height:
-        17px;
-
-    accent-color:
-        var(--orange);
-
-}
-
-
-.checkbox-row label {
-
-    font-size:
-        11px;
-
-    font-weight:
-        700;
-
-}
-
-
-.primary-admin-button {
-
-    min-height:
-        43px;
-
-    padding:
-        0 17px;
-
-    border:
-        none;
-
-    border-radius:
-        10px;
-
-    background:
-        var(--orange);
-
-    color:
-        white;
-
-    font-size:
-        10px;
-
-    font-weight:
-        800;
-
-}
-
-
-.primary-admin-button:hover {
-
-    background:
-        var(--orange-hover);
-
-}
-
-
-.save-row {
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    gap:
-        14px;
-
-    margin-top:
-        20px;
-
-}
-
-
-#promotionMessage {
-
-    font-size:
-        10px;
-
-    font-weight:
-        700;
-
-}
-
-
-
-/* ========================================================
-STATS
-======================================================== */
-
-.referral-stats {
-
-    display:
-        grid;
-
-    grid-template-columns:
-        repeat(
-            4,
-            1fr
-        );
-
-    gap:
-        12px;
-
-    margin-bottom:
-        23px;
-
-}
-
-
-.referral-stat {
-
-    padding:
-        20px;
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius:
-        16px;
-
-    background:
-        white;
-
-}
-
-
-.referral-stat span {
-
-    display:
-        block;
-
-    color:
-        #999;
-
-    font-size:
-        8px;
-
-    font-weight:
-        800;
-
-    letter-spacing:
-        1px;
-
-}
-
-
-.referral-stat strong {
-
-    display:
-        block;
-
-    margin-top:
-        6px;
-
-    font-size:
-        27px;
-
-}
-
-
-
-/* ========================================================
-INVENTORY ITEMS
-======================================================== */
-
-.product-admin-card {
-
-    display:
-        grid;
-
-    grid-template-columns:
-        90px 1fr auto;
-
-    gap:
-        20px;
-
-    align-items:
-        center;
-
-    padding:
-        18px 0;
-
-    border-bottom:
-        1px solid
-        var(--border);
-
-}
-
-
-.product-admin-card:last-child {
-
-    border-bottom:
-        none;
-
-}
-
-
-.admin-product-image {
-
-    width:
-        86px;
-
-    height:
-        86px;
-
-    display:
-        grid;
-
-    place-items:
-        center;
-
-    border-radius:
-        14px;
-
-    background:
-        #f6f5f3;
-
-}
-
-
-.admin-product-image img {
-
-    width:
-        70px;
-
-    height:
-        70px;
-
-    object-fit:
-        contain;
-
-}
-
-
-.product-edit-grid {
-
-    display:
-        grid;
-
-    grid-template-columns:
-        2fr .8fr .8fr 1fr 1.4fr;
-
-    gap:
-        9px;
-
-}
-
-
-.product-edit-grid input {
-
-    width:
-        100%;
-
-    min-width:
-        0;
-
-    padding:
-        10px;
-
-    border:
-        1px solid
-        #e0ddd9;
-
-    border-radius:
-        9px;
-
-    outline:
-        none;
-
-    font-size:
-        10px;
-
-}
-
-
-.product-edit-grid input:focus {
-
-    border-color:
-        var(--orange);
-
-}
-
-
-.product-buttons {
-
-    display:
-        grid;
-
-    gap:
-        7px;
-
-}
-
-
-.small-button {
-
-    min-width:
-        80px;
-
-    min-height:
-        36px;
-
-    padding:
-        0 11px;
-
-    border:
-        none;
-
-    border-radius:
-        9px;
-
-    font-size:
-        9px;
-
-    font-weight:
-        800;
-
-}
-
-
-.save-button {
-
-    background:
-        var(--orange);
-
-    color:
-        white;
-
-}
-
-
-.delete-button {
-
-    background:
-        var(--red-soft);
-
-    color:
-        var(--red);
-
-}
-
-
-
-/* ========================================================
-REFERRAL REQUESTS
-======================================================== */
-
-.referral-request {
-
-    padding:
-        20px 0;
-
-    border-bottom:
-        1px solid
-        var(--border);
-
-}
-
-
-.referral-request:last-child {
-
-    border-bottom:
-        none;
-
-}
-
-
-.referral-request-top {
-
-    display:
-        flex;
-
-    align-items:
-        flex-start;
-
-    justify-content:
-        space-between;
-
-    gap:
-        20px;
-
-}
-
-
-.referral-request h3 {
-
-    font-size:
-        14px;
-
-}
-
-
-.referral-meta {
-
-    display:
-        flex;
-
-    flex-wrap:
-        wrap;
-
-    gap:
-        7px 20px;
-
-    margin-top:
-        11px;
-
-    color:
-        var(--muted);
-
-    font-size:
-        10px;
-
-}
-
-
-.admin-status {
-
-    display:
-        inline-flex;
-
-    align-items:
-        center;
-
-    min-height:
-        25px;
-
-    padding:
-        0 9px;
-
-    border-radius:
-        100px;
-
-    font-size:
-        8px;
-
-    font-weight:
-        800;
-
-    letter-spacing:
-        .5px;
-
-}
-
-
-.status-pending {
-
-    background:
-        var(--yellow-soft);
-
-    color:
-        var(--yellow);
-
-}
-
-
-.status-approved {
-
-    background:
-        var(--green-soft);
-
-    color:
-        var(--green);
-
-}
-
-
-.status-rejected {
-
-    background:
-        var(--red-soft);
-
-    color:
-        var(--red);
-
-}
-
-
-.status-rewarded {
-
-    background:
-        var(--blue-soft);
-
-    color:
-        var(--blue);
-
-}
-
-
-.action-row {
-
-    display:
-        flex;
-
-    flex-wrap:
-        wrap;
-
-    gap:
-        8px;
-
-    margin-top:
-        15px;
-
-}
-
-
-.action-button {
-
-    min-height:
-        35px;
-
-    padding:
-        0 12px;
-
-    border:
-        none;
-
-    border-radius:
-        8px;
-
-    font-size:
-        9px;
-
-    font-weight:
-        800;
-
-}
-
-
-.approve-button {
-
-    background:
-        var(--green-soft);
-
-    color:
-        var(--green);
-
-}
-
-
-.reject-button {
-
-    background:
-        var(--red-soft);
-
-    color:
-        var(--red);
-
-}
-
-
-.reward-button {
-
-    background:
-        var(--blue-soft);
-
-    color:
-        var(--blue);
-
-}
-
-
-.reset-button {
-
-    background:
-        #f2f2f2;
-
-    color:
-        #555;
-
-}
-
-
-.hard-delete-button {
-
-    background:
-        var(--red);
-
-    color:
-        white;
-
-}
-
-
-
-/* ========================================================
-REFERRAL CODE CARDS
-======================================================== */
-
-.referral-code-card {
-
-    display:
-        grid;
-
-    grid-template-columns:
-        1fr auto;
-
-    gap:
-        20px;
-
-    padding:
-        20px 0;
-
-    border-bottom:
-        1px solid
-        var(--border);
-
-}
-
-
-.referral-code-card:last-child {
-
-    border-bottom:
-        none;
-
-}
-
-
-.referral-code {
-
-    color:
-        var(--orange);
-
-    font-size:
-        22px;
-
-    font-weight:
-        800;
-
-    letter-spacing:
-        1.5px;
-
-}
-
-
-.referral-code-name {
-
-    margin-top:
-        3px;
-
-    font-size:
-        12px;
-
-    font-weight:
-        700;
-
-}
-
-
-.referral-code-meta {
-
-    display:
-        flex;
-
-    flex-wrap:
-        wrap;
-
-    gap:
-        8px 20px;
-
-    margin-top:
-        10px;
-
-    color:
-        var(--muted);
-
-    font-size:
-        9px;
-
-}
-
-
-.code-buttons {
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    gap:
-        7px;
-
-}
-
-
-
-/* ========================================================
-EMPTY / LOADING
-======================================================== */
-
-.admin-empty {
-
-    padding:
-        35px 10px;
-
-    color:
-        #999;
-
-    text-align:
-        center;
-
-    font-size:
-        11px;
-
-}
-
-
-
-/* ========================================================
-MOBILE
-======================================================== */
-
-@media(
-    max-width:
-    1050px
-) {
-
-    .admin-layout {
-
-        grid-template-columns:
-            1fr;
-
-    }
-
-
-    .admin-sidebar {
-
-        min-height:
-            auto;
-
-        display:
-            flex;
-
-        gap:
-            7px;
-
-        padding:
-            14px 20px;
-
-        overflow-x:
-            auto;
-
-        border-right:
-            none;
-
-        border-bottom:
-            1px solid
-            var(--border);
-
-    }
-
-
-    .sidebar-title {
-
-        display:
-            none;
-
-    }
-
-
-    .admin-tab-button {
-
-        width:
-            auto;
-
-        min-width:
-            max-content;
-
-        margin:
-            0;
-
-    }
-
-
-    .product-admin-card {
-
-        grid-template-columns:
-            75px 1fr;
-
-    }
-
-
-    .product-buttons {
-
-        grid-column:
-            1 / -1;
-
-        display:
-            flex;
-
-    }
-
-
-    .product-edit-grid {
-
-        grid-template-columns:
-            repeat(
-                2,
-                1fr
+        const price =
+            Number(
+                newPrice.value
             );
 
-    }
 
-}
-
-
-@media(
-    max-width:
-    760px
-) {
-
-    .admin-header {
-
-        padding:
-            0 15px;
-
-    }
-
-
-    .admin-brand strong {
-
-        font-size:
-            12px;
-
-    }
-
-
-    .header-button {
-
-        padding:
-            0 9px;
-
-    }
-
-
-    .admin-content {
-
-        padding:
-            24px 15px;
-
-    }
-
-
-    .page-heading {
-
-        align-items:
-            flex-start;
-
-        flex-direction:
-            column;
-
-    }
-
-
-    .admin-form-grid {
-
-        grid-template-columns:
-            1fr;
-
-    }
-
-
-    .admin-field.full-width {
-
-        grid-column:
-            auto;
-
-    }
-
-
-    .referral-stats {
-
-        grid-template-columns:
-            repeat(
-                2,
-                1fr
+        const stock =
+            Number(
+                newStock.value
             );
 
+
+        const restock =
+            newRestock.value.trim();
+
+
+        const image =
+            newImage.value.trim();
+
+
+        if (
+            !name
+        ) {
+
+            alert(
+                "Enter a product name."
+            );
+
+
+            return;
+
+        }
+
+
+        const firestoreId =
+            Date.now()
+                .toString();
+
+
+        try {
+
+            await setDoc(
+
+                doc(
+                    db,
+                    "inventory",
+                    firestoreId
+                ),
+
+                {
+
+                    id:
+                        Number(
+                            firestoreId
+                        ),
+
+                    name:
+                        name,
+
+                    price:
+                        Number.isNaN(price)
+                            ? 0
+                            : price,
+
+                    stock:
+                        Number.isNaN(stock)
+                            ? 0
+                            : stock,
+
+                    restock:
+                        restock,
+
+                    image:
+                        image
+
+                }
+
+            );
+
+
+            newName.value =
+                "";
+
+
+            newPrice.value =
+                "";
+
+
+            newStock.value =
+                "";
+
+
+            newRestock.value =
+                "";
+
+
+            newImage.value =
+                "";
+
+        }
+
+        catch (
+            error
+        ) {
+
+            console.error(
+                "Add product error:",
+                error
+            );
+
+
+            alert(
+                "Unable to add product."
+            );
+
+        }
+
+    }
+
+);
+
+
+
+// ==========================================================
+// INVENTORY ACTIONS
+// ==========================================================
+
+adminProducts.addEventListener(
+
+    "click",
+
+    async (event) => {
+
+        const button =
+            event.target.closest(
+                "button[data-action]"
+            );
+
+
+        if (
+            !button
+        ) {
+
+            return;
+
+        }
+
+
+        const productCard =
+            button.closest(
+                ".product-admin-card"
+            );
+
+
+        if (
+            !productCard
+        ) {
+
+            return;
+
+        }
+
+
+        const firestoreId =
+            productCard.dataset.productId;
+
+
+        const action =
+            button.dataset.action;
+
+
+        if (
+            action ===
+            "save-product"
+        ) {
+
+            const field =
+                (name) => {
+
+                    return productCard.querySelector(
+                        `[data-field="${name}"]`
+                    );
+
+                };
+
+
+            const name =
+                field(
+                    "name"
+                ).value.trim();
+
+
+            if (
+                !name
+            ) {
+
+                alert(
+                    "Product needs a name."
+                );
+
+
+                return;
+
+            }
+
+
+            try {
+
+                await updateDoc(
+
+                    doc(
+                        db,
+                        "inventory",
+                        firestoreId
+                    ),
+
+                    {
+
+                        name:
+                            name,
+
+                        price:
+                            Number(
+                                field(
+                                    "price"
+                                ).value
+                            ) || 0,
+
+                        stock:
+                            Number(
+                                field(
+                                    "stock"
+                                ).value
+                            ) || 0,
+
+                        restock:
+                            field(
+                                "restock"
+                            )
+                                .value
+                                .trim(),
+
+                        image:
+                            field(
+                                "image"
+                            )
+                                .value
+                                .trim()
+
+                    }
+
+                );
+
+
+                button.textContent =
+                    "Saved ✓";
+
+
+                setTimeout(
+                    () => {
+
+                        button.textContent =
+                            "Save";
+
+                    },
+                    1200
+                );
+
+            }
+
+            catch (
+                error
+            ) {
+
+                console.error(
+                    "Save product error:",
+                    error
+                );
+
+
+                alert(
+                    "Unable to save product."
+                );
+
+            }
+
+        }
+
+
+        if (
+            action ===
+            "delete-product"
+        ) {
+
+            const confirmed =
+                confirm(
+                    "Delete this product permanently?"
+                );
+
+
+            if (
+                !confirmed
+            ) {
+
+                return;
+
+            }
+
+
+            try {
+
+                await deleteDoc(
+
+                    doc(
+                        db,
+                        "inventory",
+                        firestoreId
+                    )
+
+                );
+
+            }
+
+            catch (
+                error
+            ) {
+
+                console.error(
+                    "Delete product error:",
+                    error
+                );
+
+
+                alert(
+                    "Unable to delete product."
+                );
+
+            }
+
+        }
+
+    }
+
+);
+
+
+
+// ==========================================================
+// LOAD PROMOTION INTO FORM
+// ==========================================================
+
+function loadPromotionIntoForm(
+    promotion
+) {
+
+    promotionActive.checked =
+        promotion.active ===
+        true;
+
+
+    promotionName.value =
+        promotion.name ||
+        "";
+
+
+    promotionStart.value =
+        promotion.startDate ||
+        "";
+
+
+    promotionEnd.value =
+        promotion.endDate ||
+        "";
+
+
+    promotionQualifyingProduct.value =
+        promotion.qualifyingProduct ||
+        "";
+
+
+    promotionRewardProduct.value =
+        promotion.rewardProduct ||
+        "";
+
+
+    promotionRewardQuantity.value =
+        Number(
+            promotion.rewardQuantity
+        ) || 1;
+
+
+    promotionDescription.value =
+        promotion.description ||
+        "";
+
+}
+
+
+
+// ==========================================================
+// SAVE PROMOTION
+// ==========================================================
+
+savePromotionButton.addEventListener(
+
+    "click",
+
+    async () => {
+
+        promotionMessage.textContent =
+            "Saving...";
+
+
+        promotionMessage.style.color =
+            "#777";
+
+
+        try {
+
+            await setDoc(
+
+                promotionRef,
+
+                {
+
+                    id:
+                        "first-week-takis",
+
+                    name:
+                        promotionName
+                            .value
+                            .trim(),
+
+                    active:
+                        promotionActive
+                            .checked,
+
+                    startDate:
+                        promotionStart
+                            .value,
+
+                    endDate:
+                        promotionEnd
+                            .value,
+
+                    qualifyingProduct:
+                        promotionQualifyingProduct
+                            .value
+                            .trim(),
+
+                    rewardProduct:
+                        promotionRewardProduct
+                            .value
+                            .trim(),
+
+                    rewardQuantity:
+                        Number(
+                            promotionRewardQuantity
+                                .value
+                        ) || 1,
+
+                    description:
+                        promotionDescription
+                            .value
+                            .trim(),
+
+                    updatedAt:
+                        new Date()
+                            .toISOString()
+
+                },
+
+                {
+                    merge:
+                        true
+                }
+
+            );
+
+
+            promotionMessage.textContent =
+                "Saved ✓";
+
+
+            promotionMessage.style.color =
+                "#188b49";
+
+        }
+
+        catch (
+            error
+        ) {
+
+            console.error(
+                "Save promotion error:",
+                error
+            );
+
+
+            promotionMessage.textContent =
+                "Save failed";
+
+
+            promotionMessage.style.color =
+                "#d54141";
+
+        }
+
+    }
+
+);
+
+
+
+// ==========================================================
+// REFERRAL STATS
+// ==========================================================
+
+function updateReferralStats() {
+
+    const pending =
+        referralUses
+            .filter(
+                (item) => {
+
+                    return (
+                        item.status ===
+                        "pending"
+                    );
+
+                }
+            )
+            .length;
+
+
+    const approved =
+        referralUses
+            .filter(
+                (item) => {
+
+                    return (
+                        item.status ===
+                        "approved"
+                    );
+
+                }
+            )
+            .length;
+
+
+    const outstanding =
+        referralUses
+            .filter(
+                (item) => {
+
+                    return (
+                        item.rewardStatus ===
+                        "earned"
+                    );
+
+                }
+            )
+            .length;
+
+
+    pendingReferralCount.textContent =
+        pending;
+
+
+    approvedReferralCount.textContent =
+        approved;
+
+
+    outstandingRewardCount.textContent =
+        outstanding;
+
+
+    totalReferralCodes.textContent =
+        referrals.length;
+
+}
+
+
+
+// ==========================================================
+// REQUEST STATUS
+// ==========================================================
+
+function getRequestStatus(
+    item
+) {
+
+    if (
+        item.rewardStatus ===
+        "rewarded"
+    ) {
+
+        return {
+
+            text:
+                "REWARD GIVEN",
+
+            className:
+                "status-rewarded"
+
+        };
+
     }
 
 
-    .product-admin-card {
+    if (
+        item.status ===
+        "approved"
+    ) {
 
-        grid-template-columns:
-            1fr;
+        return {
 
-    }
+            text:
+                "APPROVED",
 
+            className:
+                "status-approved"
 
-    .admin-product-image {
-
-        width:
-            100%;
-
-        height:
-            120px;
-
-    }
-
-
-    .product-edit-grid {
-
-        grid-template-columns:
-            1fr;
+        };
 
     }
 
 
-    .referral-request-top,
-    .referral-code-card {
+    if (
+        item.status ===
+        "rejected"
+    ) {
 
-        grid-template-columns:
-            1fr;
+        return {
 
-        flex-direction:
-            column;
+            text:
+                "REJECTED",
+
+            className:
+                "status-rejected"
+
+        };
 
     }
 
 
-    .code-buttons {
+    return {
 
-        margin-top:
-            10px;
+        text:
+            "PENDING",
+
+        className:
+            "status-pending"
+
+    };
+
+}
+
+
+
+// ==========================================================
+// RENDER REFERRAL REQUESTS
+// ==========================================================
+
+function renderReferralRequests() {
+
+    updateReferralStats();
+
+
+    if (
+        referralUses.length ===
+        0
+    ) {
+
+        referralRequests.innerHTML = `
+
+            <div class="admin-empty">
+
+                No referral submissions yet.
+
+            </div>
+
+        `;
+
+
+        return;
+
+    }
+
+
+    const sorted =
+        [...referralUses]
+            .sort(
+                (a, b) => {
+
+                    return String(
+                        b.createdAt ||
+                        ""
+                    )
+                        .localeCompare(
+                            String(
+                                a.createdAt ||
+                                ""
+                            )
+                        );
+
+                }
+            );
+
+
+    referralRequests.innerHTML =
+        sorted
+            .map(
+                (item) => {
+
+                    const status =
+                        getRequestStatus(
+                            item
+                        );
+
+
+                    let actions =
+                        "";
+
+
+                    if (
+                        item.status ===
+                        "pending"
+                    ) {
+
+                        actions += `
+
+                            <button
+                                class="action-button approve-button"
+                                data-action="approve-request"
+                                type="button"
+                            >
+
+                                Approve Purchase
+
+                            </button>
+
+
+                            <button
+                                class="action-button reject-button"
+                                data-action="reject-request"
+                                type="button"
+                            >
+
+                                Reject
+
+                            </button>
+
+                        `;
+
+                    }
+
+
+                    if (
+                        item.status ===
+                        "rejected"
+                    ) {
+
+                        actions += `
+
+                            <button
+                                class="action-button reset-button"
+                                data-action="return-pending"
+                                type="button"
+                            >
+
+                                Return To Pending
+
+                            </button>
+
+                        `;
+
+                    }
+
+
+                    if (
+                        item.status ===
+                            "approved" &&
+                        item.rewardStatus ===
+                            "earned"
+                    ) {
+
+                        actions += `
+
+                            <button
+                                class="action-button reward-button"
+                                data-action="reward-given"
+                                type="button"
+                            >
+
+                                Mark Reward Given
+
+                            </button>
+
+                        `;
+
+                    }
+
+
+                    actions += `
+
+                        <button
+                            class="action-button hard-delete-button"
+                            data-action="delete-request"
+                            type="button"
+                        >
+
+                            Delete Request
+
+                        </button>
+
+                    `;
+
+
+                    return `
+
+                        <div
+                            class="referral-request"
+                            data-request-id="${escapeHtml(item.firestoreId)}"
+                        >
+
+                            <div class="referral-request-top">
+
+                                <div>
+
+                                    <h3>
+
+                                        ${escapeHtml(item.referrerName || "Unknown Referrer")}
+
+                                    </h3>
+
+
+                                    <div class="referral-meta">
+
+                                        <span>
+
+                                            Code:
+
+                                            <strong>
+
+                                                ${escapeHtml(item.referralCode || "")}
+
+                                            </strong>
+
+                                        </span>
+
+
+                                        <span>
+
+                                            Purchase:
+
+                                            <strong>
+
+                                                ${escapeHtml(item.qualifyingProduct || "Not recorded")}
+
+                                            </strong>
+
+                                        </span>
+
+
+                                        <span>
+
+                                            Reward:
+
+                                            <strong>
+
+                                                ${Number(item.rewardQuantity) || 1}
+                                                ×
+                                                ${escapeHtml(item.rewardProduct || "Reward")}
+
+                                            </strong>
+
+                                        </span>
+
+
+                                        <span>
+
+                                            Submitted:
+
+                                            ${escapeHtml(formatDate(item.createdAt))}
+
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+
+                                <span
+                                    class="admin-status ${status.className}"
+                                >
+
+                                    ${status.text}
+
+                                </span>
+
+                            </div>
+
+
+                            <div class="action-row">
+
+                                ${actions}
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+}
+
+
+
+// ==========================================================
+// APPROVE REFERRAL
+// ==========================================================
+
+async function approveReferralRequest(
+    requestId
+) {
+
+    await runTransaction(
+
+        db,
+
+        async (
+            transaction
+        ) => {
+
+            const useRef =
+                doc(
+                    db,
+                    "referralUses",
+                    requestId
+                );
+
+
+            const useSnapshot =
+                await transaction.get(
+                    useRef
+                );
+
+
+            if (
+                !useSnapshot.exists()
+            ) {
+
+                throw new Error(
+                    "Referral request no longer exists."
+                );
+
+            }
+
+
+            const use =
+                useSnapshot.data();
+
+
+            if (
+                use.status !==
+                "pending"
+            ) {
+
+                throw new Error(
+                    "This referral has already been reviewed."
+                );
+
+            }
+
+
+            const codeRef =
+                doc(
+                    db,
+                    "referrals",
+                    use.referralCode
+                );
+
+
+            const codeSnapshot =
+                await transaction.get(
+                    codeRef
+                );
+
+
+            if (
+                !codeSnapshot.exists()
+            ) {
+
+                throw new Error(
+                    "Referral code no longer exists."
+                );
+
+            }
+
+
+            const referralCode =
+                codeSnapshot.data();
+
+
+            transaction.update(
+
+                useRef,
+
+                {
+
+                    status:
+                        "approved",
+
+                    rewardStatus:
+                        "earned",
+
+                    approvedAt:
+                        new Date()
+                            .toISOString(),
+
+                    rewardedAt:
+                        null
+
+                }
+
+            );
+
+
+            transaction.update(
+
+                codeRef,
+
+                {
+
+                    successfulReferrals:
+
+                        Number(
+                            referralCode.successfulReferrals ||
+                            0
+                        ) + 1,
+
+                    rewardsEarned:
+
+                        Number(
+                            referralCode.rewardsEarned ||
+                            0
+                        ) + 1
+
+                }
+
+            );
+
+        }
+
+    );
+
+}
+
+
+
+// ==========================================================
+// DELETE REFERRAL REQUEST
+// ==========================================================
+
+async function deleteReferralRequest(
+    requestId
+) {
+
+    await runTransaction(
+
+        db,
+
+        async (
+            transaction
+        ) => {
+
+            const useRef =
+                doc(
+                    db,
+                    "referralUses",
+                    requestId
+                );
+
+
+            const useSnapshot =
+                await transaction.get(
+                    useRef
+                );
+
+
+            if (
+                !useSnapshot.exists()
+            ) {
+
+                return;
+
+            }
+
+
+            const use =
+                useSnapshot.data();
+
+
+            if (
+                use.status ===
+                    "approved" &&
+                use.referralCode
+            ) {
+
+                const codeRef =
+                    doc(
+                        db,
+                        "referrals",
+                        use.referralCode
+                    );
+
+
+                const codeSnapshot =
+                    await transaction.get(
+                        codeRef
+                    );
+
+
+                if (
+                    codeSnapshot.exists()
+                ) {
+
+                    const referralCode =
+                        codeSnapshot.data();
+
+
+                    transaction.update(
+
+                        codeRef,
+
+                        {
+
+                            successfulReferrals:
+
+                                Math.max(
+                                    0,
+                                    Number(
+                                        referralCode.successfulReferrals ||
+                                        0
+                                    ) - 1
+                                ),
+
+                            rewardsEarned:
+
+                                Math.max(
+                                    0,
+                                    Number(
+                                        referralCode.rewardsEarned ||
+                                        0
+                                    ) - 1
+                                )
+
+                        }
+
+                    );
+
+                }
+
+            }
+
+
+            transaction.delete(
+                useRef
+            );
+
+        }
+
+    );
+
+}
+
+
+
+// ==========================================================
+// REFERRAL REQUEST BUTTONS
+// ==========================================================
+
+referralRequests.addEventListener(
+
+    "click",
+
+    async (event) => {
+
+        const button =
+            event.target.closest(
+                "button[data-action]"
+            );
+
+
+        if (
+            !button
+        ) {
+
+            return;
+
+        }
+
+
+        const requestCard =
+            button.closest(
+                ".referral-request"
+            );
+
+
+        if (
+            !requestCard
+        ) {
+
+            return;
+
+        }
+
+
+        const requestId =
+            requestCard.dataset.requestId;
+
+
+        const action =
+            button.dataset.action;
+
+
+        try {
+
+            if (
+                action ===
+                "approve-request"
+            ) {
+
+                await approveReferralRequest(
+                    requestId
+                );
+
+            }
+
+
+            if (
+                action ===
+                "reject-request"
+            ) {
+
+                await updateDoc(
+
+                    doc(
+                        db,
+                        "referralUses",
+                        requestId
+                    ),
+
+                    {
+
+                        status:
+                            "rejected",
+
+                        rewardStatus:
+                            "none"
+
+                    }
+
+                );
+
+            }
+
+
+            if (
+                action ===
+                "return-pending"
+            ) {
+
+                await updateDoc(
+
+                    doc(
+                        db,
+                        "referralUses",
+                        requestId
+                    ),
+
+                    {
+
+                        status:
+                            "pending",
+
+                        rewardStatus:
+                            "none",
+
+                        approvedAt:
+                            null,
+
+                        rewardedAt:
+                            null
+
+                    }
+
+                );
+
+            }
+
+
+            if (
+                action ===
+                "reward-given"
+            ) {
+
+                await updateDoc(
+
+                    doc(
+                        db,
+                        "referralUses",
+                        requestId
+                    ),
+
+                    {
+
+                        rewardStatus:
+                            "rewarded",
+
+                        rewardedAt:
+                            new Date()
+                                .toISOString()
+
+                    }
+
+                );
+
+            }
+
+
+            if (
+                action ===
+                "delete-request"
+            ) {
+
+                const confirmed =
+                    confirm(
+                        "Delete this referral request permanently?"
+                    );
+
+
+                if (
+                    confirmed
+                ) {
+
+                    await deleteReferralRequest(
+                        requestId
+                    );
+
+                }
+
+            }
+
+        }
+
+        catch (
+            error
+        ) {
+
+            console.error(
+                "Referral request action error:",
+                error
+            );
+
+
+            alert(
+                error.message ||
+                "Unable to update referral."
+            );
+
+        }
+
+    }
+
+);
+
+
+
+// ==========================================================
+// RENDER REFERRAL CODES
+// ==========================================================
+
+function renderReferralCodes() {
+
+    updateReferralStats();
+
+
+    if (
+        referrals.length ===
+        0
+    ) {
+
+        referralCodes.innerHTML = `
+
+            <div class="admin-empty">
+
+                No customer referral codes yet.
+
+            </div>
+
+        `;
+
+
+        return;
+
+    }
+
+
+    const sorted =
+        [...referrals]
+            .sort(
+                (a, b) => {
+
+                    return String(
+                        b.createdAt ||
+                        ""
+                    )
+                        .localeCompare(
+                            String(
+                                a.createdAt ||
+                                ""
+                            )
+                        );
+
+                }
+            );
+
+
+    referralCodes.innerHTML =
+        sorted
+            .map(
+                (referral) => {
+
+                    const code =
+                        referral.code ||
+                        referral.firestoreId;
+
+
+                    const active =
+                        referral.active !==
+                        false;
+
+
+                    return `
+
+                        <div
+                            class="referral-code-card"
+                            data-referral-code="${escapeHtml(referral.firestoreId)}"
+                        >
+
+                            <div>
+
+                                <div class="referral-code">
+
+                                    ${escapeHtml(code)}
+
+                                </div>
+
+
+                                <div class="referral-code-name">
+
+                                    ${escapeHtml(referral.referrerName || "Unknown")}
+
+                                </div>
+
+
+                                <div class="referral-code-meta">
+
+                                    <span>
+
+                                        Successful:
+
+                                        <strong>
+
+                                            ${Number(referral.successfulReferrals) || 0}
+
+                                        </strong>
+
+                                    </span>
+
+
+                                    <span>
+
+                                        Rewards:
+
+                                        <strong>
+
+                                            ${Number(referral.rewardsEarned) || 0}
+
+                                        </strong>
+
+                                    </span>
+
+
+                                    <span>
+
+                                        Status:
+
+                                        <strong>
+
+                                            ${
+                                                active
+                                                    ? "Active"
+                                                    : "Disabled"
+                                            }
+
+                                        </strong>
+
+                                    </span>
+
+
+                                    <span>
+
+                                        Created:
+
+                                        ${escapeHtml(formatDate(referral.createdAt))}
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="code-buttons">
+
+                                <button
+                                    class="small-button ${
+                                        active
+                                            ? "delete-button"
+                                            : "save-button"
+                                    }"
+                                    data-action="toggle-code"
+                                    type="button"
+                                >
+
+                                    ${
+                                        active
+                                            ? "Disable"
+                                            : "Enable"
+                                    }
+
+                                </button>
+
+
+                                <button
+                                    class="small-button hard-delete-button"
+                                    data-action="delete-code"
+                                    type="button"
+                                >
+
+                                    Delete
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+}
+
+
+
+// ==========================================================
+// DELETE REFERRAL CODE AND ITS REQUESTS
+// ==========================================================
+
+async function deleteReferralCode(
+    code
+) {
+
+    const batch =
+        writeBatch(
+            db
+        );
+
+
+    batch.delete(
+
+        doc(
+            db,
+            "referrals",
+            code
+        )
+
+    );
+
+
+    referralUses
+        .filter(
+            (item) => {
+
+                return (
+                    item.referralCode ===
+                    code
+                );
+
+            }
+        )
+        .forEach(
+            (item) => {
+
+                batch.delete(
+
+                    doc(
+                        db,
+                        "referralUses",
+                        item.firestoreId
+                    )
+
+                );
+
+            }
+        );
+
+
+    await batch.commit();
+
+}
+
+
+
+// ==========================================================
+// REFERRAL CODE ACTIONS
+// ==========================================================
+
+referralCodes.addEventListener(
+
+    "click",
+
+    async (event) => {
+
+        const button =
+            event.target.closest(
+                "button[data-action]"
+            );
+
+
+        if (
+            !button
+        ) {
+
+            return;
+
+        }
+
+
+        const card =
+            button.closest(
+                ".referral-code-card"
+            );
+
+
+        if (
+            !card
+        ) {
+
+            return;
+
+        }
+
+
+        const code =
+            card.dataset.referralCode;
+
+
+        const referral =
+            referrals.find(
+                (item) => {
+
+                    return (
+                        item.firestoreId ===
+                        code
+                    );
+
+                }
+            );
+
+
+        if (
+            !referral
+        ) {
+
+            return;
+
+        }
+
+
+        const action =
+            button.dataset.action;
+
+
+        try {
+
+            if (
+                action ===
+                "toggle-code"
+            ) {
+
+                await updateDoc(
+
+                    doc(
+                        db,
+                        "referrals",
+                        code
+                    ),
+
+                    {
+
+                        active:
+                            referral.active ===
+                            false
+
+                    }
+
+                );
+
+            }
+
+
+            if (
+                action ===
+                "delete-code"
+            ) {
+
+                const confirmed =
+                    confirm(
+                        "Delete this referral code AND all submissions connected to it?"
+                    );
+
+
+                if (
+                    confirmed
+                ) {
+
+                    await deleteReferralCode(
+                        code
+                    );
+
+                }
+
+            }
+
+        }
+
+        catch (
+            error
+        ) {
+
+            console.error(
+                "Referral code action error:",
+                error
+            );
+
+
+            alert(
+                "Unable to update referral code."
+            );
+
+        }
+
+    }
+
+);
+
+
+
+// ==========================================================
+// START FIRESTORE LISTENERS
+// ==========================================================
+
+function startListeners() {
+
+    stopListeners();
+
+
+    unsubscribeInventory =
+        onSnapshot(
+
+            inventoryRef,
+
+            (snapshot) => {
+
+                inventory =
+                    snapshot.docs
+                        .map(
+                            (item) => {
+
+                                return {
+
+                                    firestoreId:
+                                        item.id,
+
+                                    ...item.data()
+
+                                };
+
+                            }
+                        )
+                        .sort(
+                            (a, b) => {
+
+                                return String(
+                                    a.name ||
+                                    ""
+                                )
+                                    .localeCompare(
+                                        String(
+                                            b.name ||
+                                            ""
+                                        )
+                                    );
+
+                            }
+                        );
+
+
+                renderInventory();
+
+            },
+
+            (error) => {
+
+                console.error(
+                    "Inventory listener error:",
+                    error
+                );
+
+            }
+
+        );
+
+
+    unsubscribePromotion =
+        onSnapshot(
+
+            promotionRef,
+
+            (snapshot) => {
+
+                if (
+                    snapshot.exists()
+                ) {
+
+                    loadPromotionIntoForm(
+                        snapshot.data()
+                    );
+
+                }
+
+                else {
+
+                    loadPromotionIntoForm({
+
+                        active:
+                            false,
+
+                        rewardQuantity:
+                            1
+
+                    });
+
+                }
+
+            },
+
+            (error) => {
+
+                console.error(
+                    "Promotion listener error:",
+                    error
+                );
+
+            }
+
+        );
+
+
+    unsubscribeReferralUses =
+        onSnapshot(
+
+            referralUsesRef,
+
+            (snapshot) => {
+
+                referralUses =
+                    snapshot.docs
+                        .map(
+                            (item) => {
+
+                                return {
+
+                                    firestoreId:
+                                        item.id,
+
+                                    ...item.data()
+
+                                };
+
+                            }
+                        );
+
+
+                renderReferralRequests();
+
+            },
+
+            (error) => {
+
+                console.error(
+                    "Referral request listener error:",
+                    error
+                );
+
+            }
+
+        );
+
+
+    unsubscribeReferrals =
+        onSnapshot(
+
+            referralsRef,
+
+            (snapshot) => {
+
+                referrals =
+                    snapshot.docs
+                        .map(
+                            (item) => {
+
+                                return {
+
+                                    firestoreId:
+                                        item.id,
+
+                                    ...item.data()
+
+                                };
+
+                            }
+                        );
+
+
+                renderReferralCodes();
+
+            },
+
+            (error) => {
+
+                console.error(
+                    "Referral codes listener error:",
+                    error
+                );
+
+            }
+
+        );
+
+}
+
+
+
+// ==========================================================
+// STOP LISTENERS
+// ==========================================================
+
+function stopListeners() {
+
+    if (
+        unsubscribeInventory
+    ) {
+
+        unsubscribeInventory();
+
+        unsubscribeInventory =
+            null;
+
+    }
+
+
+    if (
+        unsubscribePromotion
+    ) {
+
+        unsubscribePromotion();
+
+        unsubscribePromotion =
+            null;
+
+    }
+
+
+    if (
+        unsubscribeReferralUses
+    ) {
+
+        unsubscribeReferralUses();
+
+        unsubscribeReferralUses =
+            null;
+
+    }
+
+
+    if (
+        unsubscribeReferrals
+    ) {
+
+        unsubscribeReferrals();
+
+        unsubscribeReferrals =
+            null;
 
     }
 
 }
 
-</style>
 
-</head>
 
+// ==========================================================
+// RESTORE SESSION
+// ==========================================================
 
-<body>
+if (
+    sessionStorage.getItem(
+        "gssAdminLoggedIn"
+    ) ===
+    "true"
+) {
 
+    showDashboard();
 
-<!-- =====================================================
-LOGIN
-===================================================== -->
+}
 
-<div
-    id="loginBox"
-    class="login-page"
->
 
-<div class="login-card">
 
-<div class="login-logo">
+// ==========================================================
+// READY
+// ==========================================================
 
-🍬
-
-</div>
-
-<div class="login-eyebrow">
-
-OWNER ACCESS
-
-</div>
-
-<h1>
-
-Admin Dashboard
-
-</h1>
-
-<p>
-
-Manage inventory, promotions, referrals, and customer rewards.
-
-</p>
-
-
-<div class="login-field">
-
-<label for="username">
-
-Username
-
-</label>
-
-<input
-    id="username"
-    type="text"
-    autocomplete="username"
->
-
-</div>
-
-
-<div class="login-field">
-
-<label for="password">
-
-Password
-
-</label>
-
-<input
-    id="password"
-    type="password"
-    autocomplete="current-password"
->
-
-</div>
-
-
-<button
-    id="loginButton"
-    type="button"
->
-
-Log In
-
-</button>
-
-
-<div id="loginMessage">
-
-</div>
-
-</div>
-
-</div>
-
-
-
-
-<!-- =====================================================
-DASHBOARD
-===================================================== -->
-
-<div
-    id="dashboard"
-    class="dashboard hidden"
->
-
-
-<header class="admin-header">
-
-
-<div class="admin-brand">
-
-<div class="admin-brand-icon">
-
-🍬
-
-</div>
-
-<div>
-
-<strong>
-
-Grayson's Snack Shop
-
-</strong>
-
-<span>
-
-ADMIN DASHBOARD
-
-</span>
-
-</div>
-
-</div>
-
-
-<div class="header-actions">
-
-<a
-    href="index.html"
-    class="header-button"
->
-
-View Shop
-
-</a>
-
-<button
-    id="logout"
-    class="header-button"
-    type="button"
->
-
-Log Out
-
-</button>
-
-</div>
-
-</header>
-
-
-
-
-<div class="admin-layout">
-
-
-<!-- SIDEBAR -->
-
-<aside class="admin-sidebar">
-
-<div class="sidebar-title">
-
-MANAGEMENT
-
-</div>
-
-
-<button
-    id="inventoryTabButton"
-    class="admin-tab-button active"
-    type="button"
->
-
-<span>
-📦
-</span>
-
-Inventory
-
-</button>
-
-
-<button
-    id="promotionsTabButton"
-    class="admin-tab-button"
-    type="button"
->
-
-<span>
-🎁
-</span>
-
-Promotions & Referrals
-
-</button>
-
-</aside>
-
-
-
-
-<main class="admin-content">
-
-
-<!-- =================================================
-INVENTORY TAB
-================================================= -->
-
-<div
-    id="inventoryTab"
-    class="admin-tab-panel"
->
-
-
-<div class="page-heading">
-
-<div>
-
-<span>
-STORE MANAGEMENT
-</span>
-
-<h1>
-
-Inventory
-
-</h1>
-
-<p>
-
-Add products and update live customer stock.
-
-</p>
-
-</div>
-
-</div>
-
-
-
-<div class="admin-card">
-
-<div class="card-heading">
-
-<div>
-
-<h2>
-
-Add Product
-
-</h2>
-
-<p>
-
-Create a new item in the shop.
-
-</p>
-
-</div>
-
-</div>
-
-
-<div class="admin-form-grid">
-
-
-<div class="admin-field">
-
-<label for="newName">
-
-Product Name
-
-</label>
-
-<input
-    id="newName"
-    placeholder="Taki Red Fiesta"
->
-
-</div>
-
-
-<div class="admin-field">
-
-<label for="newPrice">
-
-Price
-
-</label>
-
-<input
-    id="newPrice"
-    type="number"
-    min="0"
-    step="0.01"
-    placeholder="8.00"
->
-
-</div>
-
-
-<div class="admin-field">
-
-<label for="newStock">
-
-Stock
-
-</label>
-
-<input
-    id="newStock"
-    type="number"
-    min="0"
-    step="1"
-    placeholder="10"
->
-
-</div>
-
-
-<div class="admin-field">
-
-<label for="newRestock">
-
-Restock Date
-
-</label>
-
-<input
-    id="newRestock"
-    placeholder="8/15/2026"
->
-
-</div>
-
-
-<div class="admin-field">
-
-<label for="newImage">
-
-Image Filename
-
-</label>
-
-<input
-    id="newImage"
-    placeholder="product.png"
->
-
-</div>
-
-
-</div>
-
-
-<div class="save-row">
-
-<button
-    id="addProduct"
-    class="primary-admin-button"
-    type="button"
->
-
-Add Product
-
-</button>
-
-</div>
-
-</div>
-
-
-
-<div class="admin-card">
-
-<div class="card-heading">
-
-<div>
-
-<h2>
-
-Current Products
-
-</h2>
-
-<p>
-
-Changes update Firestore and the customer shop.
-
-</p>
-
-</div>
-
-</div>
-
-
-<div id="adminProducts">
-
-<div class="admin-empty">
-
-Loading products...
-
-</div>
-
-</div>
-
-</div>
-
-
-</div>
-
-
-
-
-<!-- =================================================
-PROMOTIONS TAB
-================================================= -->
-
-<div
-    id="promotionsTab"
-    class="admin-tab-panel hidden"
->
-
-
-<div class="page-heading">
-
-<div>
-
-<span>
-REWARDS PROGRAM
-</span>
-
-<h1>
-
-Promotions & Referrals
-
-</h1>
-
-<p>
-
-Control the promotion and review customer referrals.
-
-</p>
-
-</div>
-
-</div>
-
-
-
-<!-- PROMOTION SETTINGS -->
-
-<div class="admin-card">
-
-<div class="card-heading">
-
-<div>
-
-<h2>
-
-Current Promotion
-
-</h2>
-
-<p>
-
-This controls what customers see on the main website.
-
-</p>
-
-</div>
-
-</div>
-
-
-<div class="checkbox-row">
-
-<input
-    id="promotionActive"
-    type="checkbox"
->
-
-<label for="promotionActive">
-
-Promotion Active
-
-</label>
-
-</div>
-
-
-<div class="admin-form-grid">
-
-
-<div class="admin-field">
-
-<label for="promotionName">
-
-Promotion Name
-
-</label>
-
-<input
-    id="promotionName"
-    placeholder="Bring a Friend"
->
-
-</div>
-
-
-<div class="admin-field">
-
-<label for="promotionStart">
-
-Start Date
-
-</label>
-
-<input
-    id="promotionStart"
-    type="date"
->
-
-</div>
-
-
-<div class="admin-field">
-
-<label for="promotionEnd">
-
-End Date
-
-</label>
-
-<input
-    id="promotionEnd"
-    type="date"
->
-
-</div>
-
-
-<div class="admin-field">
-
-<label for="promotionQualifyingProduct">
-
-Qualifying Product
-
-</label>
-
-<input
-    id="promotionQualifyingProduct"
-    list="inventoryProductNames"
-    placeholder="Product friend must buy"
->
-
-</div>
-
-
-<div class="admin-field">
-
-<label for="promotionRewardProduct">
-
-Reward Product
-
-</label>
-
-<input
-    id="promotionRewardProduct"
-    list="inventoryProductNames"
-    placeholder="Reward"
->
-
-</div>
-
-
-<div class="admin-field">
-
-<label for="promotionRewardQuantity">
-
-Reward Quantity
-
-</label>
-
-<input
-    id="promotionRewardQuantity"
-    type="number"
-    min="1"
-    step="1"
-    value="1"
->
-
-</div>
-
-
-<div class="admin-field full-width">
-
-<label for="promotionDescription">
-
-Description
-
-</label>
-
-<textarea
-    id="promotionDescription"
-    placeholder="Explain how the promotion works..."
-></textarea>
-
-</div>
-
-
-</div>
-
-
-<datalist id="inventoryProductNames">
-
-</datalist>
-
-
-<div class="save-row">
-
-<button
-    id="savePromotion"
-    class="primary-admin-button"
-    type="button"
->
-
-Save Promotion
-
-</button>
-
-<span id="promotionMessage">
-
-</span>
-
-</div>
-
-</div>
-
-
-
-<!-- REFERRAL STATS -->
-
-<div class="referral-stats">
-
-
-<div class="referral-stat">
-
-<span>
-PENDING REQUESTS
-</span>
-
-<strong id="pendingReferralCount">
-
-0
-
-</strong>
-
-</div>
-
-
-<div class="referral-stat">
-
-<span>
-APPROVED
-</span>
-
-<strong id="approvedReferralCount">
-
-0
-
-</strong>
-
-</div>
-
-
-<div class="referral-stat">
-
-<span>
-REWARDS TO GIVE
-</span>
-
-<strong id="outstandingRewardCount">
-
-0
-
-</strong>
-
-</div>
-
-
-<div class="referral-stat">
-
-<span>
-REFERRAL CODES
-</span>
-
-<strong id="totalReferralCodes">
-
-0
-
-</strong>
-
-</div>
-
-
-</div>
-
-
-
-<!-- REFERRAL REQUESTS -->
-
-<div class="admin-card">
-
-<div class="card-heading">
-
-<div>
-
-<h2>
-
-Referral Purchase Requests
-
-</h2>
-
-<p>
-
-Approve, reject, reward, or completely delete submissions.
-
-</p>
-
-</div>
-
-</div>
-
-
-<div id="referralRequests">
-
-<div class="admin-empty">
-
-Loading referral requests...
-
-</div>
-
-</div>
-
-</div>
-
-
-
-<!-- REFERRAL CODES -->
-
-<div class="admin-card">
-
-<div class="card-heading">
-
-<div>
-
-<h2>
-
-Referral Codes
-
-</h2>
-
-<p>
-
-Customers can now create multiple codes for different friends.
-
-</p>
-
-</div>
-
-</div>
-
-
-<div id="referralCodes">
-
-<div class="admin-empty">
-
-Loading referral codes...
-
-</div>
-
-</div>
-
-</div>
-
-
-</div>
-
-
-</main>
-
-</div>
-
-</div>
-
-
-<script
-    type="module"
-    src="admin.js"
-></script>
-
-</body>
-
-</html>
+console.log(
+    "Grayson's Snack Shop Admin Dashboard Loaded"
+);
