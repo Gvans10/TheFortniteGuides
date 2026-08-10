@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
@@ -38,98 +37,87 @@ Grayson's Snack Shop
 >
 
 <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
 >
 
 </head>
 
-
 <body>
 
 
 <!-- =====================================================
-NAVIGATION
+NAVBAR
 ===================================================== -->
 
-<header>
+<header class="site-header">
 
 <nav class="navbar">
 
+<a
+    href="#home"
+    class="brand"
+>
 
-<div class="logo">
+<span class="brand-icon">
+🍬
+</span>
 
-🍬 Grayson's Snack Shop
+<span>
+Grayson's Snack Shop
+</span>
 
-</div>
-
-
-<ul class="nav-links">
-
-
-<li>
-
-<a href="#home">
-Home
 </a>
 
-</li>
 
-
-<li>
+<div class="nav-center">
 
 <a href="#products">
-Products
+Shop
 </a>
-
-</li>
-
-
-<li>
 
 <a href="#inventory">
 Stock
 </a>
 
-</li>
-
-
-<li>
-
 <a href="#contact">
 Contact
 </a>
 
-</li>
-
-
-<li>
-
-<a href="admin.html">
-🔐 Admin
+<a
+    id="rewardsNavLink"
+    href="#referralSection"
+    class="hidden"
+>
+Rewards
 </a>
 
-</li>
+</div>
 
 
-</ul>
-
+<div class="nav-actions">
 
 <button
     id="darkModeButton"
+    class="icon-button"
     type="button"
     aria-label="Toggle dark mode"
 >
-
 🌙
-
 </button>
 
+<a
+    href="admin.html"
+    class="admin-link"
+>
+Admin
+</a>
+
+</div>
 
 </nav>
 
 </header>
-
 
 
 
@@ -142,57 +130,48 @@ HERO
     class="hero"
 >
 
+<div class="hero-content">
 
-<div class="hero-text">
-
-
-<div class="hero-label">
+<div class="hero-pill">
 
 UPLIFT ELEVATE PREPARATORY
 
 </div>
 
-
 <h1>
 
-Grayson's Snack Shop
+Your school snack stop.
 
 </h1>
 
+<p class="hero-subtitle">
 
-<h2>
-
-Snacks without leaving campus.
-
-</h2>
-
-
-<p>
-
-Affordable snacks and drinks for students.
-
-<br>
-
-Check live stock before you buy.
+See what's in stock, check prices, and catch current promotions before they're gone.
 
 </p>
 
+<div class="hero-actions">
 
 <a
     href="#products"
-    class="heroButton"
+    class="primary-button"
 >
-
 Browse Snacks
-
 </a>
 
+<a
+    id="heroRewardsButton"
+    href="#referralSection"
+    class="secondary-button hidden"
+>
+View Rewards
+</a>
 
 </div>
 
+</div>
 
 </section>
-
 
 
 
@@ -200,76 +179,80 @@ Browse Snacks
 STATS
 ===================================================== -->
 
-<section class="stats">
+<section class="stats-wrap">
 
+<div class="stats">
 
-<div class="stat">
+<div class="stat-card">
 
+<div class="stat-icon">
+🍭
+</div>
 
-<h2 id="totalProducts">
+<div>
 
+<strong id="totalProducts">
 0
+</strong>
 
-</h2>
-
-
-<p>
-
+<span>
 Products
+</span>
 
-</p>
-
+</div>
 
 </div>
 
 
-<div class="stat">
+<div class="stat-card">
 
+<div class="stat-icon">
+📦
+</div>
 
-<h2 id="itemsInStock">
+<div>
 
+<strong id="itemsInStock">
 0
+</strong>
 
-</h2>
-
-
-<p>
-
+<span>
 Items Available
+</span>
 
-</p>
-
+</div>
 
 </div>
 
 
-<div class="stat">
+<div class="stat-card">
 
-
-<h2>
-
+<div class="stat-icon">
 ⚡
+</div>
 
-</h2>
+<div>
 
+<strong>
+Live
+</strong>
 
-<p>
-
-Live Inventory
-
-</p>
-
+<span>
+Firebase Inventory
+</span>
 
 </div>
 
+</div>
+
+</div>
 
 </section>
 
 
 
-
 <!-- =====================================================
-CURRENT PROMOTION
+PROMOTION
 ===================================================== -->
 
 <section
@@ -277,491 +260,318 @@ CURRENT PROMOTION
     class="promotion-section hidden"
 >
 
-
 <div class="promotion-card">
 
+<div class="promotion-copy">
 
-<div class="promotion-top-row">
-
-
-<div class="promotion-live-badge">
+<div class="promotion-live">
 
 <span class="live-dot"></span>
 
-LIVE NOW
+LIVE PROMOTION
 
 </div>
-
-
-<div class="promotion-small-label">
-
-LIMITED-TIME OFFER
-
-</div>
-
-
-</div>
-
 
 <h2 id="promotionTitle">
 
-Current Promotion
+Referral Promotion
 
 </h2>
 
-
-<p
-    id="promotionDescriptionText"
-    class="promotion-description"
->
+<p id="promotionDescriptionText">
 
 </p>
 
 
-<div class="promotion-details">
+<div class="promotion-mini-details">
+
+<div>
+
+<span>
+BUY
+</span>
+
+<strong id="promotionQualifyingProduct">
+—
+</strong>
+
+</div>
 
 
-<div class="promotion-detail-box">
-
-
-<div class="promotion-detail-icon">
-
-🛍️
-
+<div class="promo-arrow">
+→
 </div>
 
 
 <div>
 
-
 <span>
-
-QUALIFYING PURCHASE
-
+EARN
 </span>
 
-
-<strong id="promotionQualifyingProduct">
-
+<strong id="promotionReward">
 —
-
 </strong>
 
+</div>
 
 </div>
 
 
-</div>
+<p id="promotionDates"></p>
 
 
-<div class="promotion-arrow">
+<a
+    href="#referralSection"
+    class="promotion-button"
+>
 
+Join the promotion
+
+<span>
 →
+</span>
+
+</a>
 
 </div>
 
 
-<div class="promotion-detail-box">
+<div class="promotion-art">
 
-
-<div class="promotion-detail-icon">
+<div class="gift-circle">
 
 🎁
 
 </div>
 
+<div class="promo-bubble bubble-one">
+FREE
+</div>
 
-<div>
-
-
-<span>
-
-REFERRAL REWARD
-
-</span>
-
-
-<strong id="promotionReward">
-
-—
-
-</strong>
-
+<div class="promo-bubble bubble-two">
+REWARDS
+</div>
 
 </div>
 
-
 </div>
-
-
-</div>
-
-
-<p
-    id="promotionDates"
-    class="promotion-dates"
->
-
-</p>
-
-
-<a
-    href="#referralSection"
-    class="promotion-action-button"
->
-
-Get My Referral Code
-
-<span>
-↓
-</span>
-
-</a>
-
-
-</div>
-
 
 </section>
 
 
 
-
 <!-- =====================================================
-REFERRAL REWARDS
+REFERRAL REWARDS HUB
 ===================================================== -->
 
 <section
     id="referralSection"
-    class="referral-section hidden"
+    class="rewards-section hidden"
 >
 
-
-<div class="referral-shell">
-
-
-<!-- REFERRAL HEADER -->
-
-<div class="referral-header">
+<div class="rewards-shell">
 
 
-<div class="referral-eyebrow">
+<!-- LEFT SIDE -->
+
+<div class="rewards-info">
+
+<div class="rewards-eyebrow">
 
 GRAYSon's REWARDS
 
 </div>
 
-
 <h2>
 
-Share the shop.
-
-<br>
+Bring a friend.
 
 <span>
-Earn free snacks.
+Get rewarded.
 </span>
 
 </h2>
 
+<p class="rewards-description">
 
-<p>
-
-Get your own referral code, send it to a friend, and earn a reward when their qualifying purchase is approved.
-
-</p>
-
-
-</div>
-
-
-
-
-<!-- HOW IT WORKS -->
-
-<div class="referral-how">
-
-
-<div class="referral-how-header">
-
-
-<h3>
-
-How it works
-
-</h3>
-
-
-<p>
-
-Four simple steps.
+Create your referral code, send it to a friend, and earn a snack reward when their qualifying purchase is approved.
 
 </p>
 
 
-</div>
+<div class="reward-highlight">
 
-
-<div class="referral-steps">
-
-
-<div class="referral-step">
-
-
-<div class="step-top">
-
-
-<div class="referral-step-number">
-
-01
-
-</div>
-
-
-<div class="referral-step-icon">
-
-🎟️
-
-</div>
-
-
-</div>
-
-
-<h4>
-
-Get your code
-
-</h4>
-
-
-<p>
-
-Enter your name below and we'll create your personal referral code.
-
-</p>
-
-
-</div>
-
-
-
-
-<div class="referral-step">
-
-
-<div class="step-top">
-
-
-<div class="referral-step-number">
-
-02
-
-</div>
-
-
-<div class="referral-step-icon">
-
-📲
-
-</div>
-
-
-</div>
-
-
-<h4>
-
-Send it
-
-</h4>
-
-
-<p>
-
-Share the code with a friend who wants to shop with Grayson.
-
-</p>
-
-
-</div>
-
-
-
-
-<div class="referral-step">
-
-
-<div class="step-top">
-
-
-<div class="referral-step-number">
-
-03
-
-</div>
-
-
-<div class="referral-step-icon">
-
-🛒
-
-</div>
-
-
-</div>
-
-
-<h4>
-
-They use it
-
-</h4>
-
-
-<p>
-
-Your friend enters your code here before completing the qualifying purchase.
-
-</p>
-
-
-</div>
-
-
-
-
-<div class="referral-step">
-
-
-<div class="step-top">
-
-
-<div class="referral-step-number">
-
-04
-
-</div>
-
-
-<div class="referral-step-icon">
+<div class="reward-highlight-icon">
 
 🎁
 
 </div>
 
-
-</div>
-
-
-<h4>
-
-You get rewarded
-
-</h4>
-
-
-<p>
-
-Once the purchase is approved, your referral counts and your reward is earned.
-
-</p>
-
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-
-
-<!-- CHOOSE SIDE -->
-
-<div class="referral-choice-title">
-
+<div>
 
 <span>
-
-START HERE
-
+CURRENT REWARD
 </span>
 
+<strong id="referralRewardSummary">
+Referral reward
+</strong>
 
-<h3>
-
-Which one are you?
-
-</h3>
-
+</div>
 
 </div>
 
 
+<div class="qualifying-highlight">
 
+<span>
+FRIEND MUST PURCHASE
+</span>
 
-<div class="referral-grid">
-
-
-<!-- ===================================================
-REFER SOMEONE
-=================================================== -->
-
-<div class="referral-box referral-owner-box">
-
-
-<div class="referral-card-header">
-
-
-<div class="referral-card-icon orange-icon">
-
-🤝
+<strong id="referralQualifyingSummary">
+Qualifying product
+</strong>
 
 </div>
 
+
+<div class="reward-steps">
+
+<div class="reward-step">
+
+<span class="reward-step-number">
+1
+</span>
 
 <div>
 
+<strong>
+Create
+</strong>
 
-<div class="referral-card-label">
+<p>
+Generate your personal code.
+</p>
 
-FOR THE REFERRER
+</div>
 
 </div>
 
 
-<h2>
+<div class="reward-step">
 
-I'm referring a friend
+<span class="reward-step-number">
+2
+</span>
 
-</h2>
+<div>
 
+<strong>
+Share
+</strong>
+
+<p>
+Send your code or referral link.
+</p>
+
+</div>
 
 </div>
 
 
+<div class="reward-step">
+
+<span class="reward-step-number">
+3
+</span>
+
+<div>
+
+<strong>
+Earn
+</strong>
+
+<p>
+Get rewarded after approval.
+</p>
+
+</div>
+
+</div>
+
+</div>
+
 </div>
 
 
-<p class="referral-card-description">
 
-Create your personal code and send it to your friend.
+<!-- RIGHT SIDE -->
+
+<div class="rewards-action-card">
+
+
+<div class="referral-tabs">
+
+<button
+    id="referTabButton"
+    class="referral-tab active"
+    type="button"
+>
+
+I'm referring someone
+
+</button>
+
+<button
+    id="useTabButton"
+    class="referral-tab"
+    type="button"
+>
+
+I have a code
+
+</button>
+
+</div>
+
+
+
+<!-- =================================================
+REFER PANEL
+================================================= -->
+
+<div
+    id="referPanel"
+    class="referral-panel"
+>
+
+<div class="panel-heading">
+
+<span>
+REFER A FRIEND
+</span>
+
+<h3>
+Get your personal code
+</h3>
+
+<p>
+
+We'll save your code so you can come back and use the same one later.
 
 </p>
 
+</div>
 
-<div class="referral-form-group">
 
+<div class="form-field">
 
 <label for="referralName">
 
 Your name
 
 </label>
-
 
 <input
     id="referralName"
@@ -770,163 +580,165 @@ Your name
     autocomplete="name"
 >
 
-
 </div>
 
 
 <button
     id="generateReferralButton"
-    class="referral-main-button"
+    class="big-action-button"
     type="button"
 >
 
-Generate My Code
+Generate My Referral Code
 
 <span>
-
 →
-
 </span>
 
 </button>
 
 
-<p
+<div
     id="referralMessage"
-    class="referral-message"
->
-
-</p>
+    class="form-message"
+></div>
 
 
 
-
-<!-- GENERATED CODE -->
+<!-- VISIBLE GENERATED CODE -->
 
 <div
     id="referralResult"
-    class="referral-result hidden"
+    class="generated-referral hidden"
 >
 
 
-<div class="referral-result-label">
+<div class="generated-top">
 
+<span>
 YOUR REFERRAL CODE
+</span>
+
+<div
+    id="referralActiveStatus"
+    class="code-status"
+>
+
+ACTIVE
+
+</div>
 
 </div>
 
 
 <div
     id="referralCode"
-    class="referral-code-display"
+    class="giant-referral-code"
 >
 
-------
+GS-XXXXXX
 
 </div>
 
 
-<p class="referral-code-help">
+<p class="share-instruction">
 
-Send this code to your friend.
+Send this code to your friend or share your direct referral link.
 
 </p>
 
 
+<div class="code-actions">
+
 <button
     id="copyReferralButton"
-    class="copy-referral-button"
     type="button"
+    class="copy-code-button"
 >
 
-📋 Copy Referral Code
+📋 Copy Code
 
 </button>
 
 
-<div class="referral-performance">
+<button
+    id="shareReferralButton"
+    type="button"
+    class="share-code-button"
+>
 
+↗ Share Referral
+
+</button>
+
+</div>
+
+
+<div class="referral-stats-row">
 
 <div>
-
 
 <span>
-
-SUCCESSFUL
-
+SUCCESSFUL REFERRALS
 </span>
 
-
 <strong id="referralCount">
-
-Successful Referrals: 0
-
+0
 </strong>
-
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-
-
-<!-- ===================================================
-USE SOMEONE'S CODE
-=================================================== -->
-
-<div class="referral-box referral-friend-box">
-
-
-<div class="referral-card-header">
-
-
-<div class="referral-card-icon dark-icon">
-
-🎟️
 
 </div>
 
 
 <div>
 
+<span>
+REWARDS EARNED
+</span>
 
-<div class="referral-card-label">
-
-FOR THE FRIEND
+<strong id="referralRewardsEarned">
+0
+</strong>
 
 </div>
-
-
-<h2>
-
-I was referred
-
-</h2>
-
 
 </div>
 
 
 </div>
 
+</div>
 
-<p class="referral-card-description">
 
-Got a code from a friend? Enter it before making the qualifying purchase.
+
+<!-- =================================================
+USE CODE PANEL
+================================================= -->
+
+<div
+    id="usePanel"
+    class="referral-panel hidden"
+>
+
+<div class="panel-heading">
+
+<span>
+REFERRED BY A FRIEND?
+</span>
+
+<h3>
+Enter their code
+</h3>
+
+<p>
+
+Apply the code before completing the qualifying purchase.
 
 </p>
 
+</div>
 
-<div class="referral-form-group">
 
+<div class="form-field">
 
 <label for="useReferralCode">
 
@@ -934,120 +746,77 @@ Referral code
 
 </label>
 
-
 <input
     id="useReferralCode"
     type="text"
     placeholder="GS-ABC123"
     autocomplete="off"
+    maxlength="9"
 >
-
 
 </div>
 
 
 <button
     id="submitReferralButton"
-    class="referral-secondary-button"
+    class="big-action-button dark-action"
     type="button"
 >
 
 Apply Referral Code
 
 <span>
-
 ✓
-
 </span>
 
 </button>
 
 
-<p
+<div
     id="useReferralMessage"
-    class="referral-message"
+    class="form-message"
+></div>
+
+
+<div
+    id="referralAppliedBox"
+    class="referral-applied hidden"
 >
 
-</p>
+<div class="success-check">
 
-
-
-
-<div class="referral-next-step">
-
-
-<div class="next-step-icon">
-
-🛍️
+✓
 
 </div>
 
-
 <div>
-
 
 <span>
-
-WHAT HAPPENS NEXT?
-
+REFERRAL APPLIED
 </span>
 
-
 <h4>
-
-Complete your purchase with Grayson.
-
+Now complete the purchase.
 </h4>
 
-
 <p>
 
-After you use the code, make the qualifying purchase. Grayson verifies it from the Admin dashboard.
+After your qualifying purchase, Grayson can approve the referral from the Admin dashboard.
 
 </p>
 
+</div>
+
+</div>
 
 </div>
 
 
 </div>
 
-
 </div>
-
-
-</div>
-
-
-
-
-<!-- REFERRAL RULE -->
-
-<div class="referral-footer-note">
-
-
-<div>
-
-ℹ️
-
-</div>
-
-
-<p>
-
-Referral rewards are earned only after the qualifying purchase is verified and approved.
-
-</p>
-
-
-</div>
-
-
-</div>
-
 
 </section>
-
 
 
 
@@ -1055,38 +824,41 @@ Referral rewards are earned only after the qualifying purchase is verified and a
 PRODUCTS
 ===================================================== -->
 
-<section id="products">
+<section
+    id="products"
+    class="shop-section"
+>
 
+<div class="section-header">
 
-<div class="section-heading-group">
+<div>
 
-
-<span>
-
+<span class="section-eyebrow">
 THE SHOP
-
 </span>
 
-
-<h2 class="section-title">
-
+<h2>
 Snacks & Drinks
-
 </h2>
 
+</div>
 
 <p>
 
-See what's available right now.
+Live prices and availability.
 
 </p>
-
 
 </div>
 
 
-<div class="searchBar">
+<div class="search-row">
 
+<div class="search-box">
+
+<span>
+⌕
+</span>
 
 <input
     type="text"
@@ -1094,6 +866,7 @@ See what's available right now.
     placeholder="Search snacks..."
 >
 
+</div>
 
 </div>
 
@@ -1101,13 +874,9 @@ See what's available right now.
 <div
     id="productContainer"
     class="product-grid"
->
-
-</div>
-
+></div>
 
 </section>
-
 
 
 
@@ -1115,92 +884,73 @@ See what's available right now.
 INVENTORY
 ===================================================== -->
 
-<section id="inventory">
+<section
+    id="inventory"
+    class="stock-section"
+>
 
+<div class="section-header">
 
-<div class="section-heading-group">
+<div>
 
-
-<span>
-
-LIVE AVAILABILITY
-
+<span class="section-eyebrow">
+LIVE STOCK
 </span>
 
-
-<h2 class="section-title">
-
-Current Stock
-
+<h2>
+Inventory
 </h2>
 
+</div>
 
 <p>
-
-Inventory is updated as items are sold and restocked.
-
+See exactly what's available.
 </p>
-
 
 </div>
 
 
 <div class="table-container">
 
-
 <table>
-
 
 <thead>
 
-
 <tr>
-
 
 <th>
 Item
 </th>
 
-
 <th>
 Price
 </th>
-
 
 <th>
 Available
 </th>
 
-
 <th>
 Status
 </th>
 
-
 <th>
-Restock Date
+Restock
 </th>
-
 
 </tr>
 
-
 </thead>
-
 
 <tbody id="inventoryTable">
 
 </tbody>
 
-
 </table>
-
 
 </div>
 
-
 </section>
-
 
 
 
@@ -1208,84 +958,65 @@ Restock Date
 CONTACT
 ===================================================== -->
 
-<section id="contact">
+<section
+    id="contact"
+    class="contact-section"
+>
 
+<div class="contact-card">
 
-<div class="section-heading-group">
+<div>
 
-
-<span>
-
-GET IN TOUCH
-
+<span class="section-eyebrow">
+CONTACT
 </span>
 
-
-<h2 class="section-title">
-
-Contact
-
+<h2>
+Have a request?
 </h2>
 
+<p>
+
+Want a new snack added to the shop? Send me a suggestion.
+
+</p>
 
 </div>
 
 
-<div class="contact-box">
+<div class="contact-details">
 
-
-<div class="contact-item">
-
+<div>
 
 <span>
-
 OWNER
-
 </span>
 
-
 <strong>
-
 Grayson VanTassel
-
 </strong>
-
 
 </div>
 
 
-<div class="contact-item">
-
+<div>
 
 <span>
-
 SCHOOL
-
 </span>
 
-
 <strong>
-
 Uplift Elevate Preparatory
-
 </strong>
-
 
 </div>
 
 
-<div class="contact-item">
-
+<div>
 
 <span>
-
 EMAIL
-
 </span>
-
-
-<strong>
-
 
 <a href="mailto:vantasselgrayson@gmail.com">
 
@@ -1293,55 +1024,27 @@ vantasselgrayson@gmail.com
 
 </a>
 
-
-</strong>
-
+</div>
 
 </div>
 
-
-<div class="contact-message">
-
-Have a snack suggestion?
-
-<br>
-
-I read every message and consider new requests.
-
 </div>
-
-
-</div>
-
 
 </section>
 
 
 
-
-<!-- =====================================================
-FOOTER
-===================================================== -->
-
 <footer>
 
+<strong>
+🍬 Grayson's Snack Shop
+</strong>
 
 <p>
-
-© 2026 Grayson's Snack Shop
-
+© 2026 · Uplift Elevate Preparatory
 </p>
-
-
-<p>
-
-Serving students at Uplift Elevate Preparatory
-
-</p>
-
 
 </footer>
-
 
 
 
@@ -1350,12 +1053,10 @@ Serving students at Uplift Elevate Preparatory
     src="script.js"
 ></script>
 
-
 <script
     type="module"
     src="referrals.js"
 ></script>
-
 
 </body>
 
