@@ -45,7 +45,6 @@ async function loadInventory() {
 
         inventory = [];
 
-
         const snapshot = await getDocs(inventoryRef);
 
 
@@ -54,11 +53,34 @@ async function loadInventory() {
             const data = item.data();
 
 
+            /*
+            Use the product's saved ID if one exists.
+
+            If there isn't one, use the Firebase
+            document ID instead.
+            */
+
+            let productId = data.id;
+
+            if (
+                productId === undefined ||
+                productId === null ||
+                productId === "" ||
+                Number.isNaN(Number(productId))
+            ) {
+
+                productId = item.id;
+
+            }
+
+
             inventory.push({
 
-                id: Number(item.id),
+                ...data,
 
-                ...data
+                id: productId,
+
+                firebaseId: item.id
 
             });
 
@@ -82,9 +104,7 @@ async function loadInventory() {
             error
         );
 
-
         inventory = [];
-
 
         return inventory;
 
@@ -95,66 +115,60 @@ async function loadInventory() {
 
 
 // ==========================================================
-// SAVE / UPDATE PRODUCT
+// SAVE PRODUCT CHANGES
 // ==========================================================
 
 async function saveProduct(product) {
 
     try {
 
-        if (!product || product.id === undefined) {
+        /*
+        Use firebaseId when available.
 
-            throw new Error(
-                "Product must have an ID before it can be saved."
-            );
+        This prevents the system from trying to
+        save to a document called "NaN".
+        */
 
-        }
-
-
-        const productRef = doc(
-            db,
-            "inventory",
-            product.id.toString()
-        );
+        const documentId =
+            product.firebaseId ||
+            product.id.toString();
 
 
         await updateDoc(
-            productRef,
+
+            doc(
+                db,
+                "inventory",
+                documentId
+            ),
+
             {
-
                 name: product.name,
-
                 price: Number(product.price),
-
                 stock: Number(product.stock),
-
                 restock: product.restock || "",
-
                 image: product.image || ""
-
             }
+
         );
 
 
         console.log(
-            "Product Updated:",
+            "Product saved:",
             product
         );
 
-
-        return true;
 
     }
 
     catch (error) {
 
         console.error(
-            "Error updating product:",
+            "Error saving product:",
             error
         );
 
-
-        return false;
+        throw error;
 
     }
 
@@ -170,34 +184,27 @@ async function addProduct(product) {
 
     try {
 
-        if (!product) {
+        /*
+        New products get a unique numeric ID.
 
-            throw new Error(
-                "No product was provided."
-            );
+        Firebase will use this same ID as
+        the document ID.
+        */
 
-        }
-
-
-        if (
-            product.id === undefined ||
-            product.id === null
-        ) {
-
-            product.id = Date.now();
-
-        }
+        const productId =
+            product.id ||
+            Date.now();
 
 
         const newProduct = {
 
-            id: Number(product.id),
+            id: productId,
 
-            name: product.name || "Unnamed Product",
+            name: product.name,
 
-            price: Number(product.price) || 0,
+            price: Number(product.price),
 
-            stock: Number(product.stock) || 0,
+            stock: Number(product.stock),
 
             restock: product.restock || "",
 
@@ -211,7 +218,7 @@ async function addProduct(product) {
             doc(
                 db,
                 "inventory",
-                newProduct.id.toString()
+                productId.toString()
             ),
 
             newProduct
@@ -220,7 +227,7 @@ async function addProduct(product) {
 
 
         console.log(
-            "Product Added:",
+            "Product added:",
             newProduct
         );
 
@@ -236,8 +243,7 @@ async function addProduct(product) {
             error
         );
 
-
-        return null;
+        throw error;
 
     }
 
@@ -253,16 +259,10 @@ async function deleteProduct(id) {
 
     try {
 
-        if (
-            id === undefined ||
-            id === null
-        ) {
-
-            throw new Error(
-                "Product ID is required."
-            );
-
-        }
+        const documentId =
+            typeof id === "object"
+                ? (id.firebaseId || id.id.toString())
+                : id.toString();
 
 
         await deleteDoc(
@@ -270,19 +270,16 @@ async function deleteProduct(id) {
             doc(
                 db,
                 "inventory",
-                id.toString()
+                documentId
             )
 
         );
 
 
         console.log(
-            "Product Deleted:",
-            id
+            "Product deleted:",
+            documentId
         );
-
-
-        return true;
 
     }
 
@@ -293,8 +290,7 @@ async function deleteProduct(id) {
             error
         );
 
-
-        return false;
+        throw error;
 
     }
 
@@ -303,7 +299,7 @@ async function deleteProduct(id) {
 
 
 // ==========================================================
-// EXPORTS
+// EXPORT
 // ==========================================================
 
 export {
