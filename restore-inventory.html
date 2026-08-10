@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Restore Grayson's Snack Shop Inventory</title>
+
+<link rel="icon" type="image/png" href="graysonslogos.png">
+
+<style>
+
+* {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    margin: 0;
+    background: #fff8f0;
+    color: #222;
+}
+
+.restore-box {
+    width: 90%;
+    max-width: 650px;
+    margin: 80px auto;
+    background: white;
+    padding: 35px;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px #ddd;
+    text-align: center;
+}
+
+h1 {
+    color: #ff7b00;
+}
+
+button {
+    margin-top: 20px;
+    background: #ff7b00;
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: .85;
+}
+
+button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+#status {
+    margin-top: 25px;
+    font-weight: bold;
+    line-height: 1.6;
+}
+
+.warning {
+    margin-top: 20px;
+    background: #fff3cd;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="restore-box">
+
+<h1>
+🍬 Restore Original Inventory
+</h1>
+
+<p>
+This will upload the original 10 Grayson's Snack Shop products back into Firebase Firestore.
+</p>
+
+
+<div class="warning">
+
+<strong>Important:</strong>
+
+This will set products 1–10 back to their original prices, stock amounts, images, and restock dates.
+
+It will also remove the old <strong>test-snack</strong> product.
+
+</div>
+
+
+<button id="restoreButton">
+Restore Original 10 Products
+</button>
+
+
+<p id="status"></p>
+
+
+<br>
+
+<a href="index.html">
+Back To Shop
+</a>
+
+<br><br>
+
+<a href="admin.html">
+Go To Admin Dashboard
+</a>
+
+
+</div>
+
+
+
+<script type="module">
+
+import { db } from "./firebase.js";
+
+import {
+    doc,
+    setDoc,
+    deleteDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+
+
+// ==========================================================
+// ORIGINAL INVENTORY
+// ==========================================================
+
+const originalInventory = [
+
+    {
+        id: 1,
+        name: "Taki Red Fiesta",
+        price: 8.00,
+        stock: 8,
+        restock: "8/9/2026",
+        image: "redtakifiesta.png"
+    },
+
+    {
+        id: 2,
+        name: "Taki Blue Fiesta",
+        price: 8.00,
+        stock: 8,
+        restock: "8/9/2026",
+        image: "bluetakifiesta.png"
+    },
+
+    {
+        id: 3,
+        name: "Taki Red 1oz Bag",
+        price: 1.00,
+        stock: 50,
+        restock: "8/9/2026",
+        image: "redtakismall.png"
+    },
+
+    {
+        id: 4,
+        name: "Taki Blue 1oz Bag",
+        price: 1.00,
+        stock: 50,
+        restock: "8/9/2026",
+        image: "bluetakismall.png"
+    },
+
+    {
+        id: 5,
+        name: "Blue Nerd Clusters 8oz Bag",
+        price: 5.00,
+        stock: 5,
+        restock: "8/9/2026",
+        image: "bluenerdcluster.png"
+    },
+
+    {
+        id: 6,
+        name: "Mike N Ike 5oz Box",
+        price: 3.00,
+        stock: 4,
+        restock: "8/9/2026",
+        image: "mikenike.png"
+    },
+
+    {
+        id: 7,
+        name: "Red Bull White",
+        price: 6.00,
+        stock: 4,
+        restock: "8/9/2026",
+        image: "redbullwhite.png"
+    },
+
+    {
+        id: 8,
+        name: "Red Bull Red",
+        price: 6.00,
+        stock: 4,
+        restock: "8/9/2026",
+        image: "redbullred.png"
+    },
+
+    {
+        id: 9,
+        name: "Arizona Mango Can",
+        price: 2.00,
+        stock: 4,
+        restock: "8/9/2026",
+        image: "arizonamango.png"
+    },
+
+    {
+        id: 10,
+        name: "Arizona Fruit Punch Can",
+        price: 2.00,
+        stock: 4,
+        restock: "8/9/2026",
+        image: "arizonafruitpunch.png"
+    }
+
+];
+
+
+
+// ==========================================================
+// ELEMENTS
+// ==========================================================
+
+const restoreButton =
+    document.getElementById(
+        "restoreButton"
+    );
+
+const status =
+    document.getElementById(
+        "status"
+    );
+
+
+
+// ==========================================================
+// RESTORE INVENTORY
+// ==========================================================
+
+restoreButton.addEventListener(
+    "click",
+    restoreInventory
+);
+
+
+
+async function restoreInventory() {
+
+    const confirmed =
+        confirm(
+            "Restore the original 10 products to Firebase?"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    restoreButton.disabled =
+        true;
+
+
+    restoreButton.textContent =
+        "Restoring...";
+
+
+    status.style.color =
+        "#222";
+
+
+    status.textContent =
+        "Connecting to Firebase...";
+
+
+    try {
+
+
+        // ==================================================
+        // UPLOAD PRODUCTS 1 - 10
+        // ==================================================
+
+        for (
+            let i = 0;
+            i < originalInventory.length;
+            i++
+        ) {
+
+            const product =
+                originalInventory[i];
+
+
+            status.textContent =
+                `Uploading ${i + 1} of ${originalInventory.length}: ${product.name}`;
+
+
+            await setDoc(
+
+                doc(
+                    db,
+                    "inventory",
+                    product.id.toString()
+                ),
+
+                product
+
+            );
+
+        }
+
+
+
+        // ==================================================
+        // REMOVE OLD TEST PRODUCT
+        // ==================================================
+
+        status.textContent =
+            "Removing old test product...";
+
+
+        await deleteDoc(
+
+            doc(
+                db,
+                "inventory",
+                "test-snack"
+            )
+
+        );
+
+
+
+        // ==================================================
+        // FINISHED
+        // ==================================================
+
+        status.style.color =
+            "green";
+
+
+        status.innerHTML = `
+            ✅ Inventory restored successfully!
+            <br><br>
+            10 original products are now in Firestore.
+            <br>
+            The test product has been removed.
+        `;
+
+
+        restoreButton.textContent =
+            "Inventory Restored ✅";
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Inventory restore error:",
+            error
+        );
+
+
+        status.style.color =
+            "red";
+
+
+        status.textContent =
+            "❌ Something went wrong. Check the browser console.";
+
+
+        restoreButton.disabled =
+            false;
+
+
+        restoreButton.textContent =
+            "Try Again";
+
+    }
+
+}
+
+</script>
+
+
+</body>
+
+</html>
