@@ -1,10 +1,9 @@
-```javascript
 /*
 ==========================================================
 Grayson's Snack Shop
 script.js
 Main Website
-Firebase Inventory Version
+Firebase Inventory + Promotions
 ==========================================================
 */
 
@@ -27,23 +26,12 @@ import {
 // ELEMENTS
 // ==========================================================
 
-const productContainer =
-    document.getElementById("productContainer");
-
-const inventoryTable =
-    document.getElementById("inventoryTable");
-
-const searchInput =
-    document.getElementById("searchInput");
-
-const totalProducts =
-    document.getElementById("totalProducts");
-
-const itemsInStock =
-    document.getElementById("itemsInStock");
-
-const darkButton =
-    document.getElementById("darkModeButton");
+const productContainer = document.getElementById("productContainer");
+const inventoryTable = document.getElementById("inventoryTable");
+const searchInput = document.getElementById("searchInput");
+const totalProducts = document.getElementById("totalProducts");
+const itemsInStock = document.getElementById("itemsInStock");
+const darkButton = document.getElementById("darkModeButton");
 
 
 // ==========================================================
@@ -55,13 +43,10 @@ function money(amount) {
     const number = Number(amount);
 
     if (Number.isNaN(number)) {
-
         return "$0.00";
-
     }
 
     return "$" + number.toFixed(2);
-
 }
 
 
@@ -71,44 +56,30 @@ function money(amount) {
 
 function getStatus(product) {
 
-    const stock =
-        Number(product.stock);
-
+    const stock = Number(product.stock);
 
     if (stock <= 0) {
 
         return {
-
             text: "Out of Stock",
-
-            cssClass: "out-stock"
-
+            statusClass: "out-stock"
         };
 
     }
-
 
     if (stock <= 5) {
 
         return {
-
             text: "Low Stock",
-
-            cssClass: "low-stock"
-
+            statusClass: "low-stock"
         };
 
     }
 
-
     return {
-
         text: "In Stock",
-
-        cssClass: "in-stock"
-
+        statusClass: "in-stock"
     };
-
 }
 
 
@@ -118,81 +89,54 @@ function getStatus(product) {
 
 function createProduct(product) {
 
-    const status =
-        getStatus(product);
+    const status = getStatus(product);
 
+    const card = document.createElement("div");
 
-    const card =
-        document.createElement("div");
+    card.className = "product-card";
 
+    const image = product.image || "";
+    const name = product.name || "Unnamed Product";
+    const price = money(product.price);
+    const stock = Number(product.stock) || 0;
+    const restock = product.restock || "Not specified";
 
-    card.className =
-        "product-card";
+    card.innerHTML =
+        '<div class="product-image">' +
+            '<img ' +
+                'src="' + image + '" ' +
+                'alt="' + name + '" ' +
+                'onerror="this.src=\'https://placehold.co/120x120?text=No+Image\'">' +
+        '</div>' +
 
+        '<div class="product-info">' +
 
-    card.innerHTML = `
+            '<h3>' +
+                name +
+            '</h3>' +
 
-        <div class="product-image">
+            '<div class="product-price">' +
+                price +
+            '</div>' +
 
-            <img
-                src="${product.image || ""}"
-                alt="${product.name || "Product"}"
-                onerror="this.src='https://placehold.co/120x120?text=No+Image'"
-            >
+            '<div class="product-stock">' +
+                'Available: ' + stock +
+            '</div>' +
 
-        </div>
+            '<span class="badge ' + status.statusClass + '">' +
+                status.text +
+            '</span>' +
 
+            '<p style="margin-top:15px;">' +
+                'Restock Date: ' +
+                '<strong>' +
+                    restock +
+                '</strong>' +
+            '</p>' +
 
-        <div class="product-info">
+        '</div>';
 
-            <h3>
-                ${product.name || "Unnamed Product"}
-            </h3>
-
-
-            <div class="product-price">
-
-                ${money(product.price)}
-
-            </div>
-
-
-            <div class="product-stock">
-
-                Available:
-                ${Number(product.stock) || 0}
-
-            </div>
-
-
-            <span class="badge ${status.cssClass}">
-
-                ${status.text}
-
-            </span>
-
-
-            <p style="margin-top:15px;">
-
-                Restock Date:
-
-                <strong>
-
-                    ${product.restock || "Not specified"}
-
-                </strong>
-
-            </p>
-
-        </div>
-
-    `;
-
-
-    productContainer.appendChild(
-        card
-    );
-
+    productContainer.appendChild(card);
 }
 
 
@@ -202,61 +146,39 @@ function createProduct(product) {
 
 function createTableRow(product) {
 
-    const status =
-        getStatus(product);
+    const status = getStatus(product);
 
+    const row = document.createElement("tr");
 
-    const row =
-        document.createElement("tr");
+    const name = product.name || "Unnamed Product";
+    const price = money(product.price);
+    const stock = Number(product.stock) || 0;
+    const restock = product.restock || "Not specified";
 
+    row.innerHTML =
+        '<td>' +
+            name +
+        '</td>' +
 
-    row.innerHTML = `
+        '<td>' +
+            price +
+        '</td>' +
 
-        <td>
+        '<td>' +
+            stock +
+        '</td>' +
 
-            ${product.name || "Unnamed Product"}
+        '<td>' +
+            '<span class="badge ' + status.statusClass + '">' +
+                status.text +
+            '</span>' +
+        '</td>' +
 
-        </td>
+        '<td>' +
+            restock +
+        '</td>';
 
-
-        <td>
-
-            ${money(product.price)}
-
-        </td>
-
-
-        <td>
-
-            ${Number(product.stock) || 0}
-
-        </td>
-
-
-        <td>
-
-            <span class="badge ${status.cssClass}">
-
-                ${status.text}
-
-            </span>
-
-        </td>
-
-
-        <td>
-
-            ${product.restock || "Not specified"}
-
-        </td>
-
-    `;
-
-
-    inventoryTable.appendChild(
-        row
-    );
-
+    inventoryTable.appendChild(row);
 }
 
 
@@ -266,42 +188,25 @@ function createTableRow(product) {
 
 function updateStats(products) {
 
-    let total =
-        0;
+    let total = 0;
 
+    products.forEach(function(product) {
 
-    products.forEach(
-        function(product) {
+        const stock = Number(product.stock);
 
-            const stock =
-                Number(product.stock);
-
-
-            if (!Number.isNaN(stock)) {
-
-                total += stock;
-
-            }
-
+        if (!Number.isNaN(stock)) {
+            total += stock;
         }
-    );
 
+    });
 
     if (totalProducts) {
-
-        totalProducts.textContent =
-            products.length;
-
+        totalProducts.textContent = products.length;
     }
-
 
     if (itemsInStock) {
-
-        itemsInStock.textContent =
-            total;
-
+        itemsInStock.textContent = total;
     }
-
 }
 
 
@@ -311,87 +216,49 @@ function updateStats(products) {
 
 function displayProducts(products) {
 
-    if (!productContainer) {
+    if (!productContainer || !inventoryTable) {
 
         console.error(
-            "productContainer was not found in index.html."
+            "Product containers were not found in index.html."
         );
 
         return;
-
     }
 
-
-    if (!inventoryTable) {
-
-        console.error(
-            "inventoryTable was not found in index.html."
-        );
-
-        return;
-
-    }
-
-
-    productContainer.innerHTML =
-        "";
-
-    inventoryTable.innerHTML =
-        "";
-
+    productContainer.innerHTML = "";
+    inventoryTable.innerHTML = "";
 
     if (products.length === 0) {
 
-        productContainer.innerHTML = `
+        productContainer.innerHTML =
+            '<p style="' +
+                'text-align:center;' +
+                'width:100%;' +
+                'grid-column:1/-1;' +
+            '">' +
+                'No products found.' +
+            '</p>';
 
-            <p style="
-                text-align:center;
-                width:100%;
-                grid-column:1/-1;
-            ">
-
-                No products found.
-
-            </p>
-
-        `;
-
-
-        inventoryTable.innerHTML = `
-
-            <tr>
-
-                <td colspan="5">
-
-                    No products found.
-
-                </td>
-
-            </tr>
-
-        `;
-
+        inventoryTable.innerHTML =
+            '<tr>' +
+                '<td colspan="5">' +
+                    'No products found.' +
+                '</td>' +
+            '</tr>';
 
         updateStats([]);
 
         return;
-
     }
 
+    products.forEach(function(product) {
 
-    products.forEach(
-        function(product) {
+        createProduct(product);
+        createTableRow(product);
 
-            createProduct(product);
-
-            createTableRow(product);
-
-        }
-    );
-
+    });
 
     updateStats(products);
-
 }
 
 
@@ -410,28 +277,19 @@ if (searchInput) {
                     .toLowerCase()
                     .trim();
 
-
             const filtered =
-                inventory.filter(
-                    function(product) {
+                inventory.filter(function(product) {
 
-                        const name =
-                            String(
-                                product.name || ""
-                            ).toLowerCase();
+                    const name =
+                        String(
+                            product.name || ""
+                        ).toLowerCase();
 
+                    return name.includes(text);
 
-                        return name.includes(
-                            text
-                        );
+                });
 
-                    }
-                );
-
-
-            displayProducts(
-                filtered
-            );
+            displayProducts(filtered);
 
         }
     );
@@ -446,25 +304,17 @@ if (searchInput) {
 function loadDarkMode() {
 
     const savedMode =
-        localStorage.getItem(
-            "darkMode"
-        );
-
+        localStorage.getItem("darkMode");
 
     if (
-        savedMode === "enabled"
+        savedMode === "enabled" &&
+        document.body
     ) {
 
-        document.body.classList.add(
-            "dark"
-        );
-
+        document.body.classList.add("dark");
 
         if (darkButton) {
-
-            darkButton.textContent =
-                "☀️";
-
+            darkButton.textContent = "☀️";
         }
 
     }
@@ -478,16 +328,10 @@ if (darkButton) {
         "click",
         function() {
 
-            document.body.classList.toggle(
-                "dark"
-            );
-
+            document.body.classList.toggle("dark");
 
             const enabled =
-                document.body.classList.contains(
-                    "dark"
-                );
-
+                document.body.classList.contains("dark");
 
             if (enabled) {
 
@@ -496,22 +340,16 @@ if (darkButton) {
                     "enabled"
                 );
 
+                darkButton.textContent = "☀️";
 
-                darkButton.textContent =
-                    "☀️";
-
-            }
-
-            else {
+            } else {
 
                 localStorage.setItem(
                     "darkMode",
                     "disabled"
                 );
 
-
-                darkButton.textContent =
-                    "🌙";
+                darkButton.textContent = "🌙";
 
             }
 
@@ -525,7 +363,7 @@ loadDarkMode();
 
 
 // ==========================================================
-// LOAD PROMOTION
+// PROMOTION
 // ==========================================================
 
 async function loadPromotion() {
@@ -539,12 +377,10 @@ async function loadPromotion() {
                 "current"
             );
 
-
         const snapshot =
             await getDoc(
                 promotionRef
             );
-
 
         if (!snapshot.exists()) {
 
@@ -556,33 +392,22 @@ async function loadPromotion() {
 
         }
 
-
         const promotion =
             snapshot.data();
-
 
         console.log(
             "Promotion loaded:",
             promotion
         );
 
-
-        if (
-            promotion.active === true
-        ) {
-
-            displayPromotion(
-                promotion
-            );
-
-        }
+        displayPromotion(promotion);
 
     }
 
     catch (error) {
 
         console.error(
-            "Promotion loading error:",
+            "Error loading promotion:",
             error
         );
 
@@ -592,134 +417,153 @@ async function loadPromotion() {
 
 
 // ==========================================================
+// CHECK PROMOTION DATES
+// ==========================================================
+
+function promotionIsCurrentlyActive(promotion) {
+
+    if (!promotion || promotion.active !== true) {
+        return false;
+    }
+
+    const now = new Date();
+
+    if (promotion.start) {
+
+        const startDate =
+            new Date(promotion.start);
+
+        if (
+            !Number.isNaN(startDate.getTime()) &&
+            now < startDate
+        ) {
+
+            return false;
+
+        }
+
+    }
+
+    if (promotion.end) {
+
+        const endDate =
+            new Date(promotion.end);
+
+        if (
+            !Number.isNaN(endDate.getTime()) &&
+            now > endDate
+        ) {
+
+            return false;
+
+        }
+
+    }
+
+    return true;
+}
+
+
+// ==========================================================
 // DISPLAY PROMOTION
 // ==========================================================
 
 function displayPromotion(promotion) {
 
-    if (!promotion) {
+    if (!promotionIsCurrentlyActive(promotion)) {
+
+        console.log(
+            "Promotion exists but is not currently active."
+        );
 
         return;
 
     }
 
-
-    if (
-        promotion.active !== true
-    ) {
-
-        return;
-
-    }
-
-
-    let promotionBanner =
+    let promotionBox =
         document.getElementById(
             "promotionBanner"
         );
 
+    if (!promotionBox) {
 
-    if (!promotionBanner) {
+        promotionBox =
+            document.createElement("section");
 
-        promotionBanner =
-            document.createElement(
-                "section"
-            );
-
-
-        promotionBanner.id =
+        promotionBox.id =
             "promotionBanner";
 
-
-        promotionBanner.style.margin =
-            "30px auto";
-
-
-        promotionBanner.style.maxWidth =
-            "1000px";
-
-
-        promotionBanner.style.padding =
-            "30px";
-
-
-        promotionBanner.style.borderRadius =
-            "20px";
-
-
-        promotionBanner.style.background =
-            "#fff3e6";
-
-
-        promotionBanner.style.textAlign =
-            "center";
-
-
-        promotionBanner.style.boxShadow =
-            "0 5px 20px rgba(0,0,0,0.12)";
-
+        promotionBox.style.cssText =
+            "margin:30px auto;" +
+            "max-width:1000px;" +
+            "padding:30px;" +
+            "border-radius:20px;" +
+            "background:#fff3e6;" +
+            "text-align:center;" +
+            "box-shadow:0 5px 20px rgba(0,0,0,0.12);";
 
         const productsSection =
             document.getElementById(
                 "products"
             );
 
-
         if (productsSection) {
 
             productsSection.parentNode.insertBefore(
-                promotionBanner,
+                promotionBox,
                 productsSection
+            );
+
+        } else {
+
+            document.body.appendChild(
+                promotionBox
             );
 
         }
 
     }
 
+    const promotionName =
+        promotion.name ||
+        "Special Promotion";
 
-    promotionBanner.innerHTML = `
+    const qualifyingName =
+        promotion.qualifyingProductName ||
+        "a qualifying product";
 
-        <h2>
+    const rewardQuantity =
+        promotion.rewardQuantity ||
+        1;
 
-            🎉
-            ${promotion.name || "Special Promotion"}
+    const rewardName =
+        promotion.rewardProductName ||
+        "reward";
 
-        </h2>
+    promotionBox.innerHTML =
+        '<h2 style="margin-bottom:10px;">' +
+            '🎉 ' +
+            promotionName +
+        '</h2>' +
 
+        '<p style="margin-bottom:10px;">' +
+            'Bring a new customer to ' +
+            "Grayson's Snack Shop!" +
+        '</p>' +
 
-        <p style="margin-top:10px;">
-
-            Bring a new customer to
-            Grayson's Snack Shop!
-
-        </p>
-
-
-        <p style="margin-top:10px;">
-
-            Buy
-
-            <strong>
-
-                ${promotion.qualifyingProductName || "a qualifying product"}
-
-            </strong>
-
-            and the referrer can receive
-
-            <strong>
-
-                ${promotion.rewardQuantity || 1}
-
-                ×
-
-                ${promotion.rewardProductName || "reward"}
-
-            </strong>
-
-        </p>
-
-    `;
+        '<p>' +
+            'Buy: ' +
+            '<strong>' +
+                qualifyingName +
+            '</strong>' +
+            '<br>' +
+            'The person who referred them receives: ' +
+            '<strong>' +
+                rewardQuantity +
+                ' × ' +
+                rewardName +
+            '</strong>' +
+        '</p>';
 
 }
 
@@ -736,26 +580,16 @@ async function startShop() {
             "Loading Grayson's Snack Shop..."
         );
 
-
         await loadInventory();
-
-
-        console.log(
-            "Firebase inventory loaded:",
-            inventory
-        );
-
 
         displayProducts(
             inventory
         );
 
-
         await loadPromotion();
 
-
         console.log(
-            "Grayson's Snack Shop loaded successfully!"
+            "Grayson's Snack Shop Loaded From Firebase"
         );
 
     }
@@ -763,29 +597,21 @@ async function startShop() {
     catch (error) {
 
         console.error(
-            "SHOP START ERROR:",
+            "Failed to start Grayson's Snack Shop:",
             error
         );
 
-
         if (productContainer) {
 
-            productContainer.innerHTML = `
-
-                <p style="
-                    text-align:center;
-                    width:100%;
-                ">
-
-                    Unable to load the shop.
-
-                    <br>
-
-                    Please refresh the page.
-
-                </p>
-
-            `;
+            productContainer.innerHTML =
+                '<p style="' +
+                    'text-align:center;' +
+                    'width:100%;' +
+                    'grid-column:1/-1;' +
+                '">' +
+                    'Unable to load the shop right now. ' +
+                    'Please refresh the page.' +
+                '</p>';
 
         }
 
@@ -795,8 +621,7 @@ async function startShop() {
 
 
 // ==========================================================
-// START WEBSITE
+// START
 // ==========================================================
 
 startShop();
-```
