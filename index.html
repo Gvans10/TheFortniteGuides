@@ -8,36 +8,235 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+
 <title>
 Grayson's Snack Shop
 </title>
 
-<link rel="icon" type="image/png" href="graysonslogos.png">
-
-<link rel="stylesheet" href="style.css">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
 <link
-href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-rel="stylesheet"
+    rel="icon"
+    type="image/png"
+    href="graysonslogos.png"
 >
 
+
+<link
+    rel="stylesheet"
+    href="style.css"
+>
+
+
+<link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+>
+
+
+<link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+>
+
+
+<link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+>
+
+
+<style>
+
+/*
+==========================================================
+PROMOTION SECTION
+==========================================================
+*/
+
+.promotion-section {
+
+    padding-top: 30px;
+    padding-bottom: 30px;
+
+}
+
+
+.promotion-card {
+
+    max-width: 900px;
+    margin: auto;
+
+    background: linear-gradient(
+        135deg,
+        #ff7b00,
+        #ff9e3d
+    );
+
+    color: white;
+
+    padding: 35px;
+
+    border-radius: 25px;
+
+    text-align: center;
+
+    box-shadow:
+        0 10px 30px
+        rgba(0, 0, 0, 0.15);
+
+}
+
+
+.promotion-live-badge {
+
+    display: inline-block;
+
+    background: white;
+
+    color: #ff7b00;
+
+    padding: 6px 14px;
+
+    border-radius: 20px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    margin-bottom: 15px;
+
+}
+
+
+.promotion-card h2 {
+
+    font-size: 32px;
+
+    margin-bottom: 10px;
+
+}
+
+
+.promotion-description {
+
+    font-size: 17px;
+
+    margin-bottom: 25px;
+
+}
+
+
+.promotion-details {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(220px, 1fr)
+        );
+
+    gap: 15px;
+
+    margin-top: 20px;
+
+}
+
+
+.promotion-detail-box {
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.18
+        );
+
+    padding: 18px;
+
+    border-radius: 15px;
+
+}
+
+
+.promotion-detail-box span {
+
+    display: block;
+
+    font-size: 13px;
+
+    opacity: .9;
+
+    margin-bottom: 5px;
+
+}
+
+
+.promotion-detail-box strong {
+
+    font-size: 18px;
+
+}
+
+
+.promotion-dates {
+
+    margin-top: 20px;
+
+    font-size: 14px;
+
+}
+
+
+.dark .promotion-card {
+
+    box-shadow:
+        0 10px 30px
+        rgba(
+            0,
+            0,
+            0,
+            0.45
+        );
+
+}
+
+
+@media(max-width:700px) {
+
+    .promotion-card {
+
+        padding: 25px 18px;
+
+    }
+
+
+    .promotion-card h2 {
+
+        font-size: 26px;
+
+    }
+
+}
+
+</style>
+
+
 </head>
+
 
 
 <body>
 
 
-<!-- ==========================================================
-NAVBAR
-========================================================== -->
 
 <header>
 
+
 <nav class="navbar">
+
 
 <div class="logo">
 
@@ -46,50 +245,83 @@ NAVBAR
 </div>
 
 
+
 <ul class="nav-links">
 
+
 <li>
+
 <a href="#home">
+
 Home
+
 </a>
+
 </li>
 
 
-<li>
-<a href="#products">
-Products
-</a>
-</li>
-
 
 <li>
-<a href="#inventory">
-Stock
-</a>
-</li>
 
+<a href="#promotionSection">
 
-<li>
-<a href="#promotion">
 Promotion
+
 </a>
+
 </li>
 
 
+
 <li>
+
+<a href="#products">
+
+Products
+
+</a>
+
+</li>
+
+
+
+<li>
+
+<a href="#inventory">
+
+Stock
+
+</a>
+
+</li>
+
+
+
+<li>
+
 <a href="#contact">
+
 Contact
+
 </a>
+
 </li>
+
 
 
 <li>
+
 <a href="admin.html">
+
 🔐 Admin
+
 </a>
+
 </li>
+
 
 </ul>
+
 
 
 <button id="darkModeButton">
@@ -98,29 +330,41 @@ Contact
 
 </button>
 
+
 </nav>
+
 
 </header>
 
 
 
-<!-- ==========================================================
-HOME
-========================================================== -->
 
-<section id="home" class="hero">
+
+
+
+<section
+    id="home"
+    class="hero"
+>
 
 
 <div class="hero-text">
 
+
 <h1>
+
 Grayson's Snack Shop
+
 </h1>
 
 
+
 <h2>
+
 Uplift Elevate Preparatory
+
 </h2>
+
 
 
 <p>
@@ -134,11 +378,16 @@ Check what is available and when new items are arriving.
 </p>
 
 
-<a href="#products" class="heroButton">
+
+<a
+    href="#products"
+    class="heroButton"
+>
 
 View Snacks
 
 </a>
+
 
 </div>
 
@@ -147,50 +396,73 @@ View Snacks
 
 
 
-<!-- ==========================================================
-STATS
-========================================================== -->
+
+
+
 
 <section class="stats">
 
 
 <div class="stat">
 
+
 <h2 id="totalProducts">
+
 0
+
 </h2>
 
+
 <p>
+
 Available Products
+
 </p>
+
 
 </div>
 
 
 
+
 <div class="stat">
+
 
 <h2 id="itemsInStock">
+
 0
+
 </h2>
 
+
 <p>
+
 Items Available
+
 </p>
+
 
 </div>
 
 
 
+
 <div class="stat">
 
+
 <h2>
+
 📦
+
 </h2>
 
+
 <p>
+
 Regular Restocks
+
 </p>
+
 
 </div>
 
@@ -199,9 +471,121 @@ Regular Restocks
 
 
 
-<!-- ==========================================================
-PRODUCTS
-========================================================== -->
+
+
+
+
+<!-- =====================================================
+CURRENT PROMOTION
+===================================================== -->
+
+<section
+    id="promotionSection"
+    class="promotion-section hidden"
+>
+
+
+<div class="promotion-card">
+
+
+<div class="promotion-live-badge">
+
+🔥 LIVE PROMOTION
+
+</div>
+
+
+
+<h2 id="promotionTitle">
+
+Current Promotion
+
+</h2>
+
+
+
+<p
+    id="promotionDescriptionText"
+    class="promotion-description"
+>
+
+</p>
+
+
+
+<div class="promotion-details">
+
+
+<div
+    id="qualifyingProductBox"
+    class="promotion-detail-box"
+>
+
+
+<span>
+
+QUALIFYING PURCHASE
+
+</span>
+
+
+<strong id="promotionQualifyingProduct">
+
+—
+
+</strong>
+
+
+</div>
+
+
+
+
+<div
+    id="rewardProductBox"
+    class="promotion-detail-box"
+>
+
+
+<span>
+
+REFERRAL REWARD
+
+</span>
+
+
+<strong id="promotionReward">
+
+—
+
+</strong>
+
+
+</div>
+
+
+</div>
+
+
+
+<p
+    id="promotionDates"
+    class="promotion-dates"
+>
+
+</p>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
 
 <section id="products">
 
@@ -216,19 +600,21 @@ Snacks & Drinks
 
 <div class="searchBar">
 
+
 <input
-type="text"
-id="searchInput"
-placeholder="Search snacks..."
+    type="text"
+    id="searchInput"
+    placeholder="Search snacks..."
 >
+
 
 </div>
 
 
 
 <div
-id="productContainer"
-class="product-grid"
+    id="productContainer"
+    class="product-grid"
 >
 
 </div>
@@ -238,39 +624,9 @@ class="product-grid"
 
 
 
-<!-- ==========================================================
-PROMOTION
-========================================================== -->
-
-<section id="promotion">
-
-
-<h2 class="section-title">
-
-🎉 Current Promotion
-
-</h2>
-
-
-<div
-id="promotionContainer"
-class="contact-box"
->
-
-<p>
-Loading promotion...
-</p>
-
-</div>
-
-
-</section>
 
 
 
-<!-- ==========================================================
-INVENTORY
-========================================================== -->
 
 <section id="inventory">
 
@@ -288,35 +644,50 @@ Current Stock
 
 <table>
 
+
 <thead>
+
 
 <tr>
 
+
 <th>
+
 Item
+
 </th>
 
 
 <th>
+
 Price
+
 </th>
 
 
 <th>
+
 Available
+
 </th>
 
 
 <th>
+
 Status
+
 </th>
 
 
 <th>
+
 Restock Date
+
 </th>
+
 
 </tr>
+
 
 </thead>
 
@@ -325,6 +696,7 @@ Restock Date
 <tbody id="inventoryTable">
 
 </tbody>
+
 
 </table>
 
@@ -336,9 +708,9 @@ Restock Date
 
 
 
-<!-- ==========================================================
-CONTACT
-========================================================== -->
+
+
+
 
 <section id="contact">
 
@@ -355,33 +727,44 @@ Contact
 
 
 <h3>
+
 Owner
+
 </h3>
 
 
 <p>
+
 Grayson VanTassel
+
 </p>
 
 
 
 <h3>
+
 School
+
 </h3>
 
 
 <p>
+
 Uplift Elevate Preparatory
+
 </p>
 
 
 
 <h3>
+
 Email
+
 </h3>
 
 
 <p>
+
 
 <a href="mailto:vantasselgrayson@gmail.com">
 
@@ -389,12 +772,15 @@ vantasselgrayson@gmail.com
 
 </a>
 
+
 </p>
 
 
 
 <h3>
+
 Suggestions?
+
 </h3>
 
 
@@ -412,20 +798,24 @@ I read every message sent and consider new snack requests!
 
 
 
-<!-- ==========================================================
-FOOTER
-========================================================== -->
+
+
+
 
 <footer>
 
 
 <p>
+
 © 2026 Grayson's Snack Shop
+
 </p>
 
 
 <p>
+
 Serving students at Uplift Elevate Preparatory
+
 </p>
 
 
@@ -433,16 +823,17 @@ Serving students at Uplift Elevate Preparatory
 
 
 
-<!-- ==========================================================
-MAIN JAVASCRIPT
-========================================================== -->
+
+
+
 
 <script
-type="module"
-src="script.js"
+    type="module"
+    src="script.js"
 ></script>
 
 
 </body>
+
 
 </html>
