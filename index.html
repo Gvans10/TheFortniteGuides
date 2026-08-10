@@ -8,11 +8,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
 <title>
 Grayson's Snack Shop
 </title>
-
 
 <link
     rel="icon"
@@ -20,18 +18,15 @@ Grayson's Snack Shop
     href="graysonslogos.png"
 >
 
-
 <link
     rel="stylesheet"
     href="style.css"
 >
 
-
 <link
     rel="preconnect"
     href="https://fonts.googleapis.com"
 >
-
 
 <link
     rel="preconnect"
@@ -39,201 +34,18 @@ Grayson's Snack Shop
     crossorigin
 >
 
-
 <link
     href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
     rel="stylesheet"
 >
 
-
-<style>
-
-/*
-==========================================================
-PROMOTION SECTION
-==========================================================
-*/
-
-.promotion-section {
-
-    padding-top: 30px;
-    padding-bottom: 30px;
-
-}
-
-
-.promotion-card {
-
-    max-width: 900px;
-    margin: auto;
-
-    background: linear-gradient(
-        135deg,
-        #ff7b00,
-        #ff9e3d
-    );
-
-    color: white;
-
-    padding: 35px;
-
-    border-radius: 25px;
-
-    text-align: center;
-
-    box-shadow:
-        0 10px 30px
-        rgba(0, 0, 0, 0.15);
-
-}
-
-
-.promotion-live-badge {
-
-    display: inline-block;
-
-    background: white;
-
-    color: #ff7b00;
-
-    padding: 6px 14px;
-
-    border-radius: 20px;
-
-    font-size: 13px;
-
-    font-weight: 700;
-
-    margin-bottom: 15px;
-
-}
-
-
-.promotion-card h2 {
-
-    font-size: 32px;
-
-    margin-bottom: 10px;
-
-}
-
-
-.promotion-description {
-
-    font-size: 17px;
-
-    margin-bottom: 25px;
-
-}
-
-
-.promotion-details {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(
-            auto-fit,
-            minmax(220px, 1fr)
-        );
-
-    gap: 15px;
-
-    margin-top: 20px;
-
-}
-
-
-.promotion-detail-box {
-
-    background:
-        rgba(
-            255,
-            255,
-            255,
-            0.18
-        );
-
-    padding: 18px;
-
-    border-radius: 15px;
-
-}
-
-
-.promotion-detail-box span {
-
-    display: block;
-
-    font-size: 13px;
-
-    opacity: .9;
-
-    margin-bottom: 5px;
-
-}
-
-
-.promotion-detail-box strong {
-
-    font-size: 18px;
-
-}
-
-
-.promotion-dates {
-
-    margin-top: 20px;
-
-    font-size: 14px;
-
-}
-
-
-.dark .promotion-card {
-
-    box-shadow:
-        0 10px 30px
-        rgba(
-            0,
-            0,
-            0,
-            0.45
-        );
-
-}
-
-
-@media(max-width:700px) {
-
-    .promotion-card {
-
-        padding: 25px 18px;
-
-    }
-
-
-    .promotion-card h2 {
-
-        font-size: 26px;
-
-    }
-
-}
-
-</style>
-
-
 </head>
-
 
 
 <body>
 
 
-
 <header>
-
 
 <nav class="navbar">
 
@@ -245,76 +57,49 @@ PROMOTION SECTION
 </div>
 
 
-
 <ul class="nav-links">
 
 
 <li>
 
 <a href="#home">
-
 Home
-
 </a>
 
 </li>
-
-
-
-<li>
-
-<a href="#promotionSection">
-
-Promotion
-
-</a>
-
-</li>
-
 
 
 <li>
 
 <a href="#products">
-
 Products
-
 </a>
 
 </li>
-
 
 
 <li>
 
 <a href="#inventory">
-
 Stock
-
 </a>
 
 </li>
-
 
 
 <li>
 
 <a href="#contact">
-
 Contact
-
 </a>
 
 </li>
 
 
-
 <li>
 
 <a href="admin.html">
-
 🔐 Admin
-
 </a>
 
 </li>
@@ -323,8 +108,10 @@ Contact
 </ul>
 
 
-
-<button id="darkModeButton">
+<button
+    id="darkModeButton"
+    type="button"
+>
 
 🌙
 
@@ -333,14 +120,15 @@ Contact
 
 </nav>
 
-
 </header>
 
 
 
 
 
-
+<!-- =====================================================
+HERO
+===================================================== -->
 
 <section
     id="home"
@@ -358,13 +146,11 @@ Grayson's Snack Shop
 </h1>
 
 
-
 <h2>
 
 Uplift Elevate Preparatory
 
 </h2>
-
 
 
 <p>
@@ -376,7 +162,6 @@ Affordable snacks and drinks for students.
 Check what is available and when new items are arriving.
 
 </p>
-
 
 
 <a
@@ -398,13 +183,14 @@ View Snacks
 
 
 
-
+<!-- =====================================================
+STATS
+===================================================== -->
 
 <section class="stats">
 
 
 <div class="stat">
-
 
 <h2 id="totalProducts">
 
@@ -412,21 +198,16 @@ View Snacks
 
 </h2>
 
-
 <p>
 
 Available Products
 
 </p>
 
-
 </div>
 
 
-
-
 <div class="stat">
-
 
 <h2 id="itemsInStock">
 
@@ -434,21 +215,16 @@ Available Products
 
 </h2>
 
-
 <p>
 
 Items Available
 
 </p>
 
-
 </div>
 
 
-
-
 <div class="stat">
-
 
 <h2>
 
@@ -456,20 +232,16 @@ Items Available
 
 </h2>
 
-
 <p>
 
 Regular Restocks
 
 </p>
 
-
 </div>
 
 
 </section>
-
-
 
 
 
@@ -495,13 +267,11 @@ CURRENT PROMOTION
 </div>
 
 
-
 <h2 id="promotionTitle">
 
 Current Promotion
 
 </h2>
-
 
 
 <p
@@ -512,15 +282,10 @@ Current Promotion
 </p>
 
 
-
 <div class="promotion-details">
 
 
-<div
-    id="qualifyingProductBox"
-    class="promotion-detail-box"
->
-
+<div class="promotion-detail-box">
 
 <span>
 
@@ -528,24 +293,16 @@ QUALIFYING PURCHASE
 
 </span>
 
-
 <strong id="promotionQualifyingProduct">
 
 —
 
 </strong>
 
-
 </div>
 
 
-
-
-<div
-    id="rewardProductBox"
-    class="promotion-detail-box"
->
-
+<div class="promotion-detail-box">
 
 <span>
 
@@ -553,19 +310,16 @@ REFERRAL REWARD
 
 </span>
 
-
 <strong id="promotionReward">
 
 —
 
 </strong>
 
-
 </div>
 
 
 </div>
-
 
 
 <p
@@ -574,6 +328,16 @@ REFERRAL REWARD
 >
 
 </p>
+
+
+<a
+    href="#referralSection"
+    class="promotion-action-button"
+>
+
+🎁 Join The Referral Promotion
+
+</a>
 
 
 </div>
@@ -585,7 +349,350 @@ REFERRAL REWARD
 
 
 
+<!-- =====================================================
+REFERRAL PROMOTION
+===================================================== -->
 
+<section
+    id="referralSection"
+    class="referral-section hidden"
+>
+
+
+<h2 class="section-title">
+
+🎁 Referral Promotion
+
+</h2>
+
+
+<p class="referral-intro">
+
+Refer a friend to Grayson's Snack Shop and earn a reward after their qualifying purchase is approved.
+
+</p>
+
+
+
+<!-- HOW IT WORKS -->
+
+<div class="referral-steps">
+
+
+<div class="referral-step">
+
+<div class="referral-step-number">
+
+1
+
+</div>
+
+<h3>
+
+Get Your Code
+
+</h3>
+
+<p>
+
+Enter your name and generate your personal referral code.
+
+</p>
+
+</div>
+
+
+
+<div class="referral-step">
+
+<div class="referral-step-number">
+
+2
+
+</div>
+
+<h3>
+
+Send It To A Friend
+
+</h3>
+
+<p>
+
+Give your code to someone who hasn't used your referral yet.
+
+</p>
+
+</div>
+
+
+
+<div class="referral-step">
+
+<div class="referral-step-number">
+
+3
+
+</div>
+
+<h3>
+
+Friend Uses It
+
+</h3>
+
+<p>
+
+Your friend enters the code on this page before making their qualifying purchase.
+
+</p>
+
+</div>
+
+
+
+<div class="referral-step">
+
+<div class="referral-step-number">
+
+4
+
+</div>
+
+<h3>
+
+Earn Your Reward
+
+</h3>
+
+<p>
+
+After the purchase is verified and approved, your reward is earned.
+
+</p>
+
+</div>
+
+
+</div>
+
+
+
+
+
+<!-- REFERRAL FORMS -->
+
+<div class="referral-grid">
+
+
+
+<!-- GENERATE CODE -->
+
+<div class="referral-box">
+
+
+<div class="referral-icon">
+
+🤝
+
+</div>
+
+
+<h2>
+
+Refer A Friend
+
+</h2>
+
+
+<p>
+
+Enter your name to get your personal referral code.
+
+</p>
+
+
+<label for="referralName">
+
+Your Name
+
+</label>
+
+
+<input
+    id="referralName"
+    type="text"
+    placeholder="Enter your name"
+    autocomplete="name"
+>
+
+
+<button
+    id="generateReferralButton"
+    type="button"
+>
+
+Generate My Referral Code
+
+</button>
+
+
+<p
+    id="referralMessage"
+    class="referral-message"
+>
+
+</p>
+
+
+
+<div
+    id="referralResult"
+    class="referral-result hidden"
+>
+
+
+<p>
+
+Your Referral Code
+
+</p>
+
+
+<div
+    id="referralCode"
+    class="referral-code-display"
+>
+
+------
+
+</div>
+
+
+<button
+    id="copyReferralButton"
+    type="button"
+>
+
+Copy Code
+
+</button>
+
+
+<p id="referralCount">
+
+Successful Referrals: 0
+
+</p>
+
+
+<p class="referral-share-text">
+
+Send this code to your friend. They need to enter it in the box on this page.
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<!-- USE CODE -->
+
+<div class="referral-box">
+
+
+<div class="referral-icon">
+
+🎟️
+
+</div>
+
+
+<h2>
+
+Have A Referral Code?
+
+</h2>
+
+
+<p>
+
+If a friend referred you, enter their code here before purchasing.
+
+</p>
+
+
+<label for="useReferralCode">
+
+Referral Code
+
+</label>
+
+
+<input
+    id="useReferralCode"
+    type="text"
+    placeholder="Example: GS-ABC123"
+    autocomplete="off"
+>
+
+
+<button
+    id="submitReferralButton"
+    type="button"
+>
+
+Use Referral Code
+
+</button>
+
+
+<p
+    id="useReferralMessage"
+    class="referral-message"
+>
+
+</p>
+
+
+<div class="referral-important">
+
+<strong>
+
+After entering the code:
+
+</strong>
+
+<p>
+
+Complete the qualifying purchase with Grayson. The referral will appear in the Admin dashboard for approval.
+
+</p>
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+<!-- =====================================================
+PRODUCTS
+===================================================== -->
 
 <section id="products">
 
@@ -595,7 +702,6 @@ REFERRAL REWARD
 Snacks & Drinks
 
 </h2>
-
 
 
 <div class="searchBar">
@@ -609,7 +715,6 @@ Snacks & Drinks
 
 
 </div>
-
 
 
 <div
@@ -626,7 +731,9 @@ Snacks & Drinks
 
 
 
-
+<!-- =====================================================
+INVENTORY
+===================================================== -->
 
 <section id="inventory">
 
@@ -636,7 +743,6 @@ Snacks & Drinks
 Current Stock
 
 </h2>
-
 
 
 <div class="table-container">
@@ -650,47 +756,30 @@ Current Stock
 
 <tr>
 
-
 <th>
-
 Item
-
 </th>
 
-
 <th>
-
 Price
-
 </th>
 
-
 <th>
-
 Available
-
 </th>
 
-
 <th>
-
 Status
-
 </th>
-
 
 <th>
-
 Restock Date
-
 </th>
-
 
 </tr>
 
 
 </thead>
-
 
 
 <tbody id="inventoryTable">
@@ -710,7 +799,9 @@ Restock Date
 
 
 
-
+<!-- =====================================================
+CONTACT
+===================================================== -->
 
 <section id="contact">
 
@@ -720,7 +811,6 @@ Restock Date
 Contact
 
 </h2>
-
 
 
 <div class="contact-box">
@@ -740,7 +830,6 @@ Grayson VanTassel
 </p>
 
 
-
 <h3>
 
 School
@@ -755,7 +844,6 @@ Uplift Elevate Preparatory
 </p>
 
 
-
 <h3>
 
 Email
@@ -765,16 +853,13 @@ Email
 
 <p>
 
-
 <a href="mailto:vantasselgrayson@gmail.com">
 
 vantasselgrayson@gmail.com
 
 </a>
 
-
 </p>
-
 
 
 <h3>
@@ -800,7 +885,9 @@ I read every message sent and consider new snack requests!
 
 
 
-
+<!-- =====================================================
+FOOTER
+===================================================== -->
 
 <footer>
 
@@ -825,15 +912,18 @@ Serving students at Uplift Elevate Preparatory
 
 
 
-
-
 <script
     type="module"
     src="script.js"
 ></script>
 
 
-</body>
+<script
+    type="module"
+    src="referrals.js"
+></script>
 
+
+</body>
 
 </html>
