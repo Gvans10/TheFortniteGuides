@@ -24,7 +24,7 @@ import {
 
 
 // ==========================================================
-// ELEMENTS
+// GET WEBSITE ELEMENTS
 // ==========================================================
 
 const productContainer =
@@ -47,18 +47,18 @@ const darkButton =
 
 
 // ==========================================================
-// MONEY FORMAT
+// MONEY
 // ==========================================================
 
 function money(amount) {
 
-    const number = Number(amount);
+    const value = Number(amount);
 
-    if (Number.isNaN(number)) {
+    if (Number.isNaN(value)) {
         return "$0.00";
     }
 
-    return "$" + number.toFixed(2);
+    return "$" + value.toFixed(2);
 }
 
 
@@ -74,7 +74,7 @@ function getStatus(product) {
 
         return {
             text: "Out of Stock",
-            class: "out-stock"
+            cssClass: "out-stock"
         };
 
     }
@@ -83,14 +83,14 @@ function getStatus(product) {
 
         return {
             text: "Low Stock",
-            class: "low-stock"
+            cssClass: "low-stock"
         };
 
     }
 
     return {
         text: "In Stock",
-        class: "in-stock"
+        cssClass: "in-stock"
     };
 
 }
@@ -102,9 +102,6 @@ function getStatus(product) {
 
 function createProduct(product) {
 
-    const status =
-        getStatus(product);
-
     const card =
         document.createElement("div");
 
@@ -112,64 +109,136 @@ function createProduct(product) {
         "product-card";
 
 
-    card.innerHTML = `
+    // Product image
 
-        <div class="product-image">
+    const imageContainer =
+        document.createElement("div");
 
-            <img
-                src="${product.image || ""}"
-                alt="${product.name || "Product"}"
-                onerror="this.src='https://placehold.co/120x120?text=No+Image'"
-            >
-
-        </div>
+    imageContainer.className =
+        "product-image";
 
 
-        <div class="product-info">
+    const image =
+        document.createElement("img");
 
-            <h3>
-                ${product.name || "Unnamed Product"}
-            </h3>
+    image.src =
+        product.image || "";
 
-
-            <div class="product-price">
-
-                ${money(product.price)}
-
-            </div>
+    image.alt =
+        product.name || "Product";
 
 
-            <div class="product-stock">
+    image.onerror =
+        function() {
 
-                Available:
-                ${Number(product.stock) || 0}
+            this.src =
+                "https://placehold.co/120x120?text=No+Image";
 
-            </div>
-
-
-            <span class="badge ${status.class}">
-
-                ${status.text}
-
-            </span>
+        };
 
 
-            <p style="margin-top:15px;">
-
-                Restock Date:
-
-                <strong>
-                    ${product.restock || "Not specified"}
-                </strong>
-
-            </p>
-
-        </div>
-
-    `;
+    imageContainer.appendChild(
+        image
+    );
 
 
-    productContainer.appendChild(card);
+    // Product info
+
+    const info =
+        document.createElement("div");
+
+    info.className =
+        "product-info";
+
+
+    // Product name
+
+    const name =
+        document.createElement("h3");
+
+    name.textContent =
+        product.name || "Unnamed Product";
+
+
+    // Price
+
+    const price =
+        document.createElement("div");
+
+    price.className =
+        "product-price";
+
+    price.textContent =
+        money(product.price);
+
+
+    // Stock
+
+    const stock =
+        document.createElement("div");
+
+    stock.className =
+        "product-stock";
+
+    stock.textContent =
+        "Available: " +
+        (Number(product.stock) || 0);
+
+
+    // Status
+
+    const status =
+        getStatus(product);
+
+
+    const badge =
+        document.createElement("span");
+
+    badge.className =
+        "badge " +
+        status.cssClass;
+
+    badge.textContent =
+        status.text;
+
+
+    // Restock
+
+    const restock =
+        document.createElement("p");
+
+    restock.style.marginTop =
+        "15px";
+
+    restock.textContent =
+        "Restock Date: " +
+        (product.restock || "Not specified");
+
+
+    // Put everything together
+
+    info.appendChild(name);
+
+    info.appendChild(price);
+
+    info.appendChild(stock);
+
+    info.appendChild(badge);
+
+    info.appendChild(restock);
+
+    card.appendChild(
+        imageContainer
+    );
+
+    card.appendChild(
+        info
+    );
+
+
+    productContainer.appendChild(
+        card
+    );
 
 }
 
@@ -180,49 +249,86 @@ function createProduct(product) {
 
 function createTableRow(product) {
 
-    const status =
-        getStatus(product);
-
     const row =
         document.createElement("tr");
 
 
-    row.innerHTML = `
+    const nameCell =
+        document.createElement("td");
 
-        <td>
-            ${product.name || "Unnamed Product"}
-        </td>
-
-
-        <td>
-            ${money(product.price)}
-        </td>
+    nameCell.textContent =
+        product.name || "Unnamed Product";
 
 
-        <td>
-            ${Number(product.stock) || 0}
-        </td>
+    const priceCell =
+        document.createElement("td");
+
+    priceCell.textContent =
+        money(product.price);
 
 
-        <td>
+    const stockCell =
+        document.createElement("td");
 
-            <span class="badge ${status.class}">
-
-                ${status.text}
-
-            </span>
-
-        </td>
+    stockCell.textContent =
+        Number(product.stock) || 0;
 
 
-        <td>
-            ${product.restock || "Not specified"}
-        </td>
-
-    `;
+    const statusCell =
+        document.createElement("td");
 
 
-    inventoryTable.appendChild(row);
+    const status =
+        getStatus(product);
+
+
+    const badge =
+        document.createElement("span");
+
+    badge.className =
+        "badge " +
+        status.cssClass;
+
+    badge.textContent =
+        status.text;
+
+
+    statusCell.appendChild(
+        badge
+    );
+
+
+    const restockCell =
+        document.createElement("td");
+
+    restockCell.textContent =
+        product.restock || "Not specified";
+
+
+    row.appendChild(
+        nameCell
+    );
+
+    row.appendChild(
+        priceCell
+    );
+
+    row.appendChild(
+        stockCell
+    );
+
+    row.appendChild(
+        statusCell
+    );
+
+    row.appendChild(
+        restockCell
+    );
+
+
+    inventoryTable.appendChild(
+        row
+    );
 
 }
 
@@ -237,19 +343,21 @@ function updateStats(products) {
         0;
 
 
-    products.forEach((product) => {
+    products.forEach(
+        function(product) {
 
-        const stock =
-            Number(product.stock);
+            const stock =
+                Number(product.stock);
 
 
-        if (!Number.isNaN(stock)) {
+            if (!Number.isNaN(stock)) {
 
-            total += stock;
+                total += stock;
+
+            }
 
         }
-
-    });
+    );
 
 
     if (totalProducts) {
@@ -276,11 +384,21 @@ function updateStats(products) {
 
 function displayProducts(products) {
 
-    if (!productContainer ||
-        !inventoryTable) {
+    if (!productContainer) {
 
         console.error(
-            "Product containers were not found in index.html."
+            "productContainer was not found."
+        );
+
+        return;
+
+    }
+
+
+    if (!inventoryTable) {
+
+        console.error(
+            "inventoryTable was not found."
         );
 
         return;
@@ -297,34 +415,40 @@ function displayProducts(products) {
 
     if (products.length === 0) {
 
-        productContainer.innerHTML = `
+        const message =
+            document.createElement("p");
 
-            <p style="
-                text-align:center;
-                width:100%;
-                grid-column:1/-1;
-            ">
+        message.textContent =
+            "No products found.";
 
-                No products found.
+        message.style.textAlign =
+            "center";
 
-            </p>
-
-        `;
+        productContainer.appendChild(
+            message
+        );
 
 
-        inventoryTable.innerHTML = `
+        const row =
+            document.createElement("tr");
 
-            <tr>
 
-                <td colspan="5">
+        const cell =
+            document.createElement("td");
 
-                    No products found.
+        cell.colSpan =
+            5;
 
-                </td>
+        cell.textContent =
+            "No products found.";
 
-            </tr>
+        row.appendChild(
+            cell
+        );
 
-        `;
+        inventoryTable.appendChild(
+            row
+        );
 
 
         updateStats([]);
@@ -334,13 +458,15 @@ function displayProducts(products) {
     }
 
 
-    products.forEach((product) => {
+    products.forEach(
+        function(product) {
 
-        createProduct(product);
+            createProduct(product);
 
-        createTableRow(product);
+            createTableRow(product);
 
-    });
+        }
+    );
 
 
     updateStats(products);
@@ -356,9 +482,9 @@ if (searchInput) {
 
     searchInput.addEventListener(
         "input",
-        () => {
+        function() {
 
-            const text =
+            const searchText =
                 searchInput.value
                     .toLowerCase()
                     .trim();
@@ -366,7 +492,7 @@ if (searchInput) {
 
             const filtered =
                 inventory.filter(
-                    (product) => {
+                    function(product) {
 
                         const name =
                             String(
@@ -374,13 +500,17 @@ if (searchInput) {
                             ).toLowerCase();
 
 
-                        return name.includes(text);
+                        return name.includes(
+                            searchText
+                        );
 
                     }
                 );
 
 
-            displayProducts(filtered);
+            displayProducts(
+                filtered
+            );
 
         }
     );
@@ -401,8 +531,7 @@ function loadDarkMode() {
 
 
     if (
-        savedMode === "enabled" &&
-        document.body
+        savedMode === "enabled"
     ) {
 
         document.body.classList.add(
@@ -426,7 +555,7 @@ if (darkButton) {
 
     darkButton.addEventListener(
         "click",
-        () => {
+        function() {
 
             document.body.classList.toggle(
                 "dark"
@@ -475,7 +604,7 @@ loadDarkMode();
 
 
 // ==========================================================
-// PROMOTION
+// LOAD PROMOTION
 // ==========================================================
 
 async function loadPromotion() {
@@ -499,7 +628,7 @@ async function loadPromotion() {
         if (!snapshot.exists()) {
 
             console.log(
-                "No promotion currently saved."
+                "No promotion found."
             );
 
             return;
@@ -517,16 +646,22 @@ async function loadPromotion() {
         );
 
 
-        displayPromotion(
-            promotion
-        );
+        if (
+            promotion.active === true
+        ) {
+
+            displayPromotion(
+                promotion
+            );
+
+        }
 
     }
 
     catch (error) {
 
         console.error(
-            "Error loading promotion:",
+            "Promotion error:",
             error
         );
 
@@ -541,52 +676,43 @@ async function loadPromotion() {
 
 function displayPromotion(promotion) {
 
-    if (!promotion) {
-        return;
-    }
-
-
-    if (promotion.active !== true) {
-
-        return;
-
-    }
-
-
-    let promotionBox =
+    let banner =
         document.getElementById(
             "promotionBanner"
         );
 
 
-    /*
-    If there isn't a promotion banner
-    in index.html yet, create one.
-    */
+    if (!banner) {
 
-    if (!promotionBox) {
-
-        promotionBox =
+        banner =
             document.createElement(
                 "section"
             );
 
-
-        promotionBox.id =
+        banner.id =
             "promotionBanner";
 
 
-        promotionBox.style.cssText = `
+        banner.style.margin =
+            "30px auto";
 
-            margin: 30px auto;
-            max-width: 1000px;
-            padding: 30px;
-            border-radius: 20px;
-            background: #fff3e6;
-            text-align: center;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+        banner.style.maxWidth =
+            "1000px";
 
-        `;
+        banner.style.padding =
+            "30px";
+
+        banner.style.borderRadius =
+            "20px";
+
+        banner.style.background =
+            "#fff3e6";
+
+        banner.style.textAlign =
+            "center";
+
+        banner.style.boxShadow =
+            "0 5px 20px rgba(0,0,0,0.12)";
 
 
         const productsSection =
@@ -598,7 +724,7 @@ function displayPromotion(promotion) {
         if (productsSection) {
 
             productsSection.parentNode.insertBefore(
-                promotionBox,
+                banner,
                 productsSection
             );
 
@@ -607,51 +733,74 @@ function displayPromotion(promotion) {
     }
 
 
-    promotionBox.innerHTML = `
-
-        <h2 style="
-            margin-bottom:10px;
-        ">
-
-            🎉 ${promotion.name || "Special Promotion"}
-
-        </h2>
+    banner.innerHTML =
+        "";
 
 
-        <p style="
-            margin-bottom:10px;
-        ">
+    const title =
+        document.createElement("h2");
 
-            Bring a new customer to
-            Grayson's Snack Shop!
+    title.textContent =
+        "🎉 " +
+        (
+            promotion.name ||
+            "Special Promotion"
+        );
 
-        </p>
+
+    const description =
+        document.createElement("p");
+
+    description.style.marginTop =
+        "10px";
+
+    description.textContent =
+        "Bring a new customer to Grayson's Snack Shop!";
 
 
-        <p>
+    const details =
+        document.createElement("p");
 
-            Buy:
+    details.style.marginTop =
+        "10px";
 
-            <strong>
-                ${promotion.qualifyingProductName || "a qualifying product"}
-            </strong>
 
-            and the referrer can receive:
+    details.textContent =
+        "Buy " +
+        (
+            promotion.qualifyingProductName ||
+            "a qualifying product"
+        ) +
+        " and the referrer can receive " +
+        (
+            promotion.rewardQuantity ||
+            1
+        ) +
+        " x " +
+        (
+            promotion.rewardProductName ||
+            "reward"
+        ) +
+        ".";
 
-            <strong>
-                ${promotion.rewardQuantity || 1} ×
-                ${promotion.rewardProductName || "reward"}
-            </strong>
 
-        </p>
+    banner.appendChild(
+        title
+    );
 
-    `;
+    banner.appendChild(
+        description
+    );
+
+    banner.appendChild(
+        details
+    );
 
 }
 
 
 // ==========================================================
-// START SHOP
+// START WEBSITE
 // ==========================================================
 
 async function startShop() {
@@ -659,11 +808,17 @@ async function startShop() {
     try {
 
         console.log(
-            "Loading Grayson's Snack Shop..."
+            "Starting Grayson's Snack Shop..."
         );
 
 
         await loadInventory();
+
+
+        console.log(
+            "Inventory loaded:",
+            inventory
+        );
 
 
         displayProducts(
@@ -675,7 +830,7 @@ async function startShop() {
 
 
         console.log(
-            "Grayson's Snack Shop Loaded From Firebase"
+            "Grayson's Snack Shop loaded successfully!"
         );
 
     }
@@ -683,27 +838,29 @@ async function startShop() {
     catch (error) {
 
         console.error(
-            "Failed to start Grayson's Snack Shop:",
+            "SHOP START ERROR:",
             error
         );
 
 
         if (productContainer) {
 
-            productContainer.innerHTML = `
+            productContainer.innerHTML =
+                "";
 
-                <p style="
-                    text-align:center;
-                    width:100%;
-                    grid-column:1/-1;
-                ">
 
-                    Unable to load the shop right now.
-                    Please refresh the page.
+            const errorMessage =
+                document.createElement("p");
 
-                </p>
+            errorMessage.textContent =
+                "Unable to load the shop. Check the browser console for details.";
 
-            `;
+            errorMessage.style.textAlign =
+                "center";
+
+            productContainer.appendChild(
+                errorMessage
+            );
 
         }
 
