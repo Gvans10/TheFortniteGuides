@@ -286,8 +286,7 @@ function createProduct(product) {
 
             <div class="product-stock">
 
-                Available:
-                ${stock}
+                Available: ${stock}
 
             </div>
 
@@ -406,7 +405,7 @@ function createTableRow(product) {
 
 
 // ==========================================================
-// UPDATE STATISTICS
+// UPDATE STATS
 // ==========================================================
 
 function updateStats(products) {
@@ -416,7 +415,7 @@ function updateStats(products) {
 
 
     products.forEach(
-        function(product) {
+        (product) => {
 
             const stock =
                 Number(
@@ -425,9 +424,7 @@ function updateStats(products) {
 
 
             if (
-                !Number.isNaN(
-                    stock
-                )
+                !Number.isNaN(stock)
             ) {
 
                 total +=
@@ -503,9 +500,7 @@ function displayProducts(products) {
                     grid-column:1/-1;
                 "
             >
-
                 No products found.
-
             </p>
 
         `;
@@ -516,9 +511,7 @@ function displayProducts(products) {
             <tr>
 
                 <td colspan="5">
-
                     No products found.
-
                 </td>
 
             </tr>
@@ -537,7 +530,7 @@ function displayProducts(products) {
 
 
     products.forEach(
-        function(product) {
+        (product) => {
 
             createProduct(
                 product
@@ -572,7 +565,7 @@ if (
 
         "input",
 
-        function() {
+        () => {
 
             const text =
 
@@ -586,7 +579,7 @@ if (
 
                 inventory.filter(
 
-                    function(product) {
+                    (product) => {
 
                         const name =
 
@@ -594,7 +587,7 @@ if (
                                 product.name ||
                                 ""
                             )
-                            .toLowerCase();
+                                .toLowerCase();
 
 
                         return (
@@ -665,7 +658,7 @@ if (
 
         "click",
 
-        function() {
+        () => {
 
             document.body.classList.toggle(
                 "dark"
@@ -722,19 +715,18 @@ loadDarkMode();
 
 
 // ==========================================================
-// DATE HELPERS
+// FORMAT PROMOTION DATE
 // ==========================================================
 
-function parseLocalDate(
-    dateString,
-    endOfDay = false
+function formatPromotionDate(
+    dateString
 ) {
 
     if (
         !dateString
     ) {
 
-        return null;
+        return "";
 
     }
 
@@ -749,7 +741,7 @@ function parseLocalDate(
         parts.length !== 3
     ) {
 
-        return null;
+        return dateString;
 
     }
 
@@ -772,63 +764,21 @@ function parseLocalDate(
         );
 
 
-    if (
-        endOfDay
-    ) {
-
-        return new Date(
-
+    const date =
+        new Date(
             year,
             month,
-            day,
-            23,
-            59,
-            59,
-            999
-
-        );
-
-    }
-
-
-    return new Date(
-
-        year,
-        month,
-        day,
-        0,
-        0,
-        0,
-        0
-
-    );
-
-}
-
-
-
-// ==========================================================
-// FORMAT PROMOTION DATE
-// ==========================================================
-
-function formatPromotionDate(
-    dateString
-) {
-
-    const date =
-        parseLocalDate(
-            dateString
+            day
         );
 
 
     if (
-        !date ||
         Number.isNaN(
             date.getTime()
         )
     ) {
 
-        return "";
+        return dateString;
 
     }
 
@@ -838,6 +788,7 @@ function formatPromotionDate(
         undefined,
 
         {
+
             month:
                 "short",
 
@@ -846,82 +797,10 @@ function formatPromotionDate(
 
             year:
                 "numeric"
+
         }
 
     );
-
-}
-
-
-
-// ==========================================================
-// CHECK IF PROMOTION IS ACTIVE
-// ==========================================================
-
-function promotionIsCurrentlyActive(
-    promotion
-) {
-
-    if (
-        !promotion ||
-        promotion.active !== true
-    ) {
-
-        return false;
-
-    }
-
-
-    const now =
-        new Date();
-
-
-    if (
-        promotion.startDate
-    ) {
-
-        const startDate =
-            parseLocalDate(
-                promotion.startDate
-            );
-
-
-        if (
-            startDate &&
-            now < startDate
-        ) {
-
-            return false;
-
-        }
-
-    }
-
-
-    if (
-        promotion.endDate
-    ) {
-
-        const endDate =
-            parseLocalDate(
-                promotion.endDate,
-                true
-            );
-
-
-        if (
-            endDate &&
-            now > endDate
-        ) {
-
-            return false;
-
-        }
-
-    }
-
-
-    return true;
 
 }
 
@@ -960,7 +839,7 @@ function displayPromotion(
     ) {
 
         console.error(
-            "Promotion section was not found in index.html."
+            "Promotion section was not found."
         );
 
         return;
@@ -968,17 +847,26 @@ function displayPromotion(
     }
 
 
+    /*
+    ========================================================
+    THE ADMIN ACTIVE SWITCH IS THE MASTER SWITCH.
+
+    Dates are informational only.
+    ========================================================
+    */
+
     if (
-        !promotionIsCurrentlyActive(
-            promotion
-        )
+        !promotion ||
+        promotion.active !== true
     ) {
 
         hidePromotion();
 
+
         console.log(
-            "Promotion is currently inactive."
+            "Promotion turned off."
         );
+
 
         return;
 
@@ -1003,14 +891,14 @@ function displayPromotion(
     const qualifyingProduct =
 
         promotion.qualifyingProduct ||
-        "";
+        "Qualifying Product";
 
 
 
     const rewardProduct =
 
         promotion.rewardProduct ||
-        "";
+        "Reward";
 
 
 
@@ -1023,73 +911,52 @@ function displayPromotion(
 
 
     promotionTitle.textContent =
-        "🎉 " + name;
+
+        "🎉 " +
+        name;
 
 
 
     promotionDescriptionText.textContent =
+
         description;
 
 
 
-    if (
-        qualifyingProduct
-    ) {
+    promotionQualifyingProduct.textContent =
 
-        qualifyingProductBox.classList.remove(
-            "hidden"
-        );
-
-
-        promotionQualifyingProduct.textContent =
-            qualifyingProduct;
-
-    }
-
-    else {
-
-        qualifyingProductBox.classList.add(
-            "hidden"
-        );
-
-    }
+        qualifyingProduct;
 
 
 
-    if (
-        rewardProduct
-    ) {
+    promotionReward.textContent =
 
-        rewardProductBox.classList.remove(
-            "hidden"
-        );
+        rewardQuantity +
+        " × " +
+        rewardProduct;
 
 
-        promotionReward.textContent =
 
-            rewardQuantity +
-            " × " +
-            rewardProduct;
+    qualifyingProductBox.classList.remove(
+        "hidden"
+    );
 
-    }
 
-    else {
-
-        rewardProductBox.classList.add(
-            "hidden"
-        );
-
-    }
+    rewardProductBox.classList.remove(
+        "hidden"
+    );
 
 
 
     const startText =
+
         formatPromotionDate(
             promotion.startDate
         );
 
 
     const endText =
+
         formatPromotionDate(
             promotion.endDate
         );
@@ -1103,11 +970,10 @@ function displayPromotion(
 
         promotionDates.textContent =
 
-            "Promotion runs " +
+            "Promotion dates: " +
             startText +
-            " through " +
-            endText +
-            ".";
+            " – " +
+            endText;
 
     }
 
@@ -1117,9 +983,8 @@ function displayPromotion(
 
         promotionDates.textContent =
 
-            "Promotion starts " +
-            startText +
-            ".";
+            "Starts: " +
+            startText;
 
     }
 
@@ -1129,9 +994,8 @@ function displayPromotion(
 
         promotionDates.textContent =
 
-            "Promotion ends " +
-            endText +
-            ".";
+            "Ends: " +
+            endText;
 
     }
 
@@ -1150,7 +1014,7 @@ function displayPromotion(
 
 
     console.log(
-        "Active promotion displayed:",
+        "Promotion is LIVE:",
         promotion
     );
 
@@ -1181,18 +1045,18 @@ function startPromotionListener() {
 
         promotionRef,
 
-        function(snapshot) {
+        (snapshot) => {
 
             if (
                 !snapshot.exists()
             ) {
 
+                hidePromotion();
+
+
                 console.log(
                     "No promotion saved."
                 );
-
-
-                hidePromotion();
 
 
                 return;
@@ -1205,7 +1069,7 @@ function startPromotionListener() {
 
 
             console.log(
-                "Promotion updated:",
+                "Promotion Firestore data:",
                 promotion
             );
 
@@ -1216,7 +1080,7 @@ function startPromotionListener() {
 
         },
 
-        function(error) {
+        (error) => {
 
             console.error(
                 "Promotion listener error:",
