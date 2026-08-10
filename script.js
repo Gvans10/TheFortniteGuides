@@ -77,6 +77,12 @@ const promotionSection =
     );
 
 
+const referralSection =
+    document.getElementById(
+        "referralSection"
+    );
+
+
 const promotionTitle =
     document.getElementById(
         "promotionTitle"
@@ -107,21 +113,9 @@ const promotionDates =
     );
 
 
-const qualifyingProductBox =
-    document.getElementById(
-        "qualifyingProductBox"
-    );
-
-
-const rewardProductBox =
-    document.getElementById(
-        "rewardProductBox"
-    );
-
-
 
 // ==========================================================
-// MONEY FORMAT
+// MONEY
 // ==========================================================
 
 function money(amount) {
@@ -264,6 +258,7 @@ function createProduct(product) {
             <img
                 src="${image}"
                 alt="${name}"
+                draggable="false"
                 onerror="this.src='https://placehold.co/120x120?text=No+Image'"
             >
 
@@ -278,23 +273,17 @@ function createProduct(product) {
 
 
             <div class="product-price">
-
                 ${price}
-
             </div>
 
 
             <div class="product-stock">
-
                 Available: ${stock}
-
             </div>
 
 
             <span class="badge ${status.statusClass}">
-
                 ${status.text}
-
             </span>
 
 
@@ -322,7 +311,7 @@ function createProduct(product) {
 
 
 // ==========================================================
-// CREATE INVENTORY TABLE ROW
+// INVENTORY TABLE
 // ==========================================================
 
 function createTableRow(product) {
@@ -367,27 +356,21 @@ function createTableRow(product) {
             ${name}
         </td>
 
-
         <td>
             ${price}
         </td>
-
 
         <td>
             ${stock}
         </td>
 
-
         <td>
 
             <span class="badge ${status.statusClass}">
-
                 ${status.text}
-
             </span>
 
         </td>
-
 
         <td>
             ${restock}
@@ -405,7 +388,7 @@ function createTableRow(product) {
 
 
 // ==========================================================
-// UPDATE STATS
+// STATS
 // ==========================================================
 
 function updateStats(products) {
@@ -470,10 +453,6 @@ function displayProducts(products) {
         !inventoryTable
     ) {
 
-        console.error(
-            "Product containers were not found in index.html."
-        );
-
         return;
 
     }
@@ -500,7 +479,9 @@ function displayProducts(products) {
                     grid-column:1/-1;
                 "
             >
+
                 No products found.
+
             </p>
 
         `;
@@ -587,7 +568,7 @@ if (
                                 product.name ||
                                 ""
                             )
-                                .toLowerCase();
+                            .toLowerCase();
 
 
                         return (
@@ -627,7 +608,8 @@ function loadDarkMode() {
 
 
     if (
-        savedMode === "enabled"
+        savedMode ===
+        "enabled"
     ) {
 
         document.body.classList.add(
@@ -746,29 +728,15 @@ function formatPromotionDate(
     }
 
 
-    const year =
-        Number(
-            parts[0]
-        );
-
-
-    const month =
-        Number(
-            parts[1]
-        ) - 1;
-
-
-    const day =
-        Number(
-            parts[2]
-        );
-
-
     const date =
         new Date(
-            year,
-            month,
-            day
+
+            Number(parts[0]),
+
+            Number(parts[1]) - 1,
+
+            Number(parts[2])
+
         );
 
 
@@ -822,6 +790,17 @@ function hidePromotion() {
 
     }
 
+
+    if (
+        referralSection
+    ) {
+
+        referralSection.classList.add(
+            "hidden"
+        );
+
+    }
+
 }
 
 
@@ -833,27 +812,6 @@ function hidePromotion() {
 function displayPromotion(
     promotion
 ) {
-
-    if (
-        !promotionSection
-    ) {
-
-        console.error(
-            "Promotion section was not found."
-        );
-
-        return;
-
-    }
-
-
-    /*
-    ========================================================
-    THE ADMIN ACTIVE SWITCH IS THE MASTER SWITCH.
-
-    Dates are informational only.
-    ========================================================
-    */
 
     if (
         !promotion ||
@@ -873,19 +831,16 @@ function displayPromotion(
     }
 
 
-
     const name =
 
         promotion.name ||
         "Current Promotion";
 
 
-
     const description =
 
         promotion.description ||
-        "Check out our current special offer!";
-
+        "Refer a friend and earn a reward!";
 
 
     const qualifyingProduct =
@@ -894,12 +849,10 @@ function displayPromotion(
         "Qualifying Product";
 
 
-
     const rewardProduct =
 
         promotion.rewardProduct ||
         "Reward";
-
 
 
     const rewardQuantity =
@@ -937,17 +890,6 @@ function displayPromotion(
 
 
 
-    qualifyingProductBox.classList.remove(
-        "hidden"
-    );
-
-
-    rewardProductBox.classList.remove(
-        "hidden"
-    );
-
-
-
     const startText =
 
         formatPromotionDate(
@@ -960,7 +902,6 @@ function displayPromotion(
         formatPromotionDate(
             promotion.endDate
         );
-
 
 
     if (
@@ -1007,8 +948,12 @@ function displayPromotion(
     }
 
 
-
     promotionSection.classList.remove(
+        "hidden"
+    );
+
+
+    referralSection.classList.remove(
         "hidden"
     );
 
@@ -1054,28 +999,13 @@ function startPromotionListener() {
                 hidePromotion();
 
 
-                console.log(
-                    "No promotion saved."
-                );
-
-
                 return;
 
             }
 
 
-            const promotion =
-                snapshot.data();
-
-
-            console.log(
-                "Promotion Firestore data:",
-                promotion
-            );
-
-
             displayPromotion(
-                promotion
+                snapshot.data()
             );
 
         },
@@ -1099,17 +1029,12 @@ function startPromotionListener() {
 
 
 // ==========================================================
-// START SHOP
+// START
 // ==========================================================
 
 async function startShop() {
 
     try {
-
-        console.log(
-            "Loading Grayson's Snack Shop..."
-        );
-
 
         await loadInventory();
 
@@ -1133,42 +1058,14 @@ async function startShop() {
     ) {
 
         console.error(
-            "Failed to start Grayson's Snack Shop:",
+            "Failed to start shop:",
             error
         );
-
-
-        if (
-            productContainer
-        ) {
-
-            productContainer.innerHTML = `
-
-                <p
-                    style="
-                        text-align:center;
-                        width:100%;
-                        grid-column:1/-1;
-                    "
-                >
-
-                    Unable to load the shop right now.
-                    Please refresh the page.
-
-                </p>
-
-            `;
-
-        }
 
     }
 
 }
 
 
-
-// ==========================================================
-// START
-// ==========================================================
 
 startShop();
