@@ -1,430 +1,357 @@
-<!DOCTYPE html>
+/*
+==========================================================
+Grayson's Snack Shop
+inventory.js
+Firebase Inventory System
+==========================================================
+*/
 
-<html lang="en">
+import {
+    db
+} from "./firebase.js";
 
-<head>
+import {
+    collection,
+    getDocs,
+    doc,
+    setDoc,
+    updateDoc,
+    deleteDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-<meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+// ==========================================================
+// FIRESTORE COLLECTION
+// ==========================================================
 
-<title>
-Grayson's Snack Shop Admin
-</title>
+const inventoryRef =
+    collection(
+        db,
+        "inventory"
+    );
 
 
-<link
-    rel="icon"
-    type="image/png"
-    href="graysonslogos.png"
->
 
+// ==========================================================
+// CURRENT INVENTORY
+// ==========================================================
 
-<link
-    rel="stylesheet"
-    href="style.css"
->
+let inventory = [];
 
 
-<link
-    rel="preconnect"
-    href="https://fonts.googleapis.com"
->
 
+// ==========================================================
+// LOAD INVENTORY
+// ==========================================================
 
-<link
-    rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin
->
+async function loadInventory() {
 
+    try {
 
-<link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet"
->
+        inventory = [];
 
-</head>
 
+        const snapshot =
+            await getDocs(
+                inventoryRef
+            );
 
 
-<body>
+        snapshot.forEach(
+            (item) => {
 
+                const data =
+                    item.data();
 
-<header>
 
-<nav class="navbar">
+                let productId =
+                    data.id;
 
 
-<div class="logo">
+                /*
+                If the product doesn't have a usable
+                numeric ID, use the Firebase document ID.
+                */
 
-🍬 Admin Panel
+                if (
+                    productId === undefined ||
+                    productId === null ||
+                    productId === "" ||
+                    Number.isNaN(
+                        Number(productId)
+                    )
+                ) {
 
-</div>
+                    productId =
+                        item.id;
 
+                }
 
 
-<a href="index.html">
+                inventory.push({
 
-Back To Shop
+                    ...data,
 
-</a>
+                    id: productId,
 
+                    firebaseId:
+                        item.id
 
-</nav>
+                });
 
-</header>
+            }
+        );
 
 
+        console.log(
+            "Firebase Inventory Loaded:",
+            inventory
+        );
 
 
+        return inventory;
 
-<section class="admin-section">
+    }
 
+    catch (error) {
 
+        console.error(
+            "Error loading inventory:",
+            error
+        );
 
-<!-- =====================================================
-     LOGIN
-===================================================== -->
+        inventory = [];
 
+        throw error;
 
-<div
-    id="loginBox"
-    class="admin-box"
->
+    }
 
+}
 
-<h1>
-Admin Login
-</h1>
 
 
-<p>
-Owner Access Only
-</p>
+// ==========================================================
+// SAVE PRODUCT
+// ==========================================================
 
+async function saveProduct(product) {
 
+    try {
 
-<input
-    id="username"
-    type="email"
-    placeholder="Admin Email"
-    autocomplete="email"
->
+        const documentId =
+            product.firebaseId ||
+            product.id.toString();
 
 
+        await updateDoc(
 
-<input
-    id="password"
-    type="password"
-    placeholder="Password"
-    autocomplete="current-password"
->
+            doc(
+                db,
+                "inventory",
+                documentId
+            ),
 
+            {
 
+                name:
+                    product.name,
 
-<button id="loginButton">
+                price:
+                    Number(product.price),
 
-Login
+                stock:
+                    Number(product.stock),
 
-</button>
+                restock:
+                    product.restock || "",
 
+                image:
+                    product.image || ""
 
+            }
 
-<p id="loginMessage"></p>
+        );
 
 
-</div>
+        console.log(
+            "Product saved:",
+            product.name
+        );
 
 
+        return true;
 
+    }
 
+    catch (error) {
 
-<!-- =====================================================
-     DASHBOARD
-===================================================== -->
+        console.error(
+            "Error saving product:",
+            error
+        );
 
+        throw error;
 
-<div
-    id="dashboard"
-    class="admin-box hidden"
->
+    }
 
+}
 
 
-<h1>
-Inventory Dashboard
-</h1>
 
+// ==========================================================
+// ADD PRODUCT
+// ==========================================================
 
+async function addProduct(product) {
 
-<p id="adminWelcome">
-Admin Dashboard
-</p>
+    try {
 
+        const productId =
+            product.id ||
+            Date.now();
 
 
+        const newProduct = {
 
+            id:
+                productId,
 
-<!-- =====================================================
-     PROMOTION CONTROL
-===================================================== -->
+            name:
+                product.name,
 
+            price:
+                Number(product.price),
 
-<div class="admin-section-card">
+            stock:
+                Number(product.stock),
 
+            restock:
+                product.restock || "",
 
-<h2>
-🎉 Promotion Control
-</h2>
+            image:
+                product.image || ""
 
+        };
 
-<p>
-Control your active promotion from here.
-</p>
 
+        await setDoc(
 
+            doc(
+                db,
+                "inventory",
+                productId.toString()
+            ),
 
-<label>
-Promotion Name
-</label>
+            newProduct
 
+        );
 
-<input
-    id="promotionName"
-    placeholder="Promotion Name"
->
 
+        console.log(
+            "Product added:",
+            newProduct
+        );
 
 
-<label>
-Description
-</label>
+        return true;
 
+    }
 
-<textarea
-    id="promotionDescription"
-    placeholder="Promotion description"
-    rows="4"
-></textarea>
+    catch (error) {
 
+        console.error(
+            "Error adding product:",
+            error
+        );
 
+        throw error;
 
-<label class="checkbox-label">
+    }
 
+}
 
-<input
-    id="promotionActive"
-    type="checkbox"
->
 
 
-<span>
-Promotion Active
-</span>
+// ==========================================================
+// DELETE PRODUCT
+// ==========================================================
 
+async function deleteProduct(product) {
 
-</label>
+    try {
 
+        let documentId;
 
 
-<label>
-Start Date & Time
-</label>
+        if (
+            typeof product === "object"
+        ) {
 
+            documentId =
+                product.firebaseId ||
+                product.id.toString();
 
-<input
-    id="promotionStart"
-    type="datetime-local"
->
+        }
 
+        else {
 
+            documentId =
+                product.toString();
 
-<label>
-End Date & Time
-</label>
+        }
 
 
-<input
-    id="promotionEnd"
-    type="datetime-local"
->
+        await deleteDoc(
 
+            doc(
+                db,
+                "inventory",
+                documentId
+            )
 
+        );
 
-<label>
-Qualifying Product
-</label>
 
+        console.log(
+            "Product deleted:",
+            documentId
+        );
 
-<select
-    id="qualifyingProduct"
->
 
-<option value="">
-Select Product
-</option>
+        return true;
 
-</select>
+    }
 
+    catch (error) {
 
+        console.error(
+            "Error deleting product:",
+            error
+        );
 
-<label>
-Reward Product
-</label>
+        throw error;
 
+    }
 
-<select
-    id="rewardProduct"
->
+}
 
-<option value="">
-Select Product
-</option>
 
-</select>
 
+// ==========================================================
+// EXPORT
+// ==========================================================
 
+export {
 
-<label>
-Reward Quantity
-</label>
+    inventory,
 
+    loadInventory,
 
-<input
-    id="rewardQuantity"
-    type="number"
-    min="1"
-    value="1"
->
+    saveProduct,
 
+    addProduct,
 
+    deleteProduct
 
-<button
-    id="savePromotion"
->
-
-Save Promotion
-
-</button>
-
-
-
-<p id="promotionMessage"></p>
-
-
-</div>
-
-
-
-
-
-<!-- =====================================================
-     ADD PRODUCT
-===================================================== -->
-
-
-<h2>
-Add New Product
-</h2>
-
-
-
-<input
-    id="newName"
-    placeholder="Product Name"
->
-
-
-
-<input
-    id="newPrice"
-    type="number"
-    step="0.01"
-    min="0"
-    placeholder="Price"
->
-
-
-
-<input
-    id="newStock"
-    type="number"
-    min="0"
-    placeholder="Stock Amount"
->
-
-
-
-<input
-    id="newRestock"
-    placeholder="Restock Date"
->
-
-
-
-<input
-    id="newImage"
-    placeholder="Image Filename (example: chips.png)"
->
-
-
-
-<button id="addProduct">
-
-Add Product
-
-</button>
-
-
-
-
-
-<!-- =====================================================
-     CURRENT PRODUCTS
-===================================================== -->
-
-
-<h2>
-Current Products
-</h2>
-
-
-
-<div id="adminProducts"></div>
-
-
-
-
-
-<!-- =====================================================
-     LOGOUT
-===================================================== -->
-
-
-<button id="logout">
-
-Logout
-
-</button>
-
-
-</div>
-
-
-</section>
-
-
-
-
-
-<script
-    type="module"
-    src="admin.js"
-></script>
-
-
-</body>
-
-</html>
+};
