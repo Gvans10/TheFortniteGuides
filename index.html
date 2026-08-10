@@ -1,1004 +1,448 @@
-/*
-==========================================================
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>
 Grayson's Snack Shop
-admin.js
-Firebase Admin Dashboard + Promotions
-==========================================================
-*/
+</title>
 
-import { auth, db } from "./firebase.js";
+<link rel="icon" type="image/png" href="graysonslogos.png">
 
-import {
-    signInWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+<link rel="stylesheet" href="style.css">
 
-import {
-    collection,
-    getDocs,
-    doc,
-    setDoc,
-    getDoc
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+<link rel="preconnect" href="https://fonts.googleapis.com">
 
-import {
-    loadInventory,
-    saveProduct as saveInventoryProduct,
-    addProduct,
-    deleteProduct as deleteInventoryProduct
-} from "./inventory.js";
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
+<link
+href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+rel="stylesheet"
+>
 
-// ==========================================================
-// ELEMENTS
-// ==========================================================
+</head>
 
-const loginBox = document.getElementById("loginBox");
-const dashboard = document.getElementById("dashboard");
-const loginButton = document.getElementById("loginButton");
-const loginMessage = document.getElementById("loginMessage");
-const adminProducts = document.getElementById("adminProducts");
-const logoutButton = document.getElementById("logout");
-const addButton = document.getElementById("addProduct");
 
-const qualifyingProduct =
-    document.getElementById("qualifyingProduct");
+<body>
 
-const rewardProduct =
-    document.getElementById("rewardProduct");
 
-const savePromotionButton =
-    document.getElementById("savePromotion");
+<!-- ==========================================================
+NAVBAR
+========================================================== -->
 
+<header>
 
-// ==========================================================
-// PRODUCTS
-// ==========================================================
+<nav class="navbar">
 
-let products = [];
+<div class="logo">
 
+🍬 Grayson's Snack Shop
 
-// ==========================================================
-// PROMOTION DOCUMENT
-// ==========================================================
+</div>
 
-const promotionRef = doc(
-    db,
-    "promotions",
-    "current"
-);
 
+<ul class="nav-links">
 
-// ==========================================================
-// AUTHENTICATION
-// ==========================================================
+<li>
+<a href="#home">
+Home
+</a>
+</li>
 
-onAuthStateChanged(auth, async (user) => {
 
-    if (user) {
+<li>
+<a href="#products">
+Products
+</a>
+</li>
 
-        loginBox.classList.add("hidden");
 
-        dashboard.classList.remove("hidden");
+<li>
+<a href="#inventory">
+Stock
+</a>
+</li>
 
-        loginMessage.textContent = "";
 
-        await loadAdminProducts();
+<li>
+<a href="#promotion">
+Promotion
+</a>
+</li>
 
-        await loadPromotion();
 
-    } else {
+<li>
+<a href="#contact">
+Contact
+</a>
+</li>
 
-        dashboard.classList.add("hidden");
 
-        loginBox.classList.remove("hidden");
+<li>
+<a href="admin.html">
+🔐 Admin
+</a>
+</li>
 
-    }
+</ul>
 
-});
 
+<button id="darkModeButton">
 
-// ==========================================================
-// LOGIN
-// ==========================================================
+🌙
 
-loginButton.addEventListener("click", async () => {
+</button>
 
-    const email =
-        document.getElementById("username").value.trim();
+</nav>
 
-    const password =
-        document.getElementById("password").value;
+</header>
 
 
-    if (!email || !password) {
 
-        loginMessage.textContent =
-            "Please enter your email and password.";
+<!-- ==========================================================
+HOME
+========================================================== -->
 
-        return;
+<section id="home" class="hero">
 
-    }
 
+<div class="hero-text">
 
-    loginButton.disabled = true;
+<h1>
+Grayson's Snack Shop
+</h1>
 
-    loginButton.textContent = "Logging In...";
 
-    loginMessage.textContent = "";
+<h2>
+Uplift Elevate Preparatory
+</h2>
 
 
-    try {
+<p>
 
-        await signInWithEmailAndPassword(
-            auth,
-            email,
-            password
-        );
+Affordable snacks and drinks for students.
 
-    } catch (error) {
+<br>
 
-        console.error("Login error:", error);
+Check what is available and when new items are arriving.
 
-        loginMessage.textContent =
-            "Incorrect email or password.";
+</p>
 
-    } finally {
 
-        loginButton.disabled = false;
+<a href="#products" class="heroButton">
 
-        loginButton.textContent = "Login";
+View Snacks
 
-    }
+</a>
 
-});
+</div>
 
 
-// ==========================================================
-// LOAD PRODUCTS
-// ==========================================================
+</section>
 
-async function loadAdminProducts() {
 
-    adminProducts.innerHTML = `
-        <p>Loading products...</p>
-    `;
 
+<!-- ==========================================================
+STATS
+========================================================== -->
 
-    try {
+<section class="stats">
 
-        products = await loadInventory();
 
-        adminProducts.innerHTML = "";
+<div class="stat">
 
+<h2 id="totalProducts">
+0
+</h2>
 
-        if (products.length === 0) {
+<p>
+Available Products
+</p>
 
-            adminProducts.innerHTML = `
-                <p>No products found.</p>
-            `;
+</div>
 
-        } else {
 
-            products.forEach((product) => {
 
-                createAdminProduct(product);
+<div class="stat">
 
-            });
+<h2 id="itemsInStock">
+0
+</h2>
 
-        }
+<p>
+Items Available
+</p>
 
+</div>
 
-        populatePromotionDropdowns();
 
-    } catch (error) {
 
-        console.error(
-            "Error loading products:",
-            error
-        );
+<div class="stat">
 
-        adminProducts.innerHTML = `
-            <p>
-                Unable to load products.
-            </p>
-        `;
+<h2>
+📦
+</h2>
 
-    }
+<p>
+Regular Restocks
+</p>
 
-}
+</div>
 
 
-// ==========================================================
-// CREATE PRODUCT ADMIN CARD
-// ==========================================================
+</section>
 
-function createAdminProduct(product) {
 
-    const box = document.createElement("div");
 
-    box.className = "admin-product";
+<!-- ==========================================================
+PRODUCTS
+========================================================== -->
 
+<section id="products">
 
-    const productId = String(
-        product.firebaseId || product.id
-    );
 
+<h2 class="section-title">
 
-    box.innerHTML = `
+Snacks & Drinks
 
-        <div class="product-image">
+</h2>
 
-            <img
-                src="${product.image || ""}"
-                alt="${product.name || "Product"}"
-                onerror="this.src='https://placehold.co/100x100?text=No+Image'"
-            >
 
-        </div>
 
+<div class="searchBar">
 
-        <h3>
-            ${product.name || "Unnamed Product"}
-        </h3>
+<input
+type="text"
+id="searchInput"
+placeholder="Search snacks..."
+>
 
+</div>
 
-        <label>
-            Image Filename
-        </label>
 
-        <input
-            id="image-${productId}"
-            value="${product.image || ""}"
-        >
 
+<div
+id="productContainer"
+class="product-grid"
+>
 
-        <label>
-            Price
-        </label>
+</div>
 
-        <input
-            id="price-${productId}"
-            type="number"
-            step="0.01"
-            min="0"
-            value="${product.price ?? 0}"
-        >
 
+</section>
 
-        <label>
-            Stock
-        </label>
 
-        <input
-            id="stock-${productId}"
-            type="number"
-            min="0"
-            value="${product.stock ?? 0}"
-        >
 
+<!-- ==========================================================
+PROMOTION
+========================================================== -->
 
-        <label>
-            Restock Date
-        </label>
+<section id="promotion">
 
-        <input
-            id="restock-${productId}"
-            value="${product.restock || ""}"
-        >
 
+<h2 class="section-title">
 
-        <div style="
-            display:flex;
-            gap:10px;
-            margin-top:15px;
-            flex-wrap:wrap;
-        ">
+🎉 Current Promotion
 
-            <button
-                type="button"
-                onclick="saveProduct('${productId}')"
-            >
-                Save
-            </button>
+</h2>
 
 
-            <button
-                type="button"
-                onclick="deleteProduct('${productId}')"
-            >
-                Delete
-            </button>
+<div
+id="promotionContainer"
+class="contact-box"
+>
 
-        </div>
+<p>
+Loading promotion...
+</p>
 
-    `;
+</div>
 
 
-    adminProducts.appendChild(box);
+</section>
 
-}
 
 
-// ==========================================================
-// SAVE PRODUCT
-// ==========================================================
+<!-- ==========================================================
+INVENTORY
+========================================================== -->
 
-window.saveProduct = async function(id) {
+<section id="inventory">
 
-    try {
 
-        const product = products.find((item) => {
+<h2 class="section-title">
 
-            return String(
-                item.firebaseId || item.id
-            ) === String(id);
+Current Stock
 
-        });
+</h2>
 
 
-        if (!product) {
 
-            alert("Product not found.");
+<div class="table-container">
 
-            return;
 
-        }
+<table>
 
+<thead>
 
-        const updatedProduct = {
+<tr>
 
-            ...product,
+<th>
+Item
+</th>
 
-            image:
-                document.getElementById(
-                    `image-${id}`
-                ).value.trim(),
 
-            price:
-                Number(
-                    document.getElementById(
-                        `price-${id}`
-                    ).value
-                ),
+<th>
+Price
+</th>
 
-            stock:
-                Number(
-                    document.getElementById(
-                        `stock-${id}`
-                    ).value
-                ),
 
-            restock:
-                document.getElementById(
-                    `restock-${id}`
-                ).value.trim()
+<th>
+Available
+</th>
 
-        };
 
+<th>
+Status
+</th>
 
-        await saveInventoryProduct(
-            updatedProduct
-        );
 
+<th>
+Restock Date
+</th>
 
-        alert(
-            "Product updated successfully!"
-        );
+</tr>
 
+</thead>
 
-        await loadAdminProducts();
 
-    } catch (error) {
 
-        console.error(
-            "Error saving product:",
-            error
-        );
+<tbody id="inventoryTable">
 
-        alert(
-            "Something went wrong while saving the product."
-        );
+</tbody>
 
-    }
+</table>
 
-};
 
+</div>
 
-// ==========================================================
-// DELETE PRODUCT
-// ==========================================================
 
-window.deleteProduct = async function(id) {
+</section>
 
-    const product = products.find((item) => {
 
-        return String(
-            item.firebaseId || item.id
-        ) === String(id);
 
-    });
+<!-- ==========================================================
+CONTACT
+========================================================== -->
 
+<section id="contact">
 
-    if (!product) {
 
-        alert("Product not found.");
+<h2 class="section-title">
 
-        return;
+Contact
 
-    }
+</h2>
 
 
-    const confirmed = confirm(
-        `Are you sure you want to delete "${product.name}"?`
-    );
 
+<div class="contact-box">
 
-    if (!confirmed) {
 
-        return;
+<h3>
+Owner
+</h3>
 
-    }
 
+<p>
+Grayson VanTassel
+</p>
 
-    try {
 
-        await deleteInventoryProduct(product);
 
-        alert(
-            "Product deleted successfully!"
-        );
+<h3>
+School
+</h3>
 
-        await loadAdminProducts();
 
-    } catch (error) {
+<p>
+Uplift Elevate Preparatory
+</p>
 
-        console.error(
-            "Error deleting product:",
-            error
-        );
 
-        alert(
-            "Something went wrong while deleting the product."
-        );
 
-    }
+<h3>
+Email
+</h3>
 
-};
 
+<p>
 
-// ==========================================================
-// ADD PRODUCT
-// ==========================================================
+<a href="mailto:vantasselgrayson@gmail.com">
 
-addButton.addEventListener("click", async () => {
+vantasselgrayson@gmail.com
 
-    const name =
-        document.getElementById("newName").value.trim();
+</a>
 
-    const price =
-        Number(
-            document.getElementById("newPrice").value
-        );
+</p>
 
-    const stock =
-        Number(
-            document.getElementById("newStock").value
-        );
 
-    const restock =
-        document.getElementById("newRestock").value.trim();
 
-    const image =
-        document.getElementById("newImage").value.trim();
+<h3>
+Suggestions?
+</h3>
 
 
-    if (!name) {
+<p>
 
-        alert(
-            "Please enter a product name."
-        );
+I read every message sent and consider new snack requests!
 
-        return;
+</p>
 
-    }
 
+</div>
 
-    if (Number.isNaN(price) || price < 0) {
 
-        alert(
-            "Please enter a valid price."
-        );
+</section>
 
-        return;
 
-    }
 
+<!-- ==========================================================
+FOOTER
+========================================================== -->
 
-    if (Number.isNaN(stock) || stock < 0) {
+<footer>
 
-        alert(
-            "Please enter a valid stock amount."
-        );
 
-        return;
+<p>
+© 2026 Grayson's Snack Shop
+</p>
 
-    }
 
+<p>
+Serving students at Uplift Elevate Preparatory
+</p>
 
-    const newProduct = {
 
-        id: Date.now(),
+</footer>
 
-        name: name,
 
-        price: price,
 
-        stock: stock,
+<!-- ==========================================================
+MAIN JAVASCRIPT
+========================================================== -->
 
-        restock: restock,
+<script
+type="module"
+src="script.js"
+></script>
 
-        image: image
 
-    };
+</body>
 
-
-    try {
-
-        addButton.disabled = true;
-
-        addButton.textContent =
-            "Adding Product...";
-
-
-        await addProduct(newProduct);
-
-
-        document.getElementById(
-            "newName"
-        ).value = "";
-
-        document.getElementById(
-            "newPrice"
-        ).value = "";
-
-        document.getElementById(
-            "newStock"
-        ).value = "";
-
-        document.getElementById(
-            "newRestock"
-        ).value = "";
-
-        document.getElementById(
-            "newImage"
-        ).value = "";
-
-
-        alert(
-            "Product added successfully!"
-        );
-
-
-        await loadAdminProducts();
-
-    } catch (error) {
-
-        console.error(
-            "Error adding product:",
-            error
-        );
-
-        alert(
-            "Something went wrong while adding the product."
-        );
-
-    } finally {
-
-        addButton.disabled = false;
-
-        addButton.textContent =
-            "Add Product";
-
-    }
-
-});
-
-
-// ==========================================================
-// PROMOTION DROPDOWNS
-// ==========================================================
-
-function populatePromotionDropdowns() {
-
-    if (!qualifyingProduct || !rewardProduct) {
-
-        console.error(
-            "Promotion dropdowns not found in admin.html."
-        );
-
-        return;
-
-    }
-
-
-    qualifyingProduct.innerHTML = `
-        <option value="">
-            Select qualifying product
-        </option>
-    `;
-
-
-    rewardProduct.innerHTML = `
-        <option value="">
-            Select reward product
-        </option>
-    `;
-
-
-    products.forEach((product) => {
-
-        const productId = String(
-            product.firebaseId || product.id
-        );
-
-
-        const productName =
-            product.name || "Unnamed Product";
-
-
-        const price =
-            Number(product.price || 0).toFixed(2);
-
-
-        const option1 =
-            document.createElement("option");
-
-        option1.value = productId;
-
-        option1.textContent =
-            `${productName} — $${price}`;
-
-
-        qualifyingProduct.appendChild(
-            option1
-        );
-
-
-        const option2 =
-            document.createElement("option");
-
-        option2.value = productId;
-
-        option2.textContent =
-            `${productName} — $${price}`;
-
-
-        rewardProduct.appendChild(
-            option2
-        );
-
-    });
-
-
-    console.log(
-        "Promotion dropdowns populated:",
-        products.length
-    );
-
-}
-
-
-// ==========================================================
-// SAVE PROMOTION
-// ==========================================================
-
-if (savePromotionButton) {
-
-    savePromotionButton.addEventListener(
-        "click",
-        async () => {
-
-            const name =
-                document.getElementById(
-                    "promotionName"
-                ).value.trim();
-
-
-            const active =
-                document.getElementById(
-                    "promotionActive"
-                ).checked;
-
-
-            const start =
-                document.getElementById(
-                    "promotionStart"
-                ).value;
-
-
-            const end =
-                document.getElementById(
-                    "promotionEnd"
-                ).value;
-
-
-            const qualifyingId =
-                qualifyingProduct.value;
-
-
-            const rewardId =
-                rewardProduct.value;
-
-
-            const rewardQuantity =
-                Number(
-                    document.getElementById(
-                        "rewardQuantity"
-                    ).value
-                );
-
-
-            if (!name) {
-
-                alert(
-                    "Please enter a promotion name."
-                );
-
-                return;
-
-            }
-
-
-            if (!qualifyingId) {
-
-                alert(
-                    "Please select the qualifying product."
-                );
-
-                return;
-
-            }
-
-
-            if (!rewardId) {
-
-                alert(
-                    "Please select the reward product."
-                );
-
-                return;
-
-            }
-
-
-            if (
-                Number.isNaN(rewardQuantity) ||
-                rewardQuantity < 1
-            ) {
-
-                alert(
-                    "Please enter a valid reward quantity."
-                );
-
-                return;
-
-            }
-
-
-            try {
-
-                savePromotionButton.disabled =
-                    true;
-
-                savePromotionButton.textContent =
-                    "Saving Promotion...";
-
-
-                const qualifying =
-                    products.find((product) => {
-
-                        return String(
-                            product.firebaseId ||
-                            product.id
-                        ) === String(qualifyingId);
-
-                    });
-
-
-                const reward =
-                    products.find((product) => {
-
-                        return String(
-                            product.firebaseId ||
-                            product.id
-                        ) === String(rewardId);
-
-                    });
-
-
-                await setDoc(
-                    promotionRef,
-                    {
-
-                        name: name,
-
-                        active: active,
-
-                        start: start,
-
-                        end: end,
-
-                        qualifyingProductId:
-                            qualifyingId,
-
-                        qualifyingProductName:
-                            qualifying
-                                ? qualifying.name
-                                : "",
-
-                        rewardProductId:
-                            rewardId,
-
-                        rewardProductName:
-                            reward
-                                ? reward.name
-                                : "",
-
-                        rewardQuantity:
-                            rewardQuantity,
-
-                        updatedAt:
-                            new Date().toISOString()
-
-                    }
-                );
-
-
-                alert(
-                    "Promotion saved successfully!"
-                );
-
-            } catch (error) {
-
-                console.error(
-                    "Error saving promotion:",
-                    error
-                );
-
-                alert(
-                    "Could not save the promotion."
-                );
-
-            } finally {
-
-                savePromotionButton.disabled =
-                    false;
-
-                savePromotionButton.textContent =
-                    "Save Promotion";
-
-            }
-
-        }
-    );
-
-}
-
-
-// ==========================================================
-// LOAD PROMOTION
-// ==========================================================
-
-async function loadPromotion() {
-
-    try {
-
-        const snapshot =
-            await getDoc(
-                promotionRef
-            );
-
-
-        if (!snapshot.exists()) {
-
-            console.log(
-                "No promotion has been saved yet."
-            );
-
-            return;
-
-        }
-
-
-        const promotion =
-            snapshot.data();
-
-
-        document.getElementById(
-            "promotionName"
-        ).value =
-            promotion.name || "";
-
-
-        document.getElementById(
-            "promotionActive"
-        ).checked =
-            promotion.active === true;
-
-
-        document.getElementById(
-            "promotionStart"
-        ).value =
-            promotion.start || "";
-
-
-        document.getElementById(
-            "promotionEnd"
-        ).value =
-            promotion.end || "";
-
-
-        document.getElementById(
-            "rewardQuantity"
-        ).value =
-            promotion.rewardQuantity || 1;
-
-
-        if (qualifyingProduct) {
-
-            qualifyingProduct.value =
-                promotion.qualifyingProductId || "";
-
-        }
-
-
-        if (rewardProduct) {
-
-            rewardProduct.value =
-                promotion.rewardProductId || "";
-
-        }
-
-
-        console.log(
-            "Promotion loaded:",
-            promotion
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Error loading promotion:",
-            error
-        );
-
-    }
-
-}
-
-
-// ==========================================================
-// LOGOUT
-// ==========================================================
-
-logoutButton.addEventListener(
-    "click",
-    async () => {
-
-        try {
-
-            await signOut(auth);
-
-        } catch (error) {
-
-            console.error(
-                "Logout error:",
-                error
-            );
-
-        }
-
-    }
-);
+</html>
