@@ -6,7 +6,9 @@ Firebase Inventory System
 ==========================================================
 */
 
-import { db } from "./firebase.js";
+import {
+    db
+} from "./firebase.js";
 
 import {
     collection,
@@ -23,7 +25,11 @@ import {
 // FIRESTORE COLLECTION
 // ==========================================================
 
-const inventoryRef = collection(db, "inventory");
+const inventoryRef =
+    collection(
+        db,
+        "inventory"
+    );
 
 
 
@@ -36,7 +42,7 @@ let inventory = [];
 
 
 // ==========================================================
-// LOAD INVENTORY FROM FIREBASE
+// LOAD INVENTORY
 // ==========================================================
 
 async function loadInventory() {
@@ -45,46 +51,57 @@ async function loadInventory() {
 
         inventory = [];
 
-        const snapshot = await getDocs(inventoryRef);
+
+        const snapshot =
+            await getDocs(
+                inventoryRef
+            );
 
 
-        snapshot.forEach((item) => {
+        snapshot.forEach(
+            (item) => {
 
-            const data = item.data();
+                const data =
+                    item.data();
 
 
-            /*
-            Use the product's saved ID if one exists.
+                let productId =
+                    data.id;
 
-            If there isn't one, use the Firebase
-            document ID instead.
-            */
 
-            let productId = data.id;
+                /*
+                If the product doesn't have a usable
+                numeric ID, use the Firebase document ID.
+                */
 
-            if (
-                productId === undefined ||
-                productId === null ||
-                productId === "" ||
-                Number.isNaN(Number(productId))
-            ) {
+                if (
+                    productId === undefined ||
+                    productId === null ||
+                    productId === "" ||
+                    Number.isNaN(
+                        Number(productId)
+                    )
+                ) {
 
-                productId = item.id;
+                    productId =
+                        item.id;
+
+                }
+
+
+                inventory.push({
+
+                    ...data,
+
+                    id: productId,
+
+                    firebaseId:
+                        item.id
+
+                });
 
             }
-
-
-            inventory.push({
-
-                ...data,
-
-                id: productId,
-
-                firebaseId: item.id
-
-            });
-
-        });
+        );
 
 
         console.log(
@@ -100,13 +117,13 @@ async function loadInventory() {
     catch (error) {
 
         console.error(
-            "Error loading inventory from Firebase:",
+            "Error loading inventory:",
             error
         );
 
         inventory = [];
 
-        return inventory;
+        throw error;
 
     }
 
@@ -115,19 +132,12 @@ async function loadInventory() {
 
 
 // ==========================================================
-// SAVE PRODUCT CHANGES
+// SAVE PRODUCT
 // ==========================================================
 
 async function saveProduct(product) {
 
     try {
-
-        /*
-        Use firebaseId when available.
-
-        This prevents the system from trying to
-        save to a document called "NaN".
-        */
 
         const documentId =
             product.firebaseId ||
@@ -143,11 +153,22 @@ async function saveProduct(product) {
             ),
 
             {
-                name: product.name,
-                price: Number(product.price),
-                stock: Number(product.stock),
-                restock: product.restock || "",
-                image: product.image || ""
+
+                name:
+                    product.name,
+
+                price:
+                    Number(product.price),
+
+                stock:
+                    Number(product.stock),
+
+                restock:
+                    product.restock || "",
+
+                image:
+                    product.image || ""
+
             }
 
         );
@@ -155,9 +176,11 @@ async function saveProduct(product) {
 
         console.log(
             "Product saved:",
-            product
+            product.name
         );
 
+
+        return true;
 
     }
 
@@ -177,19 +200,12 @@ async function saveProduct(product) {
 
 
 // ==========================================================
-// ADD NEW PRODUCT
+// ADD PRODUCT
 // ==========================================================
 
 async function addProduct(product) {
 
     try {
-
-        /*
-        New products get a unique numeric ID.
-
-        Firebase will use this same ID as
-        the document ID.
-        */
 
         const productId =
             product.id ||
@@ -198,17 +214,23 @@ async function addProduct(product) {
 
         const newProduct = {
 
-            id: productId,
+            id:
+                productId,
 
-            name: product.name,
+            name:
+                product.name,
 
-            price: Number(product.price),
+            price:
+                Number(product.price),
 
-            stock: Number(product.stock),
+            stock:
+                Number(product.stock),
 
-            restock: product.restock || "",
+            restock:
+                product.restock || "",
 
-            image: product.image || ""
+            image:
+                product.image || ""
 
         };
 
@@ -232,7 +254,7 @@ async function addProduct(product) {
         );
 
 
-        return newProduct;
+        return true;
 
     }
 
@@ -255,14 +277,29 @@ async function addProduct(product) {
 // DELETE PRODUCT
 // ==========================================================
 
-async function deleteProduct(id) {
+async function deleteProduct(product) {
 
     try {
 
-        const documentId =
-            typeof id === "object"
-                ? (id.firebaseId || id.id.toString())
-                : id.toString();
+        let documentId;
+
+
+        if (
+            typeof product === "object"
+        ) {
+
+            documentId =
+                product.firebaseId ||
+                product.id.toString();
+
+        }
+
+        else {
+
+            documentId =
+                product.toString();
+
+        }
 
 
         await deleteDoc(
@@ -280,6 +317,9 @@ async function deleteProduct(id) {
             "Product deleted:",
             documentId
         );
+
+
+        return true;
 
     }
 
