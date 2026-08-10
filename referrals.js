@@ -13,19 +13,23 @@ import {
 collection,
 doc,
 getDoc,
-setDoc,
-query,
-where,
-getDocs
+setDoc
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 // ==========================================================
-// FIRESTORE COLLECTION
+// FIRESTORE COLLECTIONS
 // ==========================================================
 
-const referralsRef = collection(
+const referralsRef =
+collection(
 db,
 "referrals"
+);
+
+const referralUsesRef =
+collection(
+db,
+"referralUses"
 );
 
 // ==========================================================
@@ -107,6 +111,7 @@ for (
             characters.length
         );
 
+
     code +=
         characters[randomIndex];
 
@@ -125,14 +130,15 @@ return code;
 async function createUniqueCode() {
 
 ```
-let code = "";
+let code;
 
 let exists = true;
 
 
 while (exists) {
 
-    code = generateCode();
+    code =
+        generateCode();
 
 
     const codeRef =
@@ -144,7 +150,9 @@ while (exists) {
 
 
     const snapshot =
-        await getDoc(codeRef);
+        await getDoc(
+            codeRef
+        );
 
 
     exists =
@@ -159,7 +167,7 @@ return code;
 }
 
 // ==========================================================
-// SHOW MESSAGE
+// SHOW GENERATOR MESSAGE
 // ==========================================================
 
 function showReferralMessage(
@@ -188,7 +196,44 @@ referralMessage.style.color =
 }
 
 // ==========================================================
-// GENERATE REFERRAL
+// SHOW CODE
+// ==========================================================
+
+function showReferralCode(
+code,
+name
+) {
+
+```
+if (referralCode) {
+
+    referralCode.textContent =
+        code;
+
+}
+
+
+if (referralName) {
+
+    referralName.value =
+        name;
+
+}
+
+
+if (referralResult) {
+
+    referralResult.classList.remove(
+        "hidden"
+    );
+
+}
+```
+
+}
+
+// ==========================================================
+// GENERATE REFERRAL CODE
 // ==========================================================
 
 if (generateReferralButton) {
@@ -240,7 +285,8 @@ generateReferralButton.addEventListener(
                     referrerName:
                         name,
 
-                    active: true,
+                    active:
+                        true,
 
                     successfulReferrals:
                         0,
@@ -255,17 +301,10 @@ generateReferralButton.addEventListener(
             );
 
 
-            referralCode.textContent =
-                code;
-
-
-            referralResult.classList.remove(
-                "hidden"
+            showReferralCode(
+                code,
+                name
             );
-
-
-            referralName.value =
-                name;
 
 
             showReferralMessage(
@@ -286,12 +325,13 @@ generateReferralButton.addEventListener(
             );
 
 
-            updateReferralCount(
+            await updateReferralCount(
                 code
             );
 
+        }
 
-        } catch (error) {
+        catch (error) {
 
             console.error(
                 "Error creating referral code:",
@@ -303,7 +343,9 @@ generateReferralButton.addEventListener(
                 "Unable to create your referral code. Please try again."
             );
 
-        } finally {
+        }
+
+        finally {
 
             generateReferralButton.disabled =
                 false;
@@ -321,7 +363,7 @@ generateReferralButton.addEventListener(
 }
 
 // ==========================================================
-// LOAD EXISTING CUSTOMER CODE
+// LOAD EXISTING CODE
 // ==========================================================
 
 async function loadMyReferralCode() {
@@ -380,16 +422,9 @@ try {
         snapshot.data();
 
 
-    referralName.value =
-        referral.referrerName;
-
-
-    referralCode.textContent =
-        referral.code;
-
-
-    referralResult.classList.remove(
-        "hidden"
+    showReferralCode(
+        referral.code,
+        referral.referrerName
     );
 
 
@@ -399,11 +434,13 @@ try {
     );
 
 
-    updateReferralCount(
+    await updateReferralCount(
         savedCode
     );
 
-} catch (error) {
+}
+
+catch (error) {
 
     console.error(
         "Error loading referral code:",
@@ -460,7 +497,9 @@ try {
 
     }
 
-} catch (error) {
+}
+
+catch (error) {
 
     console.error(
         "Error loading referral count:",
@@ -508,14 +547,19 @@ copyReferralButton.addEventListener(
                 "Copied!";
 
 
-            setTimeout(() => {
+            setTimeout(
+                () => {
 
-                copyReferralButton.textContent =
-                    "Copy";
+                    copyReferralButton.textContent =
+                        "Copy";
 
-            }, 1500);
+                },
+                1500
+            );
 
-        } catch (error) {
+        }
+
+        catch (error) {
 
             console.error(
                 "Copy error:",
@@ -526,6 +570,165 @@ copyReferralButton.addEventListener(
 
     }
 );
+```
+
+}
+
+// ==========================================================
+// CREATE REFERRAL USE
+// ==========================================================
+
+async function createReferralUse(
+code
+) {
+
+```
+const referralSnapshot =
+    await getDoc(
+        doc(
+            db,
+            "referrals",
+            code
+        )
+    );
+
+
+if (
+    !referralSnapshot.exists()
+) {
+
+    throw new Error(
+        "Referral code does not exist."
+    );
+
+}
+
+
+const referral =
+    referralSnapshot.data();
+
+
+if (
+    referral.active !== true
+) {
+
+    throw new Error(
+        "Referral code is inactive."
+    );
+
+}
+
+
+/*
+----------------------------------------------------------
+IMPORTANT
+
+A browser-generated ID is used for the referral
+transaction.
+
+This lets the same customer continue their referral
+without exposing their personal information.
+----------------------------------------------------------
+*/
+
+let customerReferralId =
+    localStorage.getItem(
+        "customerReferralId"
+    );
+
+
+if (!customerReferralId) {
+
+    customerReferralId =
+        crypto.randomUUID();
+
+
+    localStorage.setItem(
+        "customerReferralId",
+        customerReferralId
+    );
+
+}
+
+
+const existingReferral =
+    localStorage.getItem(
+        "activeReferralCode"
+    );
+
+
+if (existingReferral) {
+
+    if (
+        existingReferral === code
+    ) {
+
+        return {
+
+            alreadyActive:
+                true,
+
+            referralId:
+                customerReferralId
+
+        };
+
+    }
+
+}
+
+
+await setDoc(
+    doc(
+        db,
+        "referralUses",
+        customerReferralId
+    ),
+    {
+
+        referralId:
+            customerReferralId,
+
+        referralCode:
+            code,
+
+        referrerName:
+            referral.referrerName,
+
+        status:
+            "pending",
+
+        rewardStatus:
+            "none",
+
+        createdAt:
+            new Date().toISOString(),
+
+        approvedAt:
+            null,
+
+        rewardedAt:
+            null
+
+    }
+);
+
+
+localStorage.setItem(
+    "activeReferralCode",
+    code
+);
+
+
+return {
+
+    alreadyActive:
+        false,
+
+    referralId:
+        customerReferralId
+
+};
 ```
 
 }
@@ -552,6 +755,9 @@ submitReferralButton.addEventListener(
             useReferralMessage.textContent =
                 "Please enter a referral code.";
 
+            useReferralMessage.style.color =
+                "red";
+
             return;
 
         }
@@ -567,50 +773,28 @@ submitReferralButton.addEventListener(
 
         try {
 
-            const snapshot =
-                await getDoc(
-                    doc(
-                        db,
-                        "referrals",
-                        code
-                    )
+            const result =
+                await createReferralUse(
+                    code
                 );
 
 
-            if (!snapshot.exists()) {
-
-                useReferralMessage.textContent =
-                    "That referral code does not exist.";
-
-                return;
-
-            }
-
-
-            const referral =
-                snapshot.data();
-
-
             if (
-                referral.active !== true
+                result.alreadyActive
             ) {
 
                 useReferralMessage.textContent =
-                    "That referral code is no longer active.";
-
-                return;
+                    "This referral code is already active for this customer.";
 
             }
 
+            else {
 
-            localStorage.setItem(
-                "activeReferralCode",
-                code
-            );
+                useReferralMessage.textContent =
+                    "Referral code accepted! Your purchase can now be reviewed by the shop owner.";
 
+            }
 
-            useReferralMessage.textContent =
-                `Referral code ${code} accepted!`;
 
             useReferralMessage.style.color =
                 "green";
@@ -619,8 +803,9 @@ submitReferralButton.addEventListener(
             useReferralCode.value =
                 code;
 
+        }
 
-        } catch (error) {
+        catch (error) {
 
             console.error(
                 "Referral code error:",
@@ -629,9 +814,15 @@ submitReferralButton.addEventListener(
 
 
             useReferralMessage.textContent =
+                error.message ||
                 "Unable to verify the referral code.";
 
-        } finally {
+            useReferralMessage.style.color =
+                "red";
+
+        }
+
+        finally {
 
             submitReferralButton.disabled =
                 false;
@@ -655,10 +846,17 @@ submitReferralButton.addEventListener(
 loadMyReferralCode();
 
 // ==========================================================
-// EXPORTS
+// EXPORT
 // ==========================================================
 
 export {
+
+```
 generateCode,
-createUniqueCode
+
+createUniqueCode,
+
+createReferralUse
+```
+
 };
