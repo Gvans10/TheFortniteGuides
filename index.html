@@ -6,7 +6,10 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
 <title>
 Grayson's Snack Shop
@@ -35,7 +38,7 @@ Grayson's Snack Shop
 >
 
 <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet"
 >
 
@@ -44,6 +47,10 @@ Grayson's Snack Shop
 
 <body>
 
+
+<!-- =====================================================
+NAVIGATION
+===================================================== -->
 
 <header>
 
@@ -111,6 +118,7 @@ Contact
 <button
     id="darkModeButton"
     type="button"
+    aria-label="Toggle dark mode"
 >
 
 🌙
@@ -121,7 +129,6 @@ Contact
 </nav>
 
 </header>
-
 
 
 
@@ -139,6 +146,13 @@ HERO
 <div class="hero-text">
 
 
+<div class="hero-label">
+
+UPLIFT ELEVATE PREPARATORY
+
+</div>
+
+
 <h1>
 
 Grayson's Snack Shop
@@ -148,7 +162,7 @@ Grayson's Snack Shop
 
 <h2>
 
-Uplift Elevate Preparatory
+Snacks without leaving campus.
 
 </h2>
 
@@ -159,7 +173,7 @@ Affordable snacks and drinks for students.
 
 <br>
 
-Check what is available and when new items are arriving.
+Check live stock before you buy.
 
 </p>
 
@@ -169,7 +183,7 @@ Check what is available and when new items are arriving.
     class="heroButton"
 >
 
-View Snacks
+Browse Snacks
 
 </a>
 
@@ -178,7 +192,6 @@ View Snacks
 
 
 </section>
-
 
 
 
@@ -192,22 +205,26 @@ STATS
 
 <div class="stat">
 
+
 <h2 id="totalProducts">
 
 0
 
 </h2>
 
+
 <p>
 
-Available Products
+Products
 
 </p>
+
 
 </div>
 
 
 <div class="stat">
+
 
 <h2 id="itemsInStock">
 
@@ -215,34 +232,38 @@ Available Products
 
 </h2>
 
+
 <p>
 
 Items Available
 
 </p>
 
+
 </div>
 
 
 <div class="stat">
 
+
 <h2>
 
-📦
+⚡
 
 </h2>
 
+
 <p>
 
-Regular Restocks
+Live Inventory
 
 </p>
+
 
 </div>
 
 
 </section>
-
 
 
 
@@ -260,9 +281,24 @@ CURRENT PROMOTION
 <div class="promotion-card">
 
 
+<div class="promotion-top-row">
+
+
 <div class="promotion-live-badge">
 
-🔥 LIVE PROMOTION
+<span class="live-dot"></span>
+
+LIVE NOW
+
+</div>
+
+
+<div class="promotion-small-label">
+
+LIMITED-TIME OFFER
+
+</div>
+
 
 </div>
 
@@ -287,11 +323,23 @@ Current Promotion
 
 <div class="promotion-detail-box">
 
+
+<div class="promotion-detail-icon">
+
+🛍️
+
+</div>
+
+
+<div>
+
+
 <span>
 
 QUALIFYING PURCHASE
 
 </span>
+
 
 <strong id="promotionQualifyingProduct">
 
@@ -299,10 +347,32 @@ QUALIFYING PURCHASE
 
 </strong>
 
+
+</div>
+
+
+</div>
+
+
+<div class="promotion-arrow">
+
+→
+
 </div>
 
 
 <div class="promotion-detail-box">
+
+
+<div class="promotion-detail-icon">
+
+🎁
+
+</div>
+
+
+<div>
+
 
 <span>
 
@@ -310,11 +380,16 @@ REFERRAL REWARD
 
 </span>
 
+
 <strong id="promotionReward">
 
 —
 
 </strong>
+
+
+</div>
+
 
 </div>
 
@@ -335,7 +410,11 @@ REFERRAL REWARD
     class="promotion-action-button"
 >
 
-🎁 Join The Referral Promotion
+Get My Referral Code
+
+<span>
+↓
+</span>
 
 </a>
 
@@ -348,9 +427,8 @@ REFERRAL REWARD
 
 
 
-
 <!-- =====================================================
-REFERRAL PROMOTION
+REFERRAL REWARDS
 ===================================================== -->
 
 <section
@@ -359,162 +437,328 @@ REFERRAL PROMOTION
 >
 
 
-<h2 class="section-title">
+<div class="referral-shell">
 
-🎁 Referral Promotion
 
-</h2>
+<!-- REFERRAL HEADER -->
 
+<div class="referral-header">
 
-<p class="referral-intro">
 
-Refer a friend to Grayson's Snack Shop and earn a reward after their qualifying purchase is approved.
+<div class="referral-eyebrow">
 
-</p>
-
-
-
-<!-- HOW IT WORKS -->
-
-<div class="referral-steps">
-
-
-<div class="referral-step">
-
-<div class="referral-step-number">
-
-1
-
-</div>
-
-<h3>
-
-Get Your Code
-
-</h3>
-
-<p>
-
-Enter your name and generate your personal referral code.
-
-</p>
-
-</div>
-
-
-
-<div class="referral-step">
-
-<div class="referral-step-number">
-
-2
-
-</div>
-
-<h3>
-
-Send It To A Friend
-
-</h3>
-
-<p>
-
-Give your code to someone who hasn't used your referral yet.
-
-</p>
-
-</div>
-
-
-
-<div class="referral-step">
-
-<div class="referral-step-number">
-
-3
-
-</div>
-
-<h3>
-
-Friend Uses It
-
-</h3>
-
-<p>
-
-Your friend enters the code on this page before making their qualifying purchase.
-
-</p>
-
-</div>
-
-
-
-<div class="referral-step">
-
-<div class="referral-step-number">
-
-4
-
-</div>
-
-<h3>
-
-Earn Your Reward
-
-</h3>
-
-<p>
-
-After the purchase is verified and approved, your reward is earned.
-
-</p>
-
-</div>
-
-
-</div>
-
-
-
-
-
-<!-- REFERRAL FORMS -->
-
-<div class="referral-grid">
-
-
-
-<!-- GENERATE CODE -->
-
-<div class="referral-box">
-
-
-<div class="referral-icon">
-
-🤝
+GRAYSon's REWARDS
 
 </div>
 
 
 <h2>
 
-Refer A Friend
+Share the shop.
+
+<br>
+
+<span>
+Earn free snacks.
+</span>
 
 </h2>
 
 
 <p>
 
-Enter your name to get your personal referral code.
+Get your own referral code, send it to a friend, and earn a reward when their qualifying purchase is approved.
 
 </p>
 
 
+</div>
+
+
+
+
+<!-- HOW IT WORKS -->
+
+<div class="referral-how">
+
+
+<div class="referral-how-header">
+
+
+<h3>
+
+How it works
+
+</h3>
+
+
+<p>
+
+Four simple steps.
+
+</p>
+
+
+</div>
+
+
+<div class="referral-steps">
+
+
+<div class="referral-step">
+
+
+<div class="step-top">
+
+
+<div class="referral-step-number">
+
+01
+
+</div>
+
+
+<div class="referral-step-icon">
+
+🎟️
+
+</div>
+
+
+</div>
+
+
+<h4>
+
+Get your code
+
+</h4>
+
+
+<p>
+
+Enter your name below and we'll create your personal referral code.
+
+</p>
+
+
+</div>
+
+
+
+
+<div class="referral-step">
+
+
+<div class="step-top">
+
+
+<div class="referral-step-number">
+
+02
+
+</div>
+
+
+<div class="referral-step-icon">
+
+📲
+
+</div>
+
+
+</div>
+
+
+<h4>
+
+Send it
+
+</h4>
+
+
+<p>
+
+Share the code with a friend who wants to shop with Grayson.
+
+</p>
+
+
+</div>
+
+
+
+
+<div class="referral-step">
+
+
+<div class="step-top">
+
+
+<div class="referral-step-number">
+
+03
+
+</div>
+
+
+<div class="referral-step-icon">
+
+🛒
+
+</div>
+
+
+</div>
+
+
+<h4>
+
+They use it
+
+</h4>
+
+
+<p>
+
+Your friend enters your code here before completing the qualifying purchase.
+
+</p>
+
+
+</div>
+
+
+
+
+<div class="referral-step">
+
+
+<div class="step-top">
+
+
+<div class="referral-step-number">
+
+04
+
+</div>
+
+
+<div class="referral-step-icon">
+
+🎁
+
+</div>
+
+
+</div>
+
+
+<h4>
+
+You get rewarded
+
+</h4>
+
+
+<p>
+
+Once the purchase is approved, your referral counts and your reward is earned.
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+<!-- CHOOSE SIDE -->
+
+<div class="referral-choice-title">
+
+
+<span>
+
+START HERE
+
+</span>
+
+
+<h3>
+
+Which one are you?
+
+</h3>
+
+
+</div>
+
+
+
+
+<div class="referral-grid">
+
+
+<!-- ===================================================
+REFER SOMEONE
+=================================================== -->
+
+<div class="referral-box referral-owner-box">
+
+
+<div class="referral-card-header">
+
+
+<div class="referral-card-icon orange-icon">
+
+🤝
+
+</div>
+
+
+<div>
+
+
+<div class="referral-card-label">
+
+FOR THE REFERRER
+
+</div>
+
+
+<h2>
+
+I'm referring a friend
+
+</h2>
+
+
+</div>
+
+
+</div>
+
+
+<p class="referral-card-description">
+
+Create your personal code and send it to your friend.
+
+</p>
+
+
+<div class="referral-form-group">
+
+
 <label for="referralName">
 
-Your Name
+Your name
 
 </label>
 
@@ -527,12 +771,22 @@ Your Name
 >
 
 
+</div>
+
+
 <button
     id="generateReferralButton"
+    class="referral-main-button"
     type="button"
 >
 
-Generate My Referral Code
+Generate My Code
+
+<span>
+
+→
+
+</span>
 
 </button>
 
@@ -546,17 +800,20 @@ Generate My Referral Code
 
 
 
+
+<!-- GENERATED CODE -->
+
 <div
     id="referralResult"
     class="referral-result hidden"
 >
 
 
-<p>
+<div class="referral-result-label">
 
-Your Referral Code
+YOUR REFERRAL CODE
 
-</p>
+</div>
 
 
 <div
@@ -569,28 +826,48 @@ Your Referral Code
 </div>
 
 
+<p class="referral-code-help">
+
+Send this code to your friend.
+
+</p>
+
+
 <button
     id="copyReferralButton"
+    class="copy-referral-button"
     type="button"
 >
 
-Copy Code
+📋 Copy Referral Code
 
 </button>
 
 
-<p id="referralCount">
+<div class="referral-performance">
+
+
+<div>
+
+
+<span>
+
+SUCCESSFUL
+
+</span>
+
+
+<strong id="referralCount">
 
 Successful Referrals: 0
 
-</p>
+</strong>
 
 
-<p class="referral-share-text">
+</div>
 
-Send this code to your friend. They need to enter it in the box on this page.
 
-</p>
+</div>
 
 
 </div>
@@ -601,36 +878,59 @@ Send this code to your friend. They need to enter it in the box on this page.
 
 
 
+<!-- ===================================================
+USE SOMEONE'S CODE
+=================================================== -->
 
-<!-- USE CODE -->
-
-<div class="referral-box">
+<div class="referral-box referral-friend-box">
 
 
-<div class="referral-icon">
+<div class="referral-card-header">
+
+
+<div class="referral-card-icon dark-icon">
 
 🎟️
 
 </div>
 
 
+<div>
+
+
+<div class="referral-card-label">
+
+FOR THE FRIEND
+
+</div>
+
+
 <h2>
 
-Have A Referral Code?
+I was referred
 
 </h2>
 
 
-<p>
+</div>
 
-If a friend referred you, enter their code here before purchasing.
+
+</div>
+
+
+<p class="referral-card-description">
+
+Got a code from a friend? Enter it before making the qualifying purchase.
 
 </p>
 
 
+<div class="referral-form-group">
+
+
 <label for="useReferralCode">
 
-Referral Code
+Referral code
 
 </label>
 
@@ -638,17 +938,27 @@ Referral Code
 <input
     id="useReferralCode"
     type="text"
-    placeholder="Example: GS-ABC123"
+    placeholder="GS-ABC123"
     autocomplete="off"
 >
 
 
+</div>
+
+
 <button
     id="submitReferralButton"
+    class="referral-secondary-button"
     type="button"
 >
 
-Use Referral Code
+Apply Referral Code
+
+<span>
+
+✓
+
+</span>
 
 </button>
 
@@ -661,21 +971,73 @@ Use Referral Code
 </p>
 
 
-<div class="referral-important">
 
-<strong>
 
-After entering the code:
+<div class="referral-next-step">
 
-</strong>
+
+<div class="next-step-icon">
+
+🛍️
+
+</div>
+
+
+<div>
+
+
+<span>
+
+WHAT HAPPENS NEXT?
+
+</span>
+
+
+<h4>
+
+Complete your purchase with Grayson.
+
+</h4>
+
 
 <p>
 
-Complete the qualifying purchase with Grayson. The referral will appear in the Admin dashboard for approval.
+After you use the code, make the qualifying purchase. Grayson verifies it from the Admin dashboard.
 
 </p>
 
+
 </div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+<!-- REFERRAL RULE -->
+
+<div class="referral-footer-note">
+
+
+<div>
+
+ℹ️
+
+</div>
+
+
+<p>
+
+Referral rewards are earned only after the qualifying purchase is verified and approved.
+
+</p>
 
 
 </div>
@@ -689,7 +1051,6 @@ Complete the qualifying purchase with Grayson. The referral will appear in the A
 
 
 
-
 <!-- =====================================================
 PRODUCTS
 ===================================================== -->
@@ -697,11 +1058,31 @@ PRODUCTS
 <section id="products">
 
 
+<div class="section-heading-group">
+
+
+<span>
+
+THE SHOP
+
+</span>
+
+
 <h2 class="section-title">
 
 Snacks & Drinks
 
 </h2>
+
+
+<p>
+
+See what's available right now.
+
+</p>
+
+
+</div>
 
 
 <div class="searchBar">
@@ -730,7 +1111,6 @@ Snacks & Drinks
 
 
 
-
 <!-- =====================================================
 INVENTORY
 ===================================================== -->
@@ -738,11 +1118,31 @@ INVENTORY
 <section id="inventory">
 
 
+<div class="section-heading-group">
+
+
+<span>
+
+LIVE AVAILABILITY
+
+</span>
+
+
 <h2 class="section-title">
 
 Current Stock
 
 </h2>
+
+
+<p>
+
+Inventory is updated as items are sold and restocked.
+
+</p>
+
+
+</div>
 
 
 <div class="table-container">
@@ -756,25 +1156,31 @@ Current Stock
 
 <tr>
 
+
 <th>
 Item
 </th>
+
 
 <th>
 Price
 </th>
 
+
 <th>
 Available
 </th>
+
 
 <th>
 Status
 </th>
 
+
 <th>
 Restock Date
 </th>
+
 
 </tr>
 
@@ -798,12 +1204,21 @@ Restock Date
 
 
 
-
 <!-- =====================================================
 CONTACT
 ===================================================== -->
 
 <section id="contact">
+
+
+<div class="section-heading-group">
+
+
+<span>
+
+GET IN TOUCH
+
+</span>
 
 
 <h2 class="section-title">
@@ -813,45 +1228,64 @@ Contact
 </h2>
 
 
+</div>
+
+
 <div class="contact-box">
 
 
-<h3>
-
-Owner
-
-</h3>
+<div class="contact-item">
 
 
-<p>
+<span>
+
+OWNER
+
+</span>
+
+
+<strong>
 
 Grayson VanTassel
 
-</p>
+</strong>
 
 
-<h3>
-
-School
-
-</h3>
+</div>
 
 
-<p>
+<div class="contact-item">
+
+
+<span>
+
+SCHOOL
+
+</span>
+
+
+<strong>
 
 Uplift Elevate Preparatory
 
-</p>
+</strong>
 
 
-<h3>
-
-Email
-
-</h3>
+</div>
 
 
-<p>
+<div class="contact-item">
+
+
+<span>
+
+EMAIL
+
+</span>
+
+
+<strong>
+
 
 <a href="mailto:vantasselgrayson@gmail.com">
 
@@ -859,28 +1293,28 @@ vantasselgrayson@gmail.com
 
 </a>
 
-</p>
+
+</strong>
 
 
-<h3>
-
-Suggestions?
-
-</h3>
+</div>
 
 
-<p>
+<div class="contact-message">
 
-I read every message sent and consider new snack requests!
+Have a snack suggestion?
 
-</p>
+<br>
+
+I read every message and consider new requests.
+
+</div>
 
 
 </div>
 
 
 </section>
-
 
 
 
@@ -907,7 +1341,6 @@ Serving students at Uplift Elevate Preparatory
 
 
 </footer>
-
 
 
 
