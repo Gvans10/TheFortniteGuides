@@ -1,862 +1,431 @@
-# /*
+<!DOCTYPE html>
 
-Grayson's Snack Shop
-referrals.js
-Customer Referral System
-========================
+<html lang="en">
 
-*/
-
-import { db } from "./firebase.js";
-
-import {
-collection,
-doc,
-getDoc,
-setDoc
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-
-// ==========================================================
-// FIRESTORE COLLECTIONS
-// ==========================================================
-
-const referralsRef =
-collection(
-db,
-"referrals"
-);
-
-const referralUsesRef =
-collection(
-db,
-"referralUses"
-);
-
-// ==========================================================
-// ELEMENTS
-// ==========================================================
-
-const referralName =
-document.getElementById(
-"referralName"
-);
-
-const generateReferralButton =
-document.getElementById(
-"generateReferralButton"
-);
-
-const referralMessage =
-document.getElementById(
-"referralMessage"
-);
-
-const referralResult =
-document.getElementById(
-"referralResult"
-);
-
-const referralCode =
-document.getElementById(
-"referralCode"
-);
-
-const copyReferralButton =
-document.getElementById(
-"copyReferralButton"
-);
-
-const referralCount =
-document.getElementById(
-"referralCount"
-);
-
-const useReferralCode =
-document.getElementById(
-"useReferralCode"
-);
-
-const submitReferralButton =
-document.getElementById(
-"submitReferralButton"
-);
-
-const useReferralMessage =
-document.getElementById(
-"useReferralMessage"
-);
-
-// ==========================================================
-// GENERATE RANDOM CODE
-// ==========================================================
-
-function generateCode() {
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 ```
-const characters =
-    "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+<title>Grayson's Snack Shop Admin</title>
 
-let code = "GS-";
-
-
-for (
-    let i = 0;
-    i < 6;
-    i++
-) {
-
-    const randomIndex =
-        Math.floor(
-            Math.random() *
-            characters.length
-        );
-
-
-    code +=
-        characters[randomIndex];
-
-}
-
-
-return code;
+<link rel="icon" type="image/png" href="graysonslogos.png">
+<link rel="stylesheet" href="style.css">
 ```
 
-}
+</head>
 
-// ==========================================================
-// CREATE UNIQUE CODE
-// ==========================================================
-
-async function createUniqueCode() {
+<body>
 
 ```
-let code;
+<!-- ======================================================
+     ADMIN HEADER
+======================================================= -->
 
-let exists = true;
+<header>
+    <nav class="navbar">
 
+        <div class="logo">
+            <img src="graysonslogos.png" alt="Grayson's Snack Shop">
+            <span>Grayson's Snack Shop</span>
+        </div>
 
-while (exists) {
+        <a href="index.html" class="nav-button">
+            Back To Shop
+        </a>
 
-    code =
-        generateCode();
-
-
-    const codeRef =
-        doc(
-            db,
-            "referrals",
-            code
-        );
-
-
-    const snapshot =
-        await getDoc(
-            codeRef
-        );
+    </nav>
+</header>
 
 
-    exists =
-        snapshot.exists();
+<!-- ======================================================
+     LOGIN
+======================================================= -->
 
-}
+<main class="admin-container">
+
+    <section id="loginBox" class="admin-login">
+
+        <div class="admin-card">
+
+            <h1>🍬 Admin Panel</h1>
+
+            <p class="admin-subtitle">
+                Sign in to manage Grayson's Snack Shop
+            </p>
+
+            <input
+                id="username"
+                type="email"
+                placeholder="Admin Email"
+                autocomplete="email"
+            >
+
+            <input
+                id="password"
+                type="password"
+                placeholder="Password"
+                autocomplete="current-password"
+            >
+
+            <button id="loginButton" type="button">
+                Login
+            </button>
+
+            <p id="loginMessage" class="admin-message"></p>
+
+        </div>
+
+    </section>
 
 
-return code;
+    <!-- ==================================================
+         DASHBOARD
+    =================================================== -->
+
+    <section id="dashboard" class="hidden">
+
+        <div class="admin-header">
+
+            <div>
+                <h1>Admin Dashboard</h1>
+
+                <p>
+                    Manage products, inventory, and promotions.
+                </p>
+            </div>
+
+            <button id="logout" type="button">
+                Logout
+            </button>
+
+        </div>
+
+
+        <!-- ==================================================
+             PROMOTION
+        =================================================== -->
+
+        <section class="admin-card promotion-card">
+
+            <div class="section-heading">
+
+                <div>
+                    <h2>🎉 Promotion</h2>
+
+                    <p>
+                        Create and manage your current referral promotion.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label for="promotionName">
+                        Promotion Name
+                    </label>
+
+                    <input
+                        id="promotionName"
+                        type="text"
+                        placeholder="Example: Bring a Friend"
+                    >
+
+                </div>
+
+
+                <div class="form-group checkbox-group">
+
+                    <label for="promotionActive">
+                        <input
+                            id="promotionActive"
+                            type="checkbox"
+                        >
+
+                        Promotion Active
+                    </label>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="promotionStart">
+                        Start Date
+                    </label>
+
+                    <input
+                        id="promotionStart"
+                        type="datetime-local"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="promotionEnd">
+                        End Date
+                    </label>
+
+                    <input
+                        id="promotionEnd"
+                        type="datetime-local"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="qualifyingProduct">
+                        Qualifying Product
+                    </label>
+
+                    <select id="qualifyingProduct">
+
+                        <option value="">
+                            Loading products...
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="rewardProduct">
+                        Reward Product
+                    </label>
+
+                    <select id="rewardProduct">
+
+                        <option value="">
+                            Loading products...
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="rewardQuantity">
+                        Reward Quantity
+                    </label>
+
+                    <input
+                        id="rewardQuantity"
+                        type="number"
+                        min="1"
+                        value="1"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <button
+                id="savePromotion"
+                type="button"
+                class="primary-button"
+            >
+                Save Promotion
+            </button>
+
+        </section>
+
+
+        <!-- ==================================================
+             ADD PRODUCT
+        =================================================== -->
+
+        <section class="admin-card">
+
+            <div class="section-heading">
+
+                <div>
+                    <h2>➕ Add Product</h2>
+
+                    <p>
+                        Add a new snack to your inventory.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label for="newName">
+                        Product Name
+                    </label>
+
+                    <input
+                        id="newName"
+                        type="text"
+                        placeholder="Product Name"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="newPrice">
+                        Price
+                    </label>
+
+                    <input
+                        id="newPrice"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="0.00"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="newStock">
+                        Stock Amount
+                    </label>
+
+                    <input
+                        id="newStock"
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="newRestock">
+                        Restock Date
+                    </label>
+
+                    <input
+                        id="newRestock"
+                        type="text"
+                        placeholder="Example: 8/15/2026"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="newImage">
+                        Image Filename
+                    </label>
+
+                    <input
+                        id="newImage"
+                        type="text"
+                        placeholder="Example: chips.png"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <button
+                id="addProduct"
+                type="button"
+                class="primary-button"
+            >
+                Add Product
+            </button>
+
+        </section>
+
+
+        <!-- ==================================================
+             CURRENT PRODUCTS
+        =================================================== -->
+
+        <section class="admin-card">
+
+            <div class="section-heading">
+
+                <div>
+                    <h2>📦 Current Products</h2>
+
+                    <p>
+                        Edit prices, stock, images, and restock dates.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div id="adminProducts" class="admin-products">
+
+                <p>
+                    Loading products...
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================================================
+             REFERRAL MANAGEMENT
+        =================================================== -->
+
+        <section class="admin-card">
+
+            <div class="section-heading">
+
+                <div>
+                    <h2>👥 Referral System</h2>
+
+                    <p>
+                        Referral management will appear here as the system
+                        receives customer referrals.
+                    </p>
+                </div>
+
+            </div>
+
+            <div id="adminReferrals">
+
+                <p>
+                    No referral management actions yet.
+                </p>
+
+            </div>
+
+        </section>
+
+    </section>
+
+</main>
+
+
+<!-- ======================================================
+     JAVASCRIPT
+======================================================= -->
+
+<script type="module" src="admin.js"></script>
 ```
 
-}
+</body>
 
-// ==========================================================
-// SHOW GENERATOR MESSAGE
-// ==========================================================
-
-function showReferralMessage(
-message,
-success = false
-) {
-
-```
-if (!referralMessage) {
-
-    return;
-
-}
-
-
-referralMessage.textContent =
-    message;
-
-
-referralMessage.style.color =
-    success
-        ? "green"
-        : "red";
-```
-
-}
-
-// ==========================================================
-// SHOW CODE
-// ==========================================================
-
-function showReferralCode(
-code,
-name
-) {
-
-```
-if (referralCode) {
-
-    referralCode.textContent =
-        code;
-
-}
-
-
-if (referralName) {
-
-    referralName.value =
-        name;
-
-}
-
-
-if (referralResult) {
-
-    referralResult.classList.remove(
-        "hidden"
-    );
-
-}
-```
-
-}
-
-// ==========================================================
-// GENERATE REFERRAL CODE
-// ==========================================================
-
-if (generateReferralButton) {
-
-```
-generateReferralButton.addEventListener(
-    "click",
-    async () => {
-
-        const name =
-            referralName.value.trim();
-
-
-        if (!name) {
-
-            showReferralMessage(
-                "Please enter your name."
-            );
-
-            return;
-
-        }
-
-
-        generateReferralButton.disabled =
-            true;
-
-
-        generateReferralButton.textContent =
-            "Generating...";
-
-
-        try {
-
-            const code =
-                await createUniqueCode();
-
-
-            await setDoc(
-                doc(
-                    db,
-                    "referrals",
-                    code
-                ),
-                {
-
-                    code: code,
-
-                    referrerName:
-                        name,
-
-                    active:
-                        true,
-
-                    successfulReferrals:
-                        0,
-
-                    rewardsEarned:
-                        0,
-
-                    createdAt:
-                        new Date().toISOString()
-
-                }
-            );
-
-
-            showReferralCode(
-                code,
-                name
-            );
-
-
-            showReferralMessage(
-                "Your referral code was created!",
-                true
-            );
-
-
-            localStorage.setItem(
-                "myReferralCode",
-                code
-            );
-
-
-            localStorage.setItem(
-                "myReferralName",
-                name
-            );
-
-
-            await updateReferralCount(
-                code
-            );
-
-        }
-
-        catch (error) {
-
-            console.error(
-                "Error creating referral code:",
-                error
-            );
-
-
-            showReferralMessage(
-                "Unable to create your referral code. Please try again."
-            );
-
-        }
-
-        finally {
-
-            generateReferralButton.disabled =
-                false;
-
-
-            generateReferralButton.textContent =
-                "Generate My Referral Code";
-
-        }
-
-    }
-);
-```
-
-}
-
-// ==========================================================
-// LOAD EXISTING CODE
-// ==========================================================
-
-async function loadMyReferralCode() {
-
-```
-const savedCode =
-    localStorage.getItem(
-        "myReferralCode"
-    );
-
-
-const savedName =
-    localStorage.getItem(
-        "myReferralName"
-    );
-
-
-if (
-    !savedCode ||
-    !savedName
-) {
-
-    return;
-
-}
-
-
-try {
-
-    const snapshot =
-        await getDoc(
-            doc(
-                db,
-                "referrals",
-                savedCode
-            )
-        );
-
-
-    if (!snapshot.exists()) {
-
-        localStorage.removeItem(
-            "myReferralCode"
-        );
-
-        localStorage.removeItem(
-            "myReferralName"
-        );
-
-        return;
-
-    }
-
-
-    const referral =
-        snapshot.data();
-
-
-    showReferralCode(
-        referral.code,
-        referral.referrerName
-    );
-
-
-    showReferralMessage(
-        "Your referral code is ready!",
-        true
-    );
-
-
-    await updateReferralCount(
-        savedCode
-    );
-
-}
-
-catch (error) {
-
-    console.error(
-        "Error loading referral code:",
-        error
-    );
-
-}
-```
-
-}
-
-// ==========================================================
-// UPDATE REFERRAL COUNT
-// ==========================================================
-
-async function updateReferralCount(
-code
-) {
-
-```
-try {
-
-    const snapshot =
-        await getDoc(
-            doc(
-                db,
-                "referrals",
-                code
-            )
-        );
-
-
-    if (!snapshot.exists()) {
-
-        return;
-
-    }
-
-
-    const data =
-        snapshot.data();
-
-
-    const successful =
-        Number(
-            data.successfulReferrals || 0
-        );
-
-
-    if (referralCount) {
-
-        referralCount.textContent =
-            `Successful Referrals: ${successful}`;
-
-    }
-
-}
-
-catch (error) {
-
-    console.error(
-        "Error loading referral count:",
-        error
-    );
-
-}
-```
-
-}
-
-// ==========================================================
-// COPY CODE
-// ==========================================================
-
-if (copyReferralButton) {
-
-```
-copyReferralButton.addEventListener(
-    "click",
-    async () => {
-
-        const code =
-            referralCode.textContent.trim();
-
-
-        if (
-            !code ||
-            code === "------"
-        ) {
-
-            return;
-
-        }
-
-
-        try {
-
-            await navigator.clipboard.writeText(
-                code
-            );
-
-
-            copyReferralButton.textContent =
-                "Copied!";
-
-
-            setTimeout(
-                () => {
-
-                    copyReferralButton.textContent =
-                        "Copy";
-
-                },
-                1500
-            );
-
-        }
-
-        catch (error) {
-
-            console.error(
-                "Copy error:",
-                error
-            );
-
-        }
-
-    }
-);
-```
-
-}
-
-// ==========================================================
-// CREATE REFERRAL USE
-// ==========================================================
-
-async function createReferralUse(
-code
-) {
-
-```
-const referralSnapshot =
-    await getDoc(
-        doc(
-            db,
-            "referrals",
-            code
-        )
-    );
-
-
-if (
-    !referralSnapshot.exists()
-) {
-
-    throw new Error(
-        "Referral code does not exist."
-    );
-
-}
-
-
-const referral =
-    referralSnapshot.data();
-
-
-if (
-    referral.active !== true
-) {
-
-    throw new Error(
-        "Referral code is inactive."
-    );
-
-}
-
-
-/*
-----------------------------------------------------------
-IMPORTANT
-
-A browser-generated ID is used for the referral
-transaction.
-
-This lets the same customer continue their referral
-without exposing their personal information.
-----------------------------------------------------------
-*/
-
-let customerReferralId =
-    localStorage.getItem(
-        "customerReferralId"
-    );
-
-
-if (!customerReferralId) {
-
-    customerReferralId =
-        crypto.randomUUID();
-
-
-    localStorage.setItem(
-        "customerReferralId",
-        customerReferralId
-    );
-
-}
-
-
-const existingReferral =
-    localStorage.getItem(
-        "activeReferralCode"
-    );
-
-
-if (existingReferral) {
-
-    if (
-        existingReferral === code
-    ) {
-
-        return {
-
-            alreadyActive:
-                true,
-
-            referralId:
-                customerReferralId
-
-        };
-
-    }
-
-}
-
-
-await setDoc(
-    doc(
-        db,
-        "referralUses",
-        customerReferralId
-    ),
-    {
-
-        referralId:
-            customerReferralId,
-
-        referralCode:
-            code,
-
-        referrerName:
-            referral.referrerName,
-
-        status:
-            "pending",
-
-        rewardStatus:
-            "none",
-
-        createdAt:
-            new Date().toISOString(),
-
-        approvedAt:
-            null,
-
-        rewardedAt:
-            null
-
-    }
-);
-
-
-localStorage.setItem(
-    "activeReferralCode",
-    code
-);
-
-
-return {
-
-    alreadyActive:
-        false,
-
-    referralId:
-        customerReferralId
-
-};
-```
-
-}
-
-// ==========================================================
-// USE REFERRAL CODE
-// ==========================================================
-
-if (submitReferralButton) {
-
-```
-submitReferralButton.addEventListener(
-    "click",
-    async () => {
-
-        const code =
-            useReferralCode.value
-                .trim()
-                .toUpperCase();
-
-
-        if (!code) {
-
-            useReferralMessage.textContent =
-                "Please enter a referral code.";
-
-            useReferralMessage.style.color =
-                "red";
-
-            return;
-
-        }
-
-
-        submitReferralButton.disabled =
-            true;
-
-
-        submitReferralButton.textContent =
-            "Checking...";
-
-
-        try {
-
-            const result =
-                await createReferralUse(
-                    code
-                );
-
-
-            if (
-                result.alreadyActive
-            ) {
-
-                useReferralMessage.textContent =
-                    "This referral code is already active for this customer.";
-
-            }
-
-            else {
-
-                useReferralMessage.textContent =
-                    "Referral code accepted! Your purchase can now be reviewed by the shop owner.";
-
-            }
-
-
-            useReferralMessage.style.color =
-                "green";
-
-
-            useReferralCode.value =
-                code;
-
-        }
-
-        catch (error) {
-
-            console.error(
-                "Referral code error:",
-                error
-            );
-
-
-            useReferralMessage.textContent =
-                error.message ||
-                "Unable to verify the referral code.";
-
-            useReferralMessage.style.color =
-                "red";
-
-        }
-
-        finally {
-
-            submitReferralButton.disabled =
-                false;
-
-
-            submitReferralButton.textContent =
-                "Use Referral Code";
-
-        }
-
-    }
-);
-```
-
-}
-
-// ==========================================================
-// START
-// ==========================================================
-
-loadMyReferralCode();
-
-// ==========================================================
-// EXPORT
-// ==========================================================
-
-export {
-
-```
-generateCode,
-
-createUniqueCode,
-
-createReferralUse
-```
-
-};
+</html>
