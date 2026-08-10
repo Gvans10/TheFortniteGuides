@@ -14,11 +14,36 @@ Grayson's Snack Shop Admin
 </title>
 
 
-<link rel="icon" type="image/png" href="graysonslogos.png">
+<link
+    rel="icon"
+    type="image/png"
+    href="graysonslogos.png"
+>
 
 
-<link rel="stylesheet" href="style.css">
+<link
+    rel="stylesheet"
+    href="style.css"
+>
 
+
+<link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+>
+
+
+<link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+>
+
+
+<link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+>
 
 </head>
 
@@ -55,22 +80,24 @@ Back To Shop
 
 
 
-
-
-
-
 <section class="admin-section">
 
 
 
-<div id="loginBox" class="admin-box">
+<!-- =====================================================
+     LOGIN
+===================================================== -->
 
+
+<div
+    id="loginBox"
+    class="admin-box"
+>
 
 
 <h1>
 Admin Login
 </h1>
-
 
 
 <p>
@@ -79,33 +106,21 @@ Owner Access Only
 
 
 
-
-
 <input
-
-id="username"
-
-type="text"
-
-placeholder="Username"
-
+    id="username"
+    type="email"
+    placeholder="Admin Email"
+    autocomplete="email"
 >
 
 
 
-
-
 <input
-
-id="password"
-
-type="password"
-
-placeholder="Password"
-
+    id="password"
+    type="password"
+    placeholder="Password"
+    autocomplete="current-password"
 >
-
-
 
 
 
@@ -117,10 +132,7 @@ Login
 
 
 
-
-
 <p id="loginMessage"></p>
-
 
 
 </div>
@@ -129,15 +141,15 @@ Login
 
 
 
+<!-- =====================================================
+     DASHBOARD
+===================================================== -->
 
 
-
-
-
-
-
-
-<div id="dashboard" class="admin-box hidden">
+<div
+    id="dashboard"
+    class="admin-box hidden"
+>
 
 
 
@@ -147,6 +159,170 @@ Inventory Dashboard
 
 
 
+<p id="adminWelcome">
+Admin Dashboard
+</p>
+
+
+
+
+
+<!-- =====================================================
+     PROMOTION CONTROL
+===================================================== -->
+
+
+<div class="admin-section-card">
+
+
+<h2>
+🎉 Promotion Control
+</h2>
+
+
+<p>
+Control your active promotion from here.
+</p>
+
+
+
+<label>
+Promotion Name
+</label>
+
+
+<input
+    id="promotionName"
+    placeholder="Promotion Name"
+>
+
+
+
+<label>
+Description
+</label>
+
+
+<textarea
+    id="promotionDescription"
+    placeholder="Promotion description"
+    rows="4"
+></textarea>
+
+
+
+<label class="checkbox-label">
+
+
+<input
+    id="promotionActive"
+    type="checkbox"
+>
+
+
+<span>
+Promotion Active
+</span>
+
+
+</label>
+
+
+
+<label>
+Start Date & Time
+</label>
+
+
+<input
+    id="promotionStart"
+    type="datetime-local"
+>
+
+
+
+<label>
+End Date & Time
+</label>
+
+
+<input
+    id="promotionEnd"
+    type="datetime-local"
+>
+
+
+
+<label>
+Qualifying Product
+</label>
+
+
+<select
+    id="qualifyingProduct"
+>
+
+<option value="">
+Select Product
+</option>
+
+</select>
+
+
+
+<label>
+Reward Product
+</label>
+
+
+<select
+    id="rewardProduct"
+>
+
+<option value="">
+Select Product
+</option>
+
+</select>
+
+
+
+<label>
+Reward Quantity
+</label>
+
+
+<input
+    id="rewardQuantity"
+    type="number"
+    min="1"
+    value="1"
+>
+
+
+
+<button
+    id="savePromotion"
+>
+
+Save Promotion
+
+</button>
+
+
+
+<p id="promotionMessage"></p>
+
+
+</div>
+
+
+
+
+
+<!-- =====================================================
+     ADD PRODUCT
+===================================================== -->
 
 
 <h2>
@@ -155,83 +331,43 @@ Add New Product
 
 
 
-
-
-
-
 <input
-
-id="newName"
-
-placeholder="Product Name"
-
+    id="newName"
+    placeholder="Product Name"
 >
 
 
 
-
-
-
-
 <input
-
-id="newPrice"
-
-type="number"
-
-step="0.01"
-
-placeholder="Price"
-
+    id="newPrice"
+    type="number"
+    step="0.01"
+    min="0"
+    placeholder="Price"
 >
 
 
 
-
-
-
-
 <input
-
-id="newStock"
-
-type="number"
-
-placeholder="Stock Amount"
-
+    id="newStock"
+    type="number"
+    min="0"
+    placeholder="Stock Amount"
 >
 
 
 
-
-
-
-
 <input
-
-id="newRestock"
-
-placeholder="Restock Date"
-
+    id="newRestock"
+    placeholder="Restock Date"
 >
 
 
 
-
-
-
-
 <input
-
-id="newImage"
-
-placeholder="Image Path (example: images/takis.png)"
-
+    id="newImage"
+    placeholder="Image Filename (example: chips.png)"
 >
-
-
-
-
 
 
 
@@ -245,15 +381,14 @@ Add Product
 
 
 
-
-
+<!-- =====================================================
+     CURRENT PRODUCTS
+===================================================== -->
 
 
 <h2>
 Current Products
 </h2>
-
-
 
 
 
@@ -263,7 +398,9 @@ Current Products
 
 
 
-
+<!-- =====================================================
+     LOGOUT
+===================================================== -->
 
 
 <button id="logout">
@@ -273,14 +410,7 @@ Logout
 </button>
 
 
-
-
-
 </div>
-
-
-
-
 
 
 </section>
@@ -289,15 +419,12 @@ Logout
 
 
 
-
-
-
-
-<script type="module" src="admin.js"></script>
-
+<script
+    type="module"
+    src="admin.js"
+></script>
 
 
 </body>
-
 
 </html>
