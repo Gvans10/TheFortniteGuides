@@ -1,491 +1,221 @@
-```html
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>
-        Grayson's Snack Shop - Admin
-    </title>
 
-    <link
-        rel="icon"
-        type="image/png"
-        href="graysonslogos.png"
-    >
+<title>
+Grayson's Snack Shop Admin
+</title>
 
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+<link rel="icon" type="image/png" href="graysonslogos.png">
+
+<link rel="stylesheet" href="style.css">
 
 </head>
+
 
 
 <body>
 
 
-<!-- ==========================================================
-     HEADER
-========================================================== -->
-
 <header>
 
-    <nav class="navbar">
-
-        <div class="logo">
-
-            <img
-                src="graysonslogos.png"
-                alt="Grayson's Snack Shop"
-            >
-
-            <span>
-                Grayson's Snack Shop
-            </span>
-
-        </div>
+<nav class="navbar">
 
 
-        <div class="nav-links">
+<div class="logo">
 
-            <a href="index.html">
-                Back To Shop
-            </a>
+🍬 Admin Panel
 
-        </div>
+</div>
 
-    </nav>
+
+<a href="index.html">
+
+Back To Shop
+
+</a>
+
+
+</nav>
 
 </header>
 
 
 
-<!-- ==========================================================
-     LOGIN
-========================================================== -->
-
-<section
-    id="loginBox"
-    class="admin-login"
->
-
-    <div class="admin-card">
-
-        <h1>
-            🍬 Admin Panel
-        </h1>
-
-        <p>
-            Sign in to manage Grayson's Snack Shop.
-        </p>
 
 
-        <input
-            id="username"
-            type="email"
-            placeholder="Admin Email"
-            autocomplete="email"
-        >
-
-
-        <input
-            id="password"
-            type="password"
-            placeholder="Password"
-            autocomplete="current-password"
-        >
-
-
-        <button
-            id="loginButton"
-            type="button"
-        >
-            Login
-        </button>
-
-
-        <p
-            id="loginMessage"
-            class="admin-message"
-        ></p>
-
-    </div>
-
-</section>
+<section class="admin-section">
 
 
 
-<!-- ==========================================================
-     DASHBOARD
-========================================================== -->
+<div id="loginBox" class="admin-box">
 
-<main
-    id="dashboard"
-    class="hidden"
+
+<h1>
+Admin Login
+</h1>
+
+
+<p>
+Owner Access Only
+</p>
+
+
+
+<input
+id="username"
+type="text"
+placeholder="Username"
 >
 
 
-    <section class="admin-header">
-
-        <div>
-
-            <h1>
-                Admin Dashboard
-            </h1>
-
-            <p>
-                Manage your products, inventory, promotions,
-                and referrals.
-            </p>
-
-        </div>
 
 
-        <button
-            id="logout"
-            type="button"
-        >
-            Logout
-        </button>
-
-    </section>
+<input
+id="password"
+type="password"
+placeholder="Password"
+>
 
 
 
-<!-- ==========================================================
-     PRODUCTS
-========================================================== -->
 
-<section class="admin-section">
+<button id="loginButton">
 
-    <div class="section-heading">
+Login
 
-        <div>
-
-            <h2>
-                📦 Current Products
-            </h2>
-
-            <p>
-                Edit your existing snacks below.
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <div
-        id="adminProducts"
-        class="admin-products"
-    >
-
-        <p>
-            Loading products...
-        </p>
-
-    </div>
-
-</section>
+</button>
 
 
 
-<!-- ==========================================================
-     ADD PRODUCT
-========================================================== -->
 
-<section class="admin-section">
-
-    <div class="section-heading">
-
-        <div>
-
-            <h2>
-                ➕ Add Product
-            </h2>
-
-            <p>
-                Add a new snack to your inventory.
-            </p>
-
-        </div>
-
-    </div>
+<p id="loginMessage"></p>
 
 
-    <div class="admin-form">
 
-        <input
-            id="newName"
-            type="text"
-            placeholder="Product Name"
-        >
+</div>
 
 
-        <input
-            id="newPrice"
-            type="number"
-            step="0.01"
-            min="0"
-            placeholder="Price"
-        >
 
 
-        <input
-            id="newStock"
-            type="number"
-            min="0"
-            placeholder="Stock Amount"
-        >
 
 
-        <input
-            id="newRestock"
-            type="text"
-            placeholder="Restock Date"
-        >
+
+<div id="dashboard" class="admin-box hidden">
 
 
-        <input
-            id="newImage"
-            type="text"
-            placeholder="Image Filename (example: chips.png)"
-        >
+
+<h1>
+Inventory Dashboard
+</h1>
 
 
-        <button
-            id="addProduct"
-            type="button"
-        >
-            Add Product
-        </button>
 
-    </div>
+
+<h2>
+Add New Product
+</h2>
+
+
+
+
+<input
+id="newName"
+placeholder="Product Name"
+>
+
+
+
+
+<input
+id="newPrice"
+type="number"
+placeholder="Price"
+>
+
+
+
+
+<input
+id="newStock"
+type="number"
+placeholder="Stock Amount"
+>
+
+
+
+
+<input
+id="newRestock"
+placeholder="Restock Date"
+>
+
+
+
+
+<input
+id="newImage"
+placeholder="Image Filename"
+>
+
+
+
+
+<button id="addProduct">
+
+Add Product
+
+</button>
+
+
+
+
+
+
+<h2>
+Current Products
+</h2>
+
+
+
+
+<div id="adminProducts"></div>
+
+
+
+
+
+<button id="logout">
+
+Logout
+
+</button>
+
+
+
+
+</div>
+
+
+
 
 </section>
 
 
 
-<!-- ==========================================================
-     PROMOTIONS
-========================================================== -->
 
-<section class="admin-section">
 
-    <div class="section-heading">
 
-        <div>
-
-            <h2>
-                🎉 Promotions
-            </h2>
-
-            <p>
-                Create and manage your current promotion.
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <div class="admin-form">
-
-
-        <label for="promotionName">
-            Promotion Name
-        </label>
-
-
-        <input
-            id="promotionName"
-            type="text"
-            placeholder="Example: Bring a Friend"
-        >
-
-
-        <label>
-
-            <input
-                id="promotionActive"
-                type="checkbox"
-            >
-
-            Promotion Active
-
-        </label>
-
-
-        <label for="promotionStart">
-            Start Date
-        </label>
-
-
-        <input
-            id="promotionStart"
-            type="datetime-local"
-        >
-
-
-        <label for="promotionEnd">
-            End Date
-        </label>
-
-
-        <input
-            id="promotionEnd"
-            type="datetime-local"
-        >
-
-
-        <label for="qualifyingProduct">
-            Qualifying Product
-        </label>
-
-
-        <select
-            id="qualifyingProduct"
-        >
-
-            <option value="">
-                Select qualifying product
-            </option>
-
-        </select>
-
-
-        <label for="rewardProduct">
-            Reward Product
-        </label>
-
-
-        <select
-            id="rewardProduct"
-        >
-
-            <option value="">
-                Select reward product
-            </option>
-
-        </select>
-
-
-        <label for="rewardQuantity">
-            Reward Quantity
-        </label>
-
-
-        <input
-            id="rewardQuantity"
-            type="number"
-            min="1"
-            value="1"
-        >
-
-
-        <div class="admin-button-row">
-
-            <button
-                id="savePromotion"
-                type="button"
-            >
-                Save Promotion
-            </button>
-
-
-            <button
-                id="deletePromotion"
-                type="button"
-                class="danger-button"
-            >
-                Delete Promotion
-            </button>
-
-        </div>
-
-
-        <p id="promotionMessage"></p>
-
-    </div>
-
-</section>
-
-
-
-<!-- ==========================================================
-     REFERRALS
-========================================================== -->
-
-<section class="admin-section">
-
-    <div class="section-heading">
-
-        <div>
-
-            <h2>
-                👥 Customer Referrals
-            </h2>
-
-            <p>
-                Review referral purchases and approve rewards.
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <div
-        id="adminReferrals"
-        class="admin-referrals"
-    >
-
-        <p>
-            Referral management will appear here.
-        </p>
-
-    </div>
-
-</section>
-
-
-
-<!-- ==========================================================
-     ADMIN FOOTER
-========================================================== -->
-
-<footer class="admin-footer">
-
-    <p>
-        Grayson's Snack Shop Admin Panel
-    </p>
-
-</footer>
-
-
-</main>
-
-
-
-<!-- ==========================================================
-     JAVASCRIPT
-========================================================== -->
-
-<script
-    type="module"
-    src="admin.js"
-></script>
+<script type="module" src="admin.js"></script>
 
 
 </body>
 
 </html>
-```
